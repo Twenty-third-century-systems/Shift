@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\css\admin_lte" />
+      <Folder Include="wwwroot\img\admin_lte" />
+      <Folder Include="wwwroot\js\admin_lte" />
+    </ItemGroup>
+
+</Project>
