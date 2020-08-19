@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Dab.Models;
 
-namespace Dab.Controllers
-{
-    public class HomeController : Controller
-    {
+namespace Dab.Controllers {
+    public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)

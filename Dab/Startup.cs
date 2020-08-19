@@ -9,10 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Dab
-{
-    public class Startup
-    {
+namespace Dab {
+    public class Startup {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -42,7 +40,7 @@ namespace Dab
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseNodeModules();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -51,7 +49,7 @@ namespace Dab
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{Id?}");
             });
         }
     }

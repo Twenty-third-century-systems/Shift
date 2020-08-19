@@ -7,10 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Dab
-{
-    public class Program
-    {
+namespace Dab {
+    public class Program {
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
