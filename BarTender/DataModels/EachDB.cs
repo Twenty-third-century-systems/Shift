@@ -9,7 +9,7 @@
 
 using System;
 using System.Linq;
-
+using BarTender.DataModels;
 using LinqToDB;
 using LinqToDB.Configuration;
 using LinqToDB.Mapping;
@@ -29,7 +29,7 @@ namespace BarTender.DataModels
 		public ITable<ForeignEntity>             ForeignEntities             { get { return this.GetTable<ForeignEntity>(); } }
 		public ITable<MemoObject>                MemoObjects                 { get { return this.GetTable<MemoObject>(); } }
 		public ITable<Memorundum>                Memorundums                 { get { return this.GetTable<Memorundum>(); } }
-		public ITable<Name>                      Names                       { get { return this.GetTable<Name>(); } }
+		public ITable<Name>                      Name                       { get { return this.GetTable<Name>(); } }
 		public ITable<NameSearch>                NameSearches                { get { return this.GetTable<NameSearch>(); } }
 		public ITable<Office>                    Offices                     { get { return this.GetTable<Office>(); } }
 		public ITable<PvtEntity>                 PvtEntities                 { get { return this.GetTable<PvtEntity>(); } }
@@ -53,7 +53,7 @@ namespace BarTender.DataModels
 			// InitDataContext();
 			// InitMappingSchema();
 		}
-
+		//
 		// partial void InitDataContext  ();
 		// partial void InitMappingSchema();
 	}
@@ -123,9 +123,10 @@ namespace BarTender.DataModels
 	public partial class NameSearch
 	{
 		[Column("id"),                PrimaryKey,  NotNull] public string    Id              { get; set; } // nvarchar(50)
+		[Column("service"),                        NotNull] public int       Service         { get; set; } // int
 		[Column("date_submitted"),                 NotNull] public DateTime  DateSubmitted   { get; set; } // datetime2(6)
 		[Column("justification"),                  NotNull] public string    Justification   { get; set; } // nvarchar(200)
-		[Column("designation"),                    NotNull] public string    Designation     { get; set; } // nvarchar(45)
+		[Column("designation_id"),                 NotNull] public int    DesignationId      { get; set; } // nvarchar(45)
 		[Column("date_examined"),        Nullable         ] public DateTime? DateExamined    { get; set; } // datetime2(6)
 		[Column("expiry_date"),                    NotNull] public DateTime  ExpiryDate      { get; set; } // datetime2(6)
 		[Column("application_id"),                 NotNull] public int       ApplicationId   { get; set; } // int

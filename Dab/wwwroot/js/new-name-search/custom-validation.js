@@ -76,18 +76,19 @@ $(document).ready(function () {
                 minlength: 'Must be at least Four characters'
             },
         },
-        submitHandler:function(form){
-            console.log(readyForSubmission);
+        submitHandler:function(form){           
             if(readyForSubmission){
                 $.ajax({
-                    type: form.attr('method'),
-                    url: form.attr('action'),
-                    data: form.serialize(),
+                    type: 'Post',
+                    url: '/name-search/submission',
+                    data: $(form).serialize(),
                     success: function (data) {
-                        //alert('Office saved');
+                        toastr.success('Your application has been submitted');
+                        toastr.options.onShown(window.location.href = "https://localhost:44381/")
+                        
                     },
                     error: function (err) {
-                        alert("Error");
+                        toastr.error('Something went wrong in submitting the application');
                     },
                 });
             }else {

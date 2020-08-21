@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using BarTender.Models;
+using Dab.Models;
 
-namespace BarTender.Dtos {
+namespace Dab.Dtos {
     public class NameSearchResponseDto {
         public Guid Id { get; set; }
         public NameSearchDetails Details { get; set; }

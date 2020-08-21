@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace BarTender.Dtos {
+﻿namespace Dab.Dtos {
     public class NewNameSearchDto {
-        public Guid Id { get; set; }
         public int Reason { get; set; }
         public int Type { get; set; }
         public int Designation { get; set; }
