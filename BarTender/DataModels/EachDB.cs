@@ -70,6 +70,7 @@ namespace BarTender.DataModels
 	public partial class Application
 	{
 		[Column("id"),             PrimaryKey,  Identity] public int  Id            { get; set; } // int
+		[Column("user_id"),         NotNull              ] public string  UserId        { get; set; } // int
 		[Column("status"),         NotNull              ] public int  Status        { get; set; } // int
 		[Column("sorting_office"), NotNull              ] public int  SortingOffice { get; set; } // int
 		[Column("credit_id"),         Nullable          ] public int? CreditId      { get; set; } // int

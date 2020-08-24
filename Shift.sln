@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dab", "Dab\Dab.csproj", "{2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoneyCounter", "MoneyCounter\MoneyCounter.csproj", "{BD2CFE13-3A58-497D-80CC-FD99F7362A59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bouncer", "Bouncer\Bouncer.csproj", "{DDBAED2A-F284-41F7-BAC3-6F410BC0AD81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bouncer", "Bouncer\Bouncer.csproj", "{7DFEF67A-9FAA-410C-A546-7AB60C198A1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,9 +26,9 @@ Global
 		{BD2CFE13-3A58-497D-80CC-FD99F7362A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD2CFE13-3A58-497D-80CC-FD99F7362A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD2CFE13-3A58-497D-80CC-FD99F7362A59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDBAED2A-F284-41F7-BAC3-6F410BC0AD81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDBAED2A-F284-41F7-BAC3-6F410BC0AD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDBAED2A-F284-41F7-BAC3-6F410BC0AD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDBAED2A-F284-41F7-BAC3-6F410BC0AD81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DFEF67A-9FAA-410C-A546-7AB60C198A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DFEF67A-9FAA-410C-A546-7AB60C198A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DFEF67A-9FAA-410C-A546-7AB60C198A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DFEF67A-9FAA-410C-A546-7AB60C198A1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

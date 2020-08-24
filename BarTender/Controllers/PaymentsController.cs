@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BarTender.Controllers
 {
+    [Route("payments")]
     public class PaymentsController : Controller
     {
-        // GET
-        public IActionResult Index()
+        [HttpGet("claims")]
+        public IActionResult Get()
         {
-            return Ok();
+            return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
         }
     }
 }

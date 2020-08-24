@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Dab.Models;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace Dab.Controllers {
     public class HomeController : Controller {
@@ -16,8 +22,18 @@ namespace Dab.Controllers {
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
+                    .ReadAsStringAsync();
+                user = JsonConvert.DeserializeObject<User>(response);
+                ViewBag.User = user;
+            }
             return View();
         }
 

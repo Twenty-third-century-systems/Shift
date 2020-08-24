@@ -7,6 +7,9 @@ using BarTender.Dtos;
 using Dab.Dtos;
 using Dab.Globals;
 using Dab.Models;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -22,6 +25,8 @@ namespace Dab.Controllers {
             {
                 try
                 {
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    client.SetBearerToken(accessToken);
                     var response = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
                         .ReadAsStringAsync();
                     var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(response);
@@ -70,6 +75,8 @@ namespace Dab.Controllers {
                     if(!string.IsNullOrEmpty(newNameDetails.Name5))
                     nameSearchRequest.Names.Add(newNameDetails.Name5);
                     
+                    var accessToken = await HttpContext.GetTokenAsync("access_token");
+                    client.SetBearerToken(accessToken);
                     var response = await client
                         .PostAsJsonAsync<NameSearchRequestDto>(ApiUrls.SubmitNameSearchUrl, nameSearchRequest).Result.Content
                         .ReadAsStringAsync();

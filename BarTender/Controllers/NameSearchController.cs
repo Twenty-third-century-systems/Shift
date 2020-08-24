@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using BarTender.DataModels;
 using BarTender.Dtos;
+using BarTender.Models;
 using BarTender.Repositories;
+using IdentityModel.Client;
 using LinqToDB;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BarTender.Controllers {
     [Route("api/name")]
@@ -27,16 +34,29 @@ namespace BarTender.Controllers {
         [HttpGet("defaults")]
         public IActionResult GetDefaults()
         {
+            var userClaims = User.Claims;
             var defaults = _nameSearchRepository.GetDefaults(_poleDb, _shwaDb);
             return Ok(defaults);
         }
 
         [HttpPost("submit")]
-        public IActionResult PostNewNameSearch([FromBody] NameSearchRequestDto details)
+        public async Task<IActionResult> PostNewNameSearch([FromBody] NameSearchRequestDto details)
         {
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
+                    .ReadAsStringAsync();
+                user = JsonConvert.DeserializeObject<User>(response);
+            }
+            
+
             int status = 1;
 
             var applicationID = _eachDb.Applications
+                .Value(a=> a.UserId, user.Sub)
                 .Value(a => a.Status, status)
                 .Value(a => a.SortingOffice, details.Details.SortingOffice)
                 .InsertWithInt32Identity();
@@ -46,14 +66,14 @@ namespace BarTender.Controllers {
                 Guid nameSearchId = Guid.NewGuid();
                 int nameSearchSubmissionResult = _eachDb.NameSearches
                     .Value(b => b.Id, nameSearchId.ToString())
-                    .Value(b => b.Service, details.Details.TypeOfEntity) 
+                    .Value(b => b.Service, details.Details.TypeOfEntity)
                     .Value(b => b.DateSubmitted, DateTime.Now)
                     .Value(b => b.Justification, details.Details.Justification)
                     .Value(b => b.DesignationId, details.Details.Designation)
                     .Value(b => b.ExpiryDate, DateTime.Now.AddDays(30))
                     .Value(b => b.ApplicationId, applicationID)
                     .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
-                    .Value(b=> b.Reference, Guid.NewGuid().ToString())
+                    .Value(b => b.Reference, Guid.NewGuid().ToString())
                     .Insert();
                 if (nameSearchSubmissionResult == 1)
                 {

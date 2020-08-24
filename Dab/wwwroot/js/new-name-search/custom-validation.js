@@ -84,8 +84,7 @@ $(document).ready(function () {
                     data: $(form).serialize(),
                     success: function (data) {
                         toastr.success('Your application has been submitted');
-                        toastr.options.onShown(window.location.href = "https://localhost:44381/")
-                        
+                        $('#name-search-form').reset();
                     },
                     error: function (err) {
                         toastr.error('Something went wrong in submitting the application');
