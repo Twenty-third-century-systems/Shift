@@ -51,65 +51,79 @@ namespace BarTender.Controllers {
                     .ReadAsStringAsync();
                 user = JsonConvert.DeserializeObject<User>(response);
             }
-            
+
 
             int status = 1;
 
-            var applicationID = _eachDb.Applications
-                .Value(a=> a.UserId, user.Sub)
-                .Value(a => a.Status, status)
-                .Value(a => a.SortingOffice, details.Details.SortingOffice)
-                .InsertWithInt32Identity();
+            var service = (
+                from value in _poleDb.Services
+                where value.Description == "name search"
+                select value
+            ).FirstOrDefault();
 
-            if (applicationID != null)
+            if (service != null)
             {
-                Guid nameSearchId = Guid.NewGuid();
-                int nameSearchSubmissionResult = _eachDb.NameSearches
-                    .Value(b => b.Id, nameSearchId.ToString())
-                    .Value(b => b.Service, details.Details.TypeOfEntity)
-                    .Value(b => b.DateSubmitted, DateTime.Now)
-                    .Value(b => b.Justification, details.Details.Justification)
-                    .Value(b => b.DesignationId, details.Details.Designation)
-                    .Value(b => b.ExpiryDate, DateTime.Now.AddDays(30))
-                    .Value(b => b.ApplicationId, applicationID)
-                    .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
-                    .Value(b => b.Reference, Guid.NewGuid().ToString())
-                    .Insert();
-                if (nameSearchSubmissionResult == 1)
-                {
-                    int namesSubmited = 0;
-                    foreach (var name in details.Names)
-                    {
-                        int nameStatus = 7;
-                        namesSubmited += _eachDb.Name
-                            .Value(c => c.Value, name)
-                            .Value(c => c.Status, nameStatus)
-                            .Value(c => c.NameSearchId, nameSearchId.ToString())
-                            .Insert();
-                    }
+                var applicationId = _eachDb.Applications
+                    .Value(a => a.UserId, user.Sub)
+                    .Value(a => a.ServiceId, service.Id)
+                    .Value(a => a.DateSubmitted, DateTime.Now)
+                    .Value(a => a.Status, status)
+                    .Value(a => a.SortingOffice, details.Details.SortingOffice)
+                    .InsertWithInt32Identity();
 
-                    if (namesSubmited >= 2)
+                if (applicationId != null)
+                {
+                    Guid nameSearchId = Guid.NewGuid();
+                    int nameSearchSubmissionResult = _eachDb.NameSearches
+                        .Value(b => b.Id, nameSearchId.ToString())
+                        .Value(b => b.Service, details.Details.TypeOfEntity)
+                        .Value(b => b.Justification, details.Details.Justification)
+                        .Value(b => b.DesignationId, details.Details.Designation)
+                        .Value(b => b.ExpiryDate, DateTime.Now.AddDays(30))
+                        .Value(b => b.ApplicationId, applicationId)
+                        .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
+                        .Value(b => b.Reference, Guid.NewGuid().ToString())
+                        .Insert();
+                    if (nameSearchSubmissionResult == 1)
                     {
-                        return Created("/submited", new NameSearchResponseDto
+                        int namesSubmited = 0;
+                        foreach (var name in details.Names)
                         {
-                            Id = nameSearchId,
-                            Details = details.Details,
-                            Names = details.Names
-                        });
+                            int nameStatus = 7;
+                            namesSubmited += _eachDb.Name
+                                .Value(c => c.Value, name)
+                                .Value(c => c.Status, nameStatus)
+                                .Value(c => c.NameSearchId, nameSearchId.ToString())
+                                .Insert();
+                        }
+
+                        if (namesSubmited >= 2)
+                        {
+                            return Created("/submited", new NameSearchResponseDto
+                            {
+                                Id = nameSearchId,
+                                Details = details.Details,
+                                Names = details.Names
+                            });
+                        }
+                        else
+                        {
+                            return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert Names");
+                        }
                     }
                     else
                     {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert Names");
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert Name search");
                     }
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert Name search");
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create application");
                 }
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create application");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong");
             }
         }
     }

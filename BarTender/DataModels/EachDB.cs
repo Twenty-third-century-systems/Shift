@@ -71,6 +71,8 @@ namespace BarTender.DataModels
 	{
 		[Column("id"),             PrimaryKey,  Identity] public int  Id            { get; set; } // int
 		[Column("user_id"),         NotNull              ] public string  UserId        { get; set; } // int
+		[Column("service_id"),         NotNull              ] public int  ServiceId        { get; set; } // int
+		[Column("date_submitted"),         NotNull              ] public DateTime  DateSubmitted        { get; set; } // int
 		[Column("status"),         NotNull              ] public int  Status        { get; set; } // int
 		[Column("sorting_office"), NotNull              ] public int  SortingOffice { get; set; } // int
 		[Column("credit_id"),         Nullable          ] public int? CreditId      { get; set; } // int
@@ -125,7 +127,7 @@ namespace BarTender.DataModels
 	{
 		[Column("id"),                PrimaryKey,  NotNull] public string    Id              { get; set; } // nvarchar(50)
 		[Column("service"),                        NotNull] public int       Service         { get; set; } // int
-		[Column("date_submitted"),                 NotNull] public DateTime  DateSubmitted   { get; set; } // datetime2(6)
+		
 		[Column("justification"),                  NotNull] public string    Justification   { get; set; } // nvarchar(200)
 		[Column("designation_id"),                 NotNull] public int    DesignationId      { get; set; } // nvarchar(45)
 		[Column("date_examined"),        Nullable         ] public DateTime? DateExamined    { get; set; } // datetime2(6)

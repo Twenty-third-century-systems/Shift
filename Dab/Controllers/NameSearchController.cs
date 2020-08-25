@@ -25,11 +25,16 @@ namespace Dab.Controllers {
             {
                 try
                 {
+                    User user;
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
                     client.SetBearerToken(accessToken);
-                    var response = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
+                    var apiResponse = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
                         .ReadAsStringAsync();
-                    var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(response);
+                    var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(apiResponse);
+                    var userManagementResponse = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
+                        .ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(userManagementResponse);
+                    ViewBag.User = user;
                     ViewBag.Defaults = nameSearchDefaults;
                 }
                 catch (Exception ex)
