@@ -32,7 +32,7 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label>Reason for search: </label>
+                        <label>Reason for search </label>
                         <select class="form-control select2" name="reason">
                             <option selected="selected"></option>
                             @foreach (var value in ViewBag.Defaults.Reasons)
@@ -44,7 +44,7 @@
                     <!-- /.form-group -->
 
                     <div class="form-group">
-                        <label>Type of entity: </label>
+                        <label>Type of entity </label>
                         <select class="form-control select2" name="type">
                             <option selected="selected"></option>
                             @foreach (var value in ViewBag.Defaults.Types)
@@ -56,7 +56,7 @@
                     <!-- /.form-group -->
 
                     <div class="form-group">
-                        <label>Designation: </label>
+                        <label>Designation </label>
                         <select class="form-control select2" name="designation">
                             <option selected="selected"></option>
                             @foreach (var value in ViewBag.Defaults.Designations)
@@ -68,7 +68,7 @@
                     <!-- /.form-group -->
 
                     <div class="form-group">
-                        <label>Sorting office: </label>
+                        <label>Sorting office </label>
                         <select class="form-control select2" name="office">
                             <option selected="selected"></option>
                             @foreach (var value in ViewBag.Defaults.Sorters)
@@ -138,7 +138,10 @@
             <!-- /.card -->
 
             <!-- done -->
-            <button type="submit" class="btn btn-info pull-right">Done</button>
+            <div class="float-right">
+                <button type="submit" class="btn btn-info pull-right">Done</button>
+            </div>
+            
             <!-- /.done -->
         </div>
 

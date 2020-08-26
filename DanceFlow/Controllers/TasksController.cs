@@ -16,16 +16,17 @@ namespace DanceFlow.Controllers {
             return View();
         }
 
-        [HttpGet("name-search/{task}/{nameSearch}")]
-        public IActionResult NameSearch(int task, string nameSearch)
+        [HttpGet("name-search/{task}")]
+        public IActionResult NameSearches(int task)
         {
-            return Ok();
+            
+            return View();
         }
         
-        [HttpGet("pvt-entity/{task}/{nameSearch}")]
-        public IActionResult PvtEntity(int task, string nameSearch)
+        [HttpGet("pvt-entity/{task}")]
+        public IActionResult PvtEntity(int task)
         {
-            return Ok();
+            return View();
         }
     }
 }

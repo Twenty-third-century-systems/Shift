@@ -1,11 +1,9 @@
 ﻿let readyForSubmission = false;
 
 $(document).ready(function () {
-    // $.validator.setDefaults({
-    //     submitHandler: function () {
-    //         alert( "Form successful submitted!" );
-    //     }
-    // });
+    jQuery.validator.addMethod("noSpace", function(value, element) {
+        return value.indexOf(" ") < 0 && value != "";
+    }, "No space");
 
     $('#name-search-form').validate({
         rules: {
@@ -23,28 +21,34 @@ $(document).ready(function () {
             },
             justification: {
                 required: true,
+                noSpace:true
             },
             name1: {
                 required: true,
-                minlength: 4
+                minlength: 4,
+                noSpace:true
             },
             name2: {
                 required: true,
-                minlength: 4
+                minlength: 4,
+                noSpace:true
             },
             name3: {
-                minlength: 4
+                minlength: 4,
+                noSpace:true
             },
             name4: {
-                minlength: 4
+                minlength: 4,
+                noSpace:true
             },
             name5: {
-                minlength: 4
+                minlength: 4,
+                noSpace:true
             },
         },
         messages: {
             reason: {
-                required: 'This information is required'
+                required: 'This information is required',
             },
             type: {
                 required: 'This information is required'
@@ -56,24 +60,27 @@ $(document).ready(function () {
                 required: 'This information is required'
             },
             justification: {
-                required: 'This information is required'
+                required: 'This information is required',
+                noSpace:'Spaces are not allowed'
             },
             name1: {
                 required: 'This information is required',
-                minlength: 'Must be at least Four characters'
+                minlength: 'Must be at least Four characters',
+                noSpace:'Spaces are not allowed'
             },
             name2: {
                 required: 'This information is required',
-                minlength: 'Must be at least Four characters'
+                minlength: 'Must be at least Four characters',
+                noSpace:'Spaces are not allowed'
             },
             name3: {
-                minlength: 'Must be at least Four characters'
+                minlength: 'Must be at least Four characters',
             },
             name4: {
-                minlength: 'Must be at least Four characters'
+                minlength: 'Must be at least Four characters',
             },
             name5: {
-                minlength: 'Must be at least Four characters'
+                minlength: 'Must be at least Four characters',
             },
         },
         submitHandler:function(form){           
@@ -84,7 +91,7 @@ $(document).ready(function () {
                     data: $(form).serialize(),
                     success: function (data) {
                         toastr.success('Your application has been submitted');
-                        $('#name-search-form').reset();
+                        $('#name-search-form').trigger('reset');
                     },
                     error: function (err) {
                         toastr.error('Something went wrong in submitting the application');

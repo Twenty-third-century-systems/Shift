@@ -38,7 +38,7 @@ namespace DJ.DataModels
 		public ITable<Role>                      Roles                       { get { return this.GetTable<Role>(); } }
 		public ITable<Subcriber>                 Subcribers                  { get { return this.GetTable<Subcriber>(); } }
 		public ITable<Subscription>              Subscriptions               { get { return this.GetTable<Subscription>(); } }
-		public ITable<Task>                      Tasks                       { get { return this.GetTable<Task>(); } }
+		public ITable<Task>                      Task                       { get { return this.GetTable<Task>(); } }
 
 		// public EachDB()
 		// {
@@ -74,6 +74,7 @@ namespace DJ.DataModels
 		[Column("service_id"),         NotNull              ] public int  ServiceId        { get; set; } // int
 		[Column("status"),         NotNull              ] public int  Status        { get; set; } // int
 		[Column("sorting_office"), NotNull              ] public int  SortingOffice { get; set; } // int
+		[Column("date_examined"),        Nullable         ] public DateTime? DateExamined    { get; set; } // datetime2(6)
 		[Column("credit_id"),         Nullable          ] public int? CreditId      { get; set; } // int
 		[Column("task_id"),           Nullable          ] public int? TaskId        { get; set; } // int
 	}
@@ -130,7 +131,7 @@ namespace DJ.DataModels
 		[Column("justification"),                  NotNull] public string    Justification   { get; set; } // nvarchar(200)
 		[Column("designation_id"),                 NotNull] public int    DesignationId      { get; set; } // nvarchar(45)
 		[Column("date_examined"),        Nullable         ] public DateTime? DateExamined    { get; set; } // datetime2(6)
-		[Column("expiry_date"),                    NotNull] public DateTime  ExpiryDate      { get; set; } // datetime2(6)
+		[Column("expiry_date"),                    Nullable	] public DateTime  ExpiryDate      { get; set; } // datetime2(6)
 		[Column("application_id"),                 NotNull] public int       ApplicationId   { get; set; } // int
 		[Column("reason_for_search"),              NotNull] public int       ReasonForSearch { get; set; } // int
 		[Column("reference"),            Nullable         ] public string    Reference       { get; set; } // nvarchar(45)
@@ -226,6 +227,7 @@ namespace DJ.DataModels
 		[Column("examiner_id"),   NotNull             ] public string   ExaminerId   { get; set; } // nvarchar(45)
 		[Column("date_assigned"), NotNull             ] public DateTime DateAssigned { get; set; } // datetime2(6)
 		[Column("assigned_by"),   NotNull             ] public string   AssignedBy   { get; set; } // nvarchar(45)
+		[Column("expected_date_of_completion"), NotNull             ] public DateTime ExpectedDateOfCompletion { get; set; } // datetime2(6)
 	}
 
 	public static partial class TableExtensions

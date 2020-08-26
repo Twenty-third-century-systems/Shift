@@ -1,18 +1,188 @@
-﻿@model object
-
-@{
-    Layout = null;
+﻿@{
+    ViewBag.Title = "Applications";
+    Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <title>title</title>
-</head>
-<body>
-<div>
-      
+<div class="content-header">
+    <div class="container-fluId">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">All applications</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="#">Applications / <span class="text-muted">All applications</span></a>
+                    </li>
+                    @* <li class="breadcrumb-item active">Starter Page</li> *@
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluId -->
 </div>
-</body>
-</html>
+<!-- /.content-header -->
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <a class="btn btn-info btn-block mb-3">Applications</a>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Services</h3>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item" id="nameSearchSelector">
+                            <a class="nav-link" id="nav-name-search">
+                                <i class="fas fa-signature"></i> Name searches
+                                <span class="badge bg-primary float-right" id="nameSearchCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="pvtEntitySelector">
+                            <a class="nav-link">
+                                <i class="far fa-building"></i> Pvt Limited Entity
+                                <span class="badge bg-primary float-right" id="pvtEntityCount">7</span>
+                            </a>
+                        </li>
+                        @* <li class="nav-item"> *@
+                        @*     <a href="#" class="nav-link"> *@
+                        @*         <i class="far fa-file-alt"></i> Drafts *@
+                        @*     </a> *@
+                        @* </li> *@
+                        @* <li class="nav-item"> *@
+                        @*     <a href="#" class="nav-link"> *@
+                        @*         <i class="fas fa-filter"></i> Junk *@
+                        @*         <span class="badge bg-warning float-right">65</span> *@
+                        @*     </a> *@
+                        @* </li> *@
+                        @* <li class="nav-item"> *@
+                        @*     <a href="#" class="nav-link"> *@
+                        @*         <i class="far fa-trash-alt"></i> Trash *@
+                        @*     </a> *@
+                        @* </li> *@
+                    </ul>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+
+        <div class="col-md-6" style="height: 100%">
+            <div class="card card-info card-outline direct-chat direct-chat-primary bottom-dashboard-card" style="height: 100%">
+                <div class="card-header">
+                    <h3 class="card-title" id="onDisplay">Applications</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                    <div class="direct-chat-messages" id="applicationsContainer">
+                        <div class="media text-muted pt-3 system-control">
+                            <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
+                                <title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text>
+                            </svg>
+                            <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                                <strong class="d-block text-gray-dark">Name search <span class="float-right">23 Jan 2:00 pm</span></strong>
+                                <i>Saved/ Pending/ Assigned/ Has query/ Rejected/ Reserved</i>
+                            </p>
+                        </div>
+                        <div class="media text-muted pt-3 system-control">
+                            <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
+                                <title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text>
+                            </svg>
+                            <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                                <strong class="d-block text-gray-dark">Private limited company <span class="float-right">23 Jan 2:00 pm</span></strong>
+                                <i>Saved/ Pending/ Assigned/ Has query/ Rejected/ Reserved</i>
+                            </p>
+                        </div>
+                        <div class="media text-muted pt-3">
+                            <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
+                                <title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text>
+                            </svg>
+                            <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                                <strong class="d-block text-gray-dark">Name search <span class="float-right">23 Jan 2:00 pm</span></strong>
+                                <i>Saved/ Pending/ Assigned/ Has query/ Rejected/ Reserved</i>
+                            </p>
+                        </div>
+                        <div class="media text-muted pt-3">
+                            <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
+                                <title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text>
+                            </svg>
+                            <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                                <strong class="d-block text-gray-dark">Name search <span class="float-right">23 Jan 2:00 pm</span></strong>
+                                <i>Saved/ Pending/ Assigned/ Has query/ Rejected/ Reserved</i>
+                            </p>
+                        </div>
+                    </div>
+                    <!--/.recent activity item-->
+
+                </div>
+                <!-- /.card-body -->
+
+                <!-- /.card-footer -->
+                <div class="card-footer">
+
+                </div>
+                <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+
+        <div class="col-md-3">
+            <form id="allocateTasks">
+                <a class="btn btn-info btn-block mb-3" id="serviceToAllocate">Tasks</a>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Allocate tasks</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Service</label>
+                            <input type="text" class="form-control" name="service" id="service" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Examiner </label>
+                            <select class="form-control select2" name="examiner">
+                                <option selected="selected"></option>
+                                <option value="ex 1">Examiner 1</option>
+                                <option value="ex 2">Examiner 1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Number of applications</label>
+                            <input type="text" class="form-control" name="numberOfApplications">
+                        </div>
+                        <div class="form-group">
+                            <label>Date of completion</label>
+                            <input type="date" class="form-control" name="dateOfCompletion">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        @* <button type="button" class="btn btn-info">Auto</button> *@
+                        <div class="float-right">
+                            <button type="submit" class="btn btn-info">Allocate</button>
+                        </div>
+                    </div>
+
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </form>
+        </div>
+
+    </div>
+    <!-- /.row -->
+</div>
+
+@section Scripts
+{
+    <partial name="_ToastRScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial"/>
+    <!-- All Applications script -->
+    <script src="~/js/all-applications/all-applications.js"></script>
+    <!-- All Applications script -->
+    <script src="~/js/all-applications/custom-validation.js"></script>
+}
