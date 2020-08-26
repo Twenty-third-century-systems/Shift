@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DJ.DataModels;
 using DJ.Dtos;
-using DJ.Models;
 using LinqToDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ using Application = DJ.Models.Application;
 using Task = DJ.Models.Task;
 
 namespace DJ.Controllers {
-    [Route("applications")]
+    [Route("api/applications")]
     public class ApplicationsController : Controller {
         private EachDB _eachDb;
         private PoleDB _poleDb;
@@ -156,71 +155,6 @@ namespace DJ.Controllers {
             return BadRequest("Something went wrong");
         }
 
-        [HttpGet("allocated")]
-        public IActionResult GetTasks()
-        {
-            var examiner = "ex 1";
-            var tasks = (
-                from t in _eachDb.Task
-                where t.ExaminerId == examiner
-                select t
-            ).ToList();
-
-            if (tasks.Count > 0)
-            {
-                TasksToExaminerDto tasksToExaminer = new TasksToExaminerDto();
-
-                foreach (var task in tasks)
-                {
-                    var applications = (
-                        from s in _eachDb.Applications
-                        where s.TaskId == task.Id
-                              && s.DateExamined == null
-                        select s
-                    ).ToList();
-
-                    if (applications.Count > 0)
-                    {
-                        var service = (
-                            from t in _poleDb.Services
-                            where t.Id == applications[0].ServiceId
-                            select t.Description
-                        ).FirstOrDefault();
-
-                        if (!string.IsNullOrEmpty(service))
-                        {
-                            if (service.Equals("name search"))
-                            {
-                                tasksToExaminer.NameSearchTasks.Add(new Task
-                                {
-                                    Id = task.Id,
-                                    ApplicationCount = applications.Count,
-                                    Service = service.ToUpper(),
-                                    ExpectedDateOfCompletion = task.ExpectedDateOfCompletion
-                                });
-                            }
-                            else
-                            {
-                                return NotFound("No allocated tasks at the moment");
-                            }
-                        }
-                        else
-                        {
-                            return NotFound("No allocated tasks at the moment");
-                        }
-                    }
-                    else
-                    {
-                        return NotFound("No allocated tasks at the moment");
-                    }
-                }
-
-                return Ok(tasksToExaminer);
-            }
-            else
-            {
-                return NotFound("No allocated tasks at the moment");
-            }
-        }
+        
     }
 }

@@ -40,17 +40,5 @@ namespace DanceFlow.Controllers {
                 return Created("", savedTask);                
             }
         }
-
-        [HttpGet("tasks")]
-        public async Task<IActionResult> GetTasks()
-        {
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync(ApiUrls.AllAllocatedTasks	).Result.Content
-                    .ReadAsStringAsync();
-                TasksForExaminerDto tasks = JsonConvert.DeserializeObject<TasksForExaminerDto>(response);
-                return Ok(tasks);
-            }
-        }
     }
 }

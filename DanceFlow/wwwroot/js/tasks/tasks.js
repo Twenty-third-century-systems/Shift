@@ -2,7 +2,7 @@
     $('#name-search-tasks').hide();
     $.ajax({
         type: 'Get',
-        url: '/applications/tasks',
+        url: '/tasks/pending',
         success: function (data) {
             if (data.nameSearchTasks.length > 0) {
                 $('#name-search-tasks').show();

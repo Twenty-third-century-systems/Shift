@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using DanceFlow.Dtos;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace DanceFlow.Controllers {
     [Route("tasks")]
@@ -10,16 +14,21 @@ namespace DanceFlow.Controllers {
             return View();
         }
 
-        [HttpGet("{task}")]
-        public IActionResult Task(int task)
+        [HttpGet("pending")]
+        public async Task<IActionResult> Task(int task)
         {
-            return View();
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(ApiUrls.AllAllocatedTasks	).Result.Content
+                    .ReadAsStringAsync();
+                TasksForExaminerDto tasks = JsonConvert.DeserializeObject<TasksForExaminerDto>(response);
+                return Ok(tasks);
+            }
         }
 
         [HttpGet("name-search/{task}")]
         public IActionResult NameSearches(int task)
-        {
-            
+        {            
             return View();
         }
         

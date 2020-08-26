@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DJ", "DJ\DJ.csproj", "{6EDC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectIsinaBasa", "ProjectIsinaBasa\ProjectIsinaBasa.csproj", "{3C6559C6-6E79-4D4A-BEFF-CD1CD679A0F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cooler", "Cooler\Cooler.csproj", "{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{3C6559C6-6E79-4D4A-BEFF-CD1CD679A0F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C6559C6-6E79-4D4A-BEFF-CD1CD679A0F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C6559C6-6E79-4D4A-BEFF-CD1CD679A0F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
