@@ -1,8 +1,7 @@
 using System;
 using AutoMapper;
-using BarTender.Database;
-using BarTender.DataModels;
 using BarTender.Repositories;
+using Cooler.DataModels;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using LinqToDB.Data;

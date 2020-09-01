@@ -7,10 +7,8 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
       <PackageReference Include="IdentityModel" Version="4.3.0" />
-      <PackageReference Include="linq2db.AspNet" Version="3.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -18,13 +16,14 @@
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>Tables.generated.cs</LastGenOutput>
       </None>
-      <None Update="Database Templates\Tables.tt">
-        <Generator>TextTemplatingFileGenerator</Generator>
-      </None>
     </ItemGroup>
 
     <ItemGroup>
       <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cooler\Cooler.csproj" />
     </ItemGroup>
 
 

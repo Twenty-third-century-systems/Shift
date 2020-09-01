@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using BarTender.DataModels;
 using BarTender.Models;
+using Cooler.DataModels;
 
 namespace BarTender.Profiles {
     public class NameSearchProfile : Profile {

@@ -1,18 +1,21 @@
-﻿using System.Linq;
-using DJ.DataModels;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Cooler.DataModels;
 using DJ.Dtos;
 using DJ.Models;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Task = DJ.Models.Task;
+using Application = Cooler.DataModels.Application;
+using Name = DJ.Models.Name;
+using NameSearch = DJ.Models.NameSearch;
 
 namespace DJ.Controllers {
     [Route("api/tasks")]
     public class TasksController : Controller {
         private EachDB _eachDb;
         private PoleDB _poleDb;
-        
+
         public TasksController(EachDB eachDb, PoleDB poleDb)
         {
             _eachDb = eachDb;
@@ -24,7 +27,7 @@ namespace DJ.Controllers {
         {
             var examiner = "ex 1";
             var tasks = (
-                from t in _eachDb.Task
+                from t in _eachDb.Tasks
                 where t.ExaminerId == examiner
                 select t
             ).ToList();
@@ -54,7 +57,7 @@ namespace DJ.Controllers {
                         {
                             if (service.Equals("name search"))
                             {
-                                tasksToExaminer.NameSearchTasks.Add(new Task
+                                tasksToExaminer.NameSearchTasks.Add(new TaskSummary
                                 {
                                     Id = task.Id,
                                     ApplicationCount = applications.Count,
@@ -74,7 +77,7 @@ namespace DJ.Controllers {
                     }
                     else
                     {
-                        return NotFound("No allocated tasks at the moment");
+                        continue;
                     }
                 }
 
@@ -89,19 +92,102 @@ namespace DJ.Controllers {
         [HttpGet("{taskId}")]
         public IActionResult GetTask(int taskId)
         {
-            var application = (
-                    from c in _eachDb.Applications
-                    join d in _eachDb.NameSearches on c.Id equals d.ApplicationId
-                    join e in _eachDb.Name on d.Id equals e.NameSearchId
-                    where c.TaskId == taskId
-                        select new
+            List<NameSearchTaskDto> nameSearchTasks = new List<NameSearchTaskDto>();
+
+            var applications = (
+                from application in _eachDb.Applications
+                where application.TaskId == taskId
+                select application
+            ).ToList();
+
+            if (applications.Count > 0)
+            {
+                foreach (var application in applications)
+                {
+                    var nameSearch = (
+                        from n in _eachDb.NameSearches
+                        where n.ApplicationId == application.Id
+                        select n
+                    ).FirstOrDefault();
+
+                    if (nameSearch != null)
+                    {
+                        var names = (
+                            from name in _eachDb.Names
+                            where name.NameSearchId == nameSearch.Id
+                            select name
+                        ).ToList();
+
+                        var service = (
+                            from serv in _poleDb.Services
+                            where serv.Id == application.ServiceId
+                            select serv.Description
+                        ).FirstOrDefault();
+
+                        if (names.Count > 0)
                         {
-                            c,
-                            d,
-                            e
+                            var nameSearchTaskDto = new NameSearchTaskDto
+                            {
+                                Application = new Models.Application
+                                {
+                                    Id = application.Id,
+                                    Service = service,
+                                    User = application.UserId,
+                                    SubmissionDate = application.DateSubmitted,
+                                    Examined = application.DateExamined == null ? false : true
+                                },
+                                NameSearch = new NameSearch
+                                {
+                                    Id = nameSearch.Id,
+                                    ReasonForSearch = (
+                                        from r in _poleDb.ReasonForSearches
+                                        where r.Id == nameSearch.ReasonForSearch
+                                        select r.Description
+                                    ).FirstOrDefault(),
+                                    TypeOfEntity = (
+                                        from s in _poleDb.Services
+                                        where s.Id == nameSearch.Service
+                                        select s.Description
+                                    ).FirstOrDefault(),
+                                    Designation = (
+                                        from designation in _poleDb.Designations
+                                        where designation.Id == nameSearch.DesignationId
+                                        select designation.Description
+                                    ).FirstOrDefault(),
+                                    Justification = nameSearch.Justification
+                                }
+                            };
+
+                            foreach (var name in names)
+                            {
+                                nameSearchTaskDto.NameSearch.Names.Add(new Name
+                                {
+                                    Id = name.Id,
+                                    Value = name.Value,
+                                    Status = (
+                                        from s in _poleDb.Status
+                                        where s.Id == name.Status
+                                        select s.Description
+                                    ).FirstOrDefault(),
+                                    NameSearchId = name.NameSearchId
+                                });
+                            }
+
+                            nameSearchTasks.Add(nameSearchTaskDto);
                         }
-                ).ToList(); 
-            return Ok(application);
+                    }
+                    else
+                    {
+                        return BadRequest("Task has incorrect data");
+                    }
+                }
+            }
+            else
+            {
+                return BadRequest("Task is Empty");
+            }
+
+            return Ok(nameSearchTasks);
         }
     }
 }

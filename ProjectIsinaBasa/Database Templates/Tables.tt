@@ -51,13 +51,13 @@
 		Custom tool must be set to TextTemplatingFileGenerator, not TextTemplatingFilePreprocessor or any other value.
 	*/
 
-	NamespaceName = "DataModels";
+	NamespaceName = "Cooler.DataModels";
 
 	// to configure GetSchemaOptions properties, add them here, before load metadata call
 	GetSchemaOptions.GetTables             = true;
 	// Enables loading of foreign key relations for associations
 	GetSchemaOptions.GetForeignKeys        = false;
-	LoadSqlServerMetadata("DESKTOP-RMM46MK", "pole", "sa", "password123");
+	LoadSqlServerMetadata("DESKTOP-RMM46MK", "counter", "sa", "password123");
 //	LoadSqlServerMetadata(".", "MyDatabase"); // Integrated Security
 //	LoadSqlServerMetadata(string connectionString);
 

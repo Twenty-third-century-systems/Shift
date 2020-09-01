@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BarTender.DataModels;
 using BarTender.Dtos;
 using BarTender.Models;
+using Cooler.DataModels;
 
 namespace BarTender.Repositories {
     public class NameSearchRepository : INameSearchRepository {

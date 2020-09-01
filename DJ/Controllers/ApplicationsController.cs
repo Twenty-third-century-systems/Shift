@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DJ.DataModels;
+using Cooler.DataModels;
 using DJ.Dtos;
 using LinqToDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Application = DJ.Models.Application;
-using Task = DJ.Models.Task;
 
 namespace DJ.Controllers {
     [Route("api/applications")]
@@ -100,7 +99,7 @@ namespace DJ.Controllers {
 
                 if (service != null)
                 {
-                    var taskId = _eachDb.Task
+                    var taskId = _eachDb.Tasks
                         .Value(t => t.ExaminerId, task.Examiner)
                         .Value(t => t.DateAssigned, DateTime.Now)
                         .Value(t => t.AssignedBy, "BK")
@@ -151,10 +150,7 @@ namespace DJ.Controllers {
             {
                 return BadRequest("Invalid task");
             }
-
             return BadRequest("Something went wrong");
-        }
-
-        
+        }        
     }
 }

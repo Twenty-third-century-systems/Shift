@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BarTender.DataModels;
 using BarTender.Dtos;
 using BarTender.Models;
 using BarTender.Repositories;
+using Cooler.DataModels;
 using IdentityModel.Client;
 using LinqToDB;
 using Microsoft.AspNetCore.Authentication;
@@ -89,7 +89,7 @@ namespace BarTender.Controllers {
                         foreach (var name in details.Names)
                         {
                             int nameStatus = 7;
-                            namesSubmited += _eachDb.Name
+                            namesSubmited += _eachDb.Names
                                 .Value(c => c.Value, name)
                                 .Value(c => c.Status, nameStatus)
                                 .Value(c => c.NameSearchId, nameSearchId.ToString())
