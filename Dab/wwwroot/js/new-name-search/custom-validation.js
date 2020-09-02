@@ -1,9 +1,13 @@
 ﻿let readyForSubmission = false;
 
 $(document).ready(function () {
-    jQuery.validator.addMethod("noSpace", function(value, element) {
-        return value.indexOf(" ") < 0 && value != "";
+    jQuery.validator.addMethod("noSpace", function (value, element) {
+        return this.optional(element) || value.trim() != "";
     }, "No space");
+
+    jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[a-z\s]+$/i.test(value);
+    }, "Only alphabetical characters Allowed");
 
     $('#name-search-form').validate({
         rules: {
@@ -21,29 +25,55 @@ $(document).ready(function () {
             },
             justification: {
                 required: true,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200
             },
             name1: {
                 required: true,
                 minlength: 4,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200,
+                remote: {
+                    url: "/name-search/availability/name",
+                    type: "get",
+                }
             },
             name2: {
                 required: true,
                 minlength: 4,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200,
+                remote: {
+                    url: "/name-search/availability/name",
+                    type: "get",
+                }
             },
             name3: {
                 minlength: 4,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200,
+                remote: {
+                    url: "/name-search/availability/name",
+                    type: "get",
+                }
             },
             name4: {
                 minlength: 4,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200,
+                remote: {
+                    url: "/name-search/availability/name",
+                    type: "get",
+                }
             },
             name5: {
                 minlength: 4,
-                noSpace:true
+                noSpace: true,
+                maxlength: 200,
+                remote: {
+                    url: "/name-search/availability/name",
+                    type: "get",
+                }
             },
         },
         messages: {
@@ -61,30 +91,30 @@ $(document).ready(function () {
             },
             justification: {
                 required: 'This information is required',
-                noSpace:'Spaces are not allowed'
+                noSpace: 'Spaces are not allowed'
             },
             name1: {
                 required: 'This information is required',
                 minlength: 'Must be at least Four characters',
-                noSpace:'Spaces are not allowed'
+                noSpace: 'Spaces are not allowed'
             },
             name2: {
                 required: 'This information is required',
                 minlength: 'Must be at least Four characters',
-                noSpace:'Spaces are not allowed'
+                noSpace: 'Spaces are not allowed'
             },
             name3: {
-                minlength: 'Must be at least Four characters',
+                minlength: 'Must be at least Four characters'
             },
             name4: {
-                minlength: 'Must be at least Four characters',
+                minlength: 'Must be at least Four characters'
             },
             name5: {
-                minlength: 'Must be at least Four characters',
+                minlength: 'Must be at least Four characters'
             },
         },
-        submitHandler:function(form){           
-            if(readyForSubmission){
+        submitHandler: function (form) {
+            if (readyForSubmission) {
                 $.ajax({
                     type: 'Post',
                     url: '/name-search/submission',
@@ -97,7 +127,7 @@ $(document).ready(function () {
                         toastr.error('Something went wrong in submitting the application');
                     },
                 });
-            }else {
+            } else {
                 $('#reason').text($("[name='reason'] option:selected").text());
                 $('#type').text($("[name='type'] option:selected").text());
                 $('#designation').text($("[name='designation'] option:selected").text());
@@ -109,7 +139,7 @@ $(document).ready(function () {
                 $('#name4').text($("[name='name4']").val());
                 $('#name5').text($("[name='name5']").val());
                 $('#modal-name-search-confirm').modal('show');
-            }            
+            }
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

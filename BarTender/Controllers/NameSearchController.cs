@@ -39,6 +39,22 @@ namespace BarTender.Controllers {
             return Ok(defaults);
         }
 
+        [AllowAnonymous]
+        [HttpGet("{name}/availability")]
+        public IActionResult GetNameAvailability(string name)
+        {
+            var namesInDataBase = (
+                from n in _eachDb.Names
+                where n.Value == name
+                select n
+            ).FirstOrDefault();
+
+            if (namesInDataBase == null)
+                return NoContent();
+            else
+                return BadRequest("Not available");
+        }
+
         [HttpPost("submit")]
         public async Task<IActionResult> PostNewNameSearch([FromBody] NameSearchRequestDto details)
         {
@@ -78,7 +94,7 @@ namespace BarTender.Controllers {
                         .Value(b => b.Id, nameSearchId.ToString())
                         .Value(b => b.Service, details.Details.TypeOfEntity)
                         .Value(b => b.Justification, details.Details.Justification)
-                        .Value(b => b.DesignationId, details.Details.Designation)                       
+                        .Value(b => b.DesignationId, details.Details.Designation)
                         .Value(b => b.ApplicationId, applicationId)
                         .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
                         .Value(b => b.Reference, Guid.NewGuid().ToString())

@@ -7,5 +7,6 @@
         private static string ApiBaseUrl = "https://localhost:44312/api/";
         public static readonly string NameSearchDefaultsUrl = $"{ApiBaseUrl}name/defaults";
         public static readonly string SubmitNameSearchUrl = $"{ApiBaseUrl}name/submit";
+        public static readonly string CheckNameAvailability = $"{ApiBaseUrl}name";
     }
 }

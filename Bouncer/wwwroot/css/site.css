@@ -1,6 +1,13 @@
 ﻿.body-container {
   margin-top: 60px;
-  padding-bottom: 40px; }
+  padding-bottom: 40px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
 .welcome-page li {
   list-style: none;
