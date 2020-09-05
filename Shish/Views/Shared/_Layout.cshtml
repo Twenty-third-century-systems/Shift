@@ -14,15 +14,15 @@
     <link rel="stylesheet" href="~/css/site.css"/>
 </head>
 <body>
-<partial name="_Nav"/>
+@* <partial name="_Nav"/> *@
 
-<div class="container body-container">
+<div class="container body-container justify-content-center align-content-center h-100">
     @RenderBody()
 </div>
 
-<script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-@RenderSection("scripts", required: false)
+@RenderSection("Scripts", required: false)
 </body>
 </html>

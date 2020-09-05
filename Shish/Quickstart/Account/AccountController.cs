@@ -18,7 +18,9 @@ using System;
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
+using Cooler.DataModels;
 using Shish.Data;
+using Task = System.Threading.Tasks.Task;
 
 namespace IdentityServerHost.Quickstart.UI {
     [SecurityHeaders]
@@ -32,6 +34,8 @@ namespace IdentityServerHost.Quickstart.UI {
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private ApplicationDbContext _db;
+        private ShwaDB _shwaDb;
+
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -41,7 +45,8 @@ namespace IdentityServerHost.Quickstart.UI {
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ShwaDB shwaDb)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -51,6 +56,7 @@ namespace IdentityServerHost.Quickstart.UI {
             _schemeProvider = schemeProvider;
             _events = events;
             _db = context;
+            _shwaDb = shwaDb;
         }
 
         /// <summary>
@@ -354,6 +360,25 @@ namespace IdentityServerHost.Quickstart.UI {
         [HttpGet]
         public IActionResult Register()
         {
+            var countries = (
+                from c in _shwaDb.Countries
+                select new Country
+                {
+                    Code = c.Code,
+                    Name = c.Name
+                }).ToList();
+
+            var cities = (
+                from ct in _shwaDb.Cities
+                where ct.CountryCode.Equals(countries.Where(c => c.Name.Equals("Zimbabwe")).FirstOrDefault().Code)
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+
+            ViewBag.Countries = countries;
+            ViewBag.Cities = cities;
             return View();
         }
 
@@ -365,7 +390,7 @@ namespace IdentityServerHost.Quickstart.UI {
             {
                 var user = new ApplicationUser
                 {
-                    UserName = vm.Email,
+                    UserName = vm.NationalId,
                     Email = vm.Email,
                     PhoneNumber = vm.PhoneNumber,
                     Policy = "general"
@@ -392,7 +417,7 @@ namespace IdentityServerHost.Quickstart.UI {
                     _db.SaveChanges();
                     if (!await _roleManager.RoleExistsAsync("external"))
                         await CreateRole("external");
-                    
+
                     await _userManager.AddToRoleAsync(user, "external");
                     return View();
                 }
@@ -402,6 +427,21 @@ namespace IdentityServerHost.Quickstart.UI {
 
             return View(vm);
         }
+
+        [AllowAnonymous]
+        [HttpGet("{code}/Cities")]
+        public IActionResult GetCities(string code)
+        {
+            var cities = (
+                from ct in _shwaDb.Cities
+                where ct.CountryCode.Equals(code)
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+            return Ok(cities);
+        }        
 
         private void AddErrors(IdentityResult result)
         {
