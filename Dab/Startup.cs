@@ -38,7 +38,7 @@ namespace Dab {
                 {
                     options.Authority = "https://localhost:5001";
 
-                    options.ClientId = "mvc";
+                    options.ClientId = "interactive";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
                     options.ResponseType = "code";
 
@@ -49,8 +49,6 @@ namespace Dab {
                     options.ResponseMode = "form_post";
 
                     options.SaveTokens = true;
-
-                    options.GetClaimsFromUserInfoEndpoint = true;
                     options.UsePkce = true;
                 });
             

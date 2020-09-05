@@ -24,16 +24,9 @@ namespace Dab.Controllers {
 
         public async Task<IActionResult> Index()
         {
-            User user;
-            using (var client = new HttpClient())
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
-                    .ReadAsStringAsync();
-                user = JsonConvert.DeserializeObject<User>(response);
-                ViewBag.User = user;
-            }
+            var nameClaim = User.Claims.Where(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"))
+                .FirstOrDefault();
+            ViewBag.User = nameClaim.Value;
             return View();
         }
 

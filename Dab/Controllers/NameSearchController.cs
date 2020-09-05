@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -27,17 +28,15 @@ namespace Dab.Controllers {
             {
                 try
                 {
-                    User user;
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
                     client.SetBearerToken(accessToken);
                     var apiResponse = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
                         .ReadAsStringAsync();
                     var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(apiResponse);
-                    var userManagementResponse = await client.GetAsync("https://localhost:5001/connect/userinfo").Result
-                        .Content
-                        .ReadAsStringAsync();
-                    user = JsonConvert.DeserializeObject<User>(userManagementResponse);
-                    ViewBag.User = user;
+                    var nameClaim = User.Claims
+                        .Where(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"))
+                        .FirstOrDefault();
+                    ViewBag.User = nameClaim.Value;
                     ViewBag.Defaults = nameSearchDefaults;
                 }
                 catch (Exception ex)
@@ -73,15 +72,15 @@ namespace Dab.Controllers {
                     };
 
                     if (!string.IsNullOrEmpty(newNameDetails.Name1))
-                        nameSearchRequest.Names.Add(newNameDetails.Name1);
+                        nameSearchRequest.Names.Add(newNameDetails.Name1.ToUpper());
                     if (!string.IsNullOrEmpty(newNameDetails.Name2))
-                        nameSearchRequest.Names.Add(newNameDetails.Name2);
+                        nameSearchRequest.Names.Add(newNameDetails.Name2.ToUpper());
                     if (!string.IsNullOrEmpty(newNameDetails.Name3))
-                        nameSearchRequest.Names.Add(newNameDetails.Name3);
+                        nameSearchRequest.Names.Add(newNameDetails.Name3.ToUpper());
                     if (!string.IsNullOrEmpty(newNameDetails.Name4))
-                        nameSearchRequest.Names.Add(newNameDetails.Name4);
+                        nameSearchRequest.Names.Add(newNameDetails.Name4.ToUpper());
                     if (!string.IsNullOrEmpty(newNameDetails.Name5))
-                        nameSearchRequest.Names.Add(newNameDetails.Name5);
+                        nameSearchRequest.Names.Add(newNameDetails.Name5.ToUpper());
 
                     var accessToken = await HttpContext.GetTokenAsync("access_token");
                     client.SetBearerToken(accessToken);

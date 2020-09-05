@@ -153,6 +153,4 @@ $(document).ready(function () {
             $(element).removeClass('is-invalid');
         }
     });
-
-    $().validate()
 });

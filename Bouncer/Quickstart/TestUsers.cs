@@ -39,7 +39,10 @@ namespace IdentityServerHost.Quickstart.UI {
                             new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
                             new Claim(JwtClaimTypes.WebSite, "http://alice.com"),
                             new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address),
-                                IdentityServerConstants.ClaimValueTypes.Json)
+                                IdentityServerConstants.ClaimValueTypes.Json),
+                            
+                            new Claim("Role","internal"),
+                            new Claim("Policy","principal")
                         }
                     },
                     new TestUser
@@ -56,9 +59,33 @@ namespace IdentityServerHost.Quickstart.UI {
                             new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
                             new Claim(JwtClaimTypes.WebSite, "http://bob.com"),
                             new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address),
-                                IdentityServerConstants.ClaimValueTypes.Json)
+                                IdentityServerConstants.ClaimValueTypes.Json),
+                            
+                            
+                            new Claim("Role","internal"),
+                            new Claim("Policy","principal")
                         }
-                    }
+                    },
+                    new TestUser
+                    {
+                        SubjectId = "8187963874",
+                        Username = "ben",
+                        Password = "ben",
+                        Claims =
+                        {
+                            new Claim(JwtClaimTypes.Name, "Ben Sam"),
+                            new Claim(JwtClaimTypes.GivenName, "Ben"),
+                            new Claim(JwtClaimTypes.FamilyName, "Sam"),
+                            new Claim(JwtClaimTypes.Email, "bensam@email.com"),
+                            new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
+                            new Claim(JwtClaimTypes.WebSite, "http://ben.com"),
+                            new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address),
+                                IdentityServerConstants.ClaimValueTypes.Json),
+                            
+                            new Claim("Role","internal"),
+                            new Claim("Policy","principal")
+                        }
+                    },
                 };
             }
         }
