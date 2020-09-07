@@ -17,7 +17,7 @@
                             '                            </svg>\n' +
                             '                            <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">\n' +
                             '                                <strong class="d-block text-gray-dark">' + e.service + '<span class="float-right">' + e.expectedDateOfCompletion + '</span></strong>\n' +
-                            '                                <i>' + e.applicationCount + ' Applications</i>\n' +
+                            '                                <i>' + e.applicationCount + ' application(s)</i>\n' +
                             '                            </p>\n' +
                             '                        </div>';
                         container.append(elementItem)

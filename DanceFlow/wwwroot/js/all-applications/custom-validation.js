@@ -42,11 +42,12 @@
                 url: '/applications/allocate',
                 data: $(form).serialize(),
                 success: function (data) {
-                    toastr.success('Your application has been submitted');
+                    toastr.success('Task has been allocatted');
                     $('#allocateTasks').trigger('reset');
+                    refreshNameSearchApplicationDisplay(1);
                 },
                 error: function (err) {
-                    toastr.error('Something went wrong in submitting the task');
+                    toastr.error('Something went wrong in allocating the task');
                 },
             });         
         },

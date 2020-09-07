@@ -42,6 +42,12 @@ namespace DJ.Controllers {
             }
             else
             {
+                name.Status = (
+                    from t in _poleDb.Status
+                    where t.Description == status
+                    select t.Id
+                ).FirstOrDefault();
+                
                 var names = (
                     from c in _eachDb.Names
                     where c.NameSearchId == name.NameSearchId

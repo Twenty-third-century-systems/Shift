@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectIsinaBasa", "Project
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cooler", "Cooler\Cooler.csproj", "{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shish", "Shish\Shish.csproj", "{C227C925-AB1F-407C-AA2E-7CD8E708EC6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shisha", "Shisha\Shisha.csproj", "{CADAE34E-77CB-4E94-BA07-96780C51AFFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,9 +50,9 @@ Global
 		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{971BCFBC-E6DD-42FC-9B9E-FC93D5B734F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C227C925-AB1F-407C-AA2E-7CD8E708EC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C227C925-AB1F-407C-AA2E-7CD8E708EC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C227C925-AB1F-407C-AA2E-7CD8E708EC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C227C925-AB1F-407C-AA2E-7CD8E708EC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CADAE34E-77CB-4E94-BA07-96780C51AFFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CADAE34E-77CB-4E94-BA07-96780C51AFFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CADAE34E-77CB-4E94-BA07-96780C51AFFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CADAE34E-77CB-4E94-BA07-96780C51AFFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
