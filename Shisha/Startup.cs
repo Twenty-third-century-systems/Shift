@@ -2,7 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using Cooler.DataModels;
 using IdentityServer4;
+using LinqToDB.AspNet;
+using LinqToDB.AspNet.Logging;
 using Shisha.Data;
 using Shisha.Models;
 using Microsoft.AspNetCore.Builder;
@@ -64,6 +67,12 @@ namespace Shisha {
                     options.ClientId = "copy client ID from Google here";
                     options.ClientSecret = "copy client secret from Google here";
                 });
+            
+            services.AddLinqToDbContext<ShwaDB>((provider, options) =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
+                    .UseDefaultLogging(provider);
+            });
         }
 
         public void Configure(IApplicationBuilder app)

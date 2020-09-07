@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Shish.Models;
 using Shisha.Models;
 
 namespace Shisha.Data {
@@ -9,6 +10,12 @@ namespace Shisha.Data {
         {
         }
 
+        public DbSet<InternalUser> InternalUsers { get; set; }
+        public DbSet<ExternalUser> ExternalUsers { get; set; }
+        public DbSet<Person> UserDetails { get; set; }
+        public DbSet<Policy> Policies { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

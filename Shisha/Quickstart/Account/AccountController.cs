@@ -15,34 +15,48 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cooler.DataModels;
+using Shish.Models;
+using Shisha.Data;
+using Task = System.Threading.Tasks.Task;
 
 namespace IdentityServerHost.Quickstart.UI {
     [SecurityHeaders]
     [AllowAnonymous]
     public class AccountController : Controller {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;        
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
-        private readonly IEventService _events;
+        private readonly IEventService _events;        
+        private ApplicationDbContext _db;
+        private readonly ShwaDB _shwaDb;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
-            IEventService events)
+            IEventService events,
+            ApplicationDbContext context,
+            ShwaDB shwaDb)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _interaction = interaction;
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _db = context;
+            _shwaDb = shwaDb;
         }
 
         /// <summary>
@@ -340,6 +354,138 @@ namespace IdentityServerHost.Quickstart.UI {
             }
 
             return vm;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Register()
+        {
+            var countries = (
+                from c in _shwaDb.Countries
+                select new Country
+                {
+                    Code = c.Code,
+                    Name = c.Name
+                }).ToList();
+
+            var cities = (
+                from ct in _shwaDb.Cities
+                where ct.CountryCode.Equals(countries.Where(c => c.Name.Equals("Zimbabwe")).FirstOrDefault().Code)
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+
+            ViewBag.Countries = countries;
+            ViewBag.Cities = cities;
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateUser(RegistrationViewModel vm)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = vm.NationalId,
+                    Email = vm.Email,
+                    PhoneNumber = vm.PhoneNumber,
+                    Policies = new List<Policy>
+                    {
+                        new Policy
+                        {
+                            Value = "General"
+                        }
+                    }
+                };
+
+                var result = await _userManager.CreateAsync(user, vm.Password);
+                if (result.Succeeded)
+                {
+                    var externalUser = new ExternalUser
+                    {
+                        UserId = user.Id,
+                        UserDetails =
+                        {
+                            Names = vm.Names,
+                            Surname = vm.Surname,
+                            NationalId = vm.NationalId,
+                            Address = new Address
+                            {
+                                HouseNumber = vm.HouseNumber,
+                                Street = vm.Street,
+                                City = vm.City,
+                                Country = vm.Country,
+                            }
+                        }
+                    };
+                    _db.ExternalUsers.Add(externalUser);
+                    _db.SaveChanges();
+                    if (!await _roleManager.RoleExistsAsync("External"))
+                        await CreateRole("External");
+
+                    await _userManager.AddToRoleAsync(user, "External");
+                    return View();
+                }
+
+                AddErrors(result);
+            }
+
+            return View(vm);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{code}/Cities")]
+        public IActionResult GetCities(string code)
+        {
+            var cities = (
+                from ct in _shwaDb.Cities
+                where ct.CountryCode.Equals(code)
+                      && ct.CanSort != null
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+            return Ok(cities);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ExaminerAccount()
+        {
+            var cities = (
+                from ct in _shwaDb.Cities
+                join cr in _shwaDb.Countries on ct.CountryCode equals cr.Code
+                where cr.Name.Equals("Zimbabwe")
+                && ct.CanSort != null
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+
+            ViewBag.Cities = cities;
+            return View();
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.ToString());
+            }
+        }
+
+        private async Task CreateRole(string roleName)
+        {
+            // first we create Admin rool    
+            var role = new IdentityRole();
+            role.Name = roleName;
+            await _roleManager.CreateAsync(role);
         }
     }
 }
