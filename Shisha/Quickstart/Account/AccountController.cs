@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Cooler.DataModels;
 using Shish.Models;
@@ -28,12 +29,12 @@ namespace IdentityServerHost.Quickstart.UI {
     [AllowAnonymous]
     public class AccountController : Controller {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;        
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
-        private readonly IEventService _events;        
+        private readonly IEventService _events;
         private ApplicationDbContext _db;
         private readonly ShwaDB _shwaDb;
 
@@ -384,7 +385,7 @@ namespace IdentityServerHost.Quickstart.UI {
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> CreateUser(RegistrationViewModel vm)
+        public async Task<IActionResult> CreateExternalUser(RegistrationViewModel vm)
         {
             if (ModelState.IsValid)
             {
@@ -393,13 +394,6 @@ namespace IdentityServerHost.Quickstart.UI {
                     UserName = vm.NationalId,
                     Email = vm.Email,
                     PhoneNumber = vm.PhoneNumber,
-                    Policies = new List<Policy>
-                    {
-                        new Policy
-                        {
-                            Value = "General"
-                        }
-                    }
                 };
 
                 var result = await _userManager.CreateAsync(user, vm.Password);
@@ -408,21 +402,26 @@ namespace IdentityServerHost.Quickstart.UI {
                     var externalUser = new ExternalUser
                     {
                         UserId = user.Id,
-                        UserDetails =
+                        UserDetails = new Person
                         {
-                            Names = vm.Names,
-                            Surname = vm.Surname,
+                            Names = vm.Names.ToUpper(),
+                            Surname = vm.Surname.ToUpper(),
                             NationalId = vm.NationalId,
                             Address = new Address
                             {
-                                HouseNumber = vm.HouseNumber,
-                                Street = vm.Street,
-                                City = vm.City,
+                                ResidentialAddress = vm.ResidentialAddress.ToUpper(),
+                                City = vm.City.ToUpper(),
                                 Country = vm.Country,
                             }
                         }
                     };
                     _db.ExternalUsers.Add(externalUser);
+                    var externalPolicy = new ExternalPolicy
+                    {
+                        Value = "General",
+                        ExternalUser = externalUser
+                    };
+                    _db.ExternalPolicies.Add(externalPolicy);                    
                     _db.SaveChanges();
                     if (!await _roleManager.RoleExistsAsync("External"))
                         await CreateRole("External");
@@ -461,7 +460,7 @@ namespace IdentityServerHost.Quickstart.UI {
                 from ct in _shwaDb.Cities
                 join cr in _shwaDb.Countries on ct.CountryCode equals cr.Code
                 where cr.Name.Equals("Zimbabwe")
-                && ct.CanSort != null
+                      && ct.CanSort != null
                 select new City
                 {
                     Id = ct.ID,

@@ -10,5 +10,6 @@
         public static string AllAllocatedTasks = $"{ApiBaseUrl}tasks";
         public static string ExamineName = $"{ApiBaseUrl}ex/name";
         public static string FinishNameSearchExamination = $"{ApiBaseUrl}ex/name/f";
+        public static string AllNamesExamination = $"{ApiBaseUrl}ex/name";
     }
 }

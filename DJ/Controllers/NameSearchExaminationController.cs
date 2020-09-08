@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Cooler.DataModels;
@@ -47,7 +48,7 @@ namespace DJ.Controllers {
                     where t.Description == status
                     select t.Id
                 ).FirstOrDefault();
-                
+
                 var names = (
                     from c in _eachDb.Names
                     where c.NameSearchId == name.NameSearchId
@@ -99,23 +100,102 @@ namespace DJ.Controllers {
 
                 if (nameSearch != null)
                 {
-                    application.Status = (
-                        from s in _poleDb.Status
-                        where s.Description.Equals("examined")
-                        select s.Id
-                    ).FirstOrDefault();
-                    application.DateExamined = DateTime.Now;
+                    var names = (
+                        from n in _eachDb.Names
+                        where n.NameSearchId == nameSearch.Id
+                        select n
+                    ).ToList();
 
-                    nameSearch.ExpiryDate = DateTime.Now.AddDays(30);
-                    nameSearch.Reference = "NS/" + DateTime.Now.Year.ToString() + "/" + nameSearch.Id.ToString();
-
-                    if (_eachDb.Update(application) + _eachDb.Update(nameSearch) == 2)
+                    if (names.Count >= 2)
                     {
-                        return NoContent();
+                        bool examined = false;
+                        foreach (var name in names)
+                        {
+                            if (name.Status != 7)
+                                examined = true;
+                        }
+
+                        if (!examined)
+                        {
+                            foreach (var name in names)
+                            {
+                                name.Status = (
+                                    from s in _poleDb.Status
+                                    where s.Description.Equals("rejected")
+                                    select s.Id
+                                ).FirstOrDefault();
+                                _eachDb.Update(name);
+                            }
+                        }
+
+                        application.Status = (
+                            from s in _poleDb.Status
+                            where s.Description.Equals("examined")
+                            select s.Id
+                        ).FirstOrDefault();
+
+                        application.DateExamined = DateTime.Now;
+
+                        nameSearch.ExpiryDate = DateTime.Now.AddDays(30);
+                        nameSearch.Reference = "NS/" + DateTime.Now.Year.ToString() + "/" + nameSearch.Id.ToString();
+
+                        if (_eachDb.Update(application) + _eachDb.Update(nameSearch) == 2)
+                        {
+                            // Send Sms Notifications and email here
+                            return NoContent();
+                        }
                     }
                 }
             }
+
             return BadRequest("Application has incorrect information");
+        }
+
+        [HttpGet("{name}/contain")]
+        public IActionResult NamesThatContain(string name)
+        {
+            var names = (
+                from n in _eachDb.Names
+                where n.Value.Contains(name)
+                select n
+            ).ToList();
+
+            var namesToExaminer = new List<NameOnExaminationDto>();
+            foreach (var zita in names)
+            {
+                var nameSearchApplication = (
+                    from a in _eachDb.Applications
+                    join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
+                    where n.Id == zita.NameSearchId
+                    select new
+                    {
+                        a.DateSubmitted,
+                        n.Service
+                    }
+                ).FirstOrDefault();
+
+                var typeOfBusiness = (
+                    from s in _poleDb.Services
+                    where s.Id == nameSearchApplication.Service
+                    select s.Description
+                ).FirstOrDefault();
+
+                var service = (
+                    from s in _poleDb.Status
+                    where s.Id == zita.Status
+                    select s.Description
+                ).FirstOrDefault();
+
+                namesToExaminer.Add(new NameOnExaminationDto
+                {
+                    Name = zita.Value,
+                    Date = nameSearchApplication.DateSubmitted,
+                    TypeOfBusiness = typeOfBusiness,
+                    Status = service
+                });
+            }
+
+            return Ok(namesToExaminer);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Shisha {
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("scope1"),
+                new ApiScope("scope1","E-Online Client API"),
                 new ApiScope("scope2"),
             };
 
@@ -43,13 +43,16 @@ namespace Shisha {
                     ClientSecrets = {new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256())},
 
                     AllowedGrantTypes = GrantTypes.Code,
+                    
+                    AlwaysIncludeUserClaimsInIdToken = true,
 
-                    RedirectUris = {"https://localhost:44300/signin-oidc"},
-                    FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                    PostLogoutRedirectUris = {"https://localhost:44300/signout-callback-oidc"},
+                    RedirectUris = {"https://localhost:44381/signin-oidc"},
+                    FrontChannelLogoutUri = "https://localhost:44381/signout-oidc",
+                    PostLogoutRedirectUris = {"https://localhost:44381/signout-callback-oidc"},
 
+                    
                     AllowOfflineAccess = true,
-                    AllowedScopes = {"openid", "profile", "scope2"}
+                    AllowedScopes = {"openid", "profile", "scope1","examiner"}
                 },
             };
     }

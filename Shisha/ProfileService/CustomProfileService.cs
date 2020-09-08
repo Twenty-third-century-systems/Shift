@@ -8,6 +8,7 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Shisha.Data;
 using Shisha.Models;
 
@@ -31,23 +32,36 @@ namespace Shish.Profiles {
             var roles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>();
 
-            if (_db.ExternalUsers.First(a => a.UserId == user.Id) == null)
+            if (_db.ExternalUsers.Where(a => a.UserId == user.Id).FirstOrDefault() != null)
             {
-                var User = _db.ExternalUsers.First(a => a.UserId == user.Id);
+                var User = _db.ExternalUsers
+                    .Include(c => c.UserDetails)
+                    .Include(c=>c.Policies)
+                    .Where(a => a.UserId == user.Id)
+                    .FirstOrDefault();
                 claims.Add(new Claim(JwtClaimTypes.Name, User.UserDetails.Names + " " + User.UserDetails.Surname));
+                foreach (var policy in User.Policies)
+                {
+                    claims.Add(new Claim("Policy", policy.Value));
+                }
             }
             else
             {
-                var User = _db.InternalUsers.First(a => a.UserId == user.Id);
+                var User = _db.InternalUsers
+                    .Include(c => c.UserDetails)
+                    .Where(a => a.UserId == user.Id)
+                    .FirstOrDefault();
                 claims.Add(new Claim(JwtClaimTypes.Name, User.UserDetails.Names + " " + User.UserDetails.Surname));
             }
 
             claims.Add(new Claim(JwtClaimTypes.Role, JsonSerializer.Serialize(roles),
                 IdentityServerConstants.ClaimValueTypes.Json));
-            foreach (var policy in user.Policies)
-            {
-                claims.Add(new Claim("Policy",policy.Value));
-            }
+
+            // _db.Policies.Where(q => q. = user.Id).ToList();
+            // foreach (var policy in user.Policies)
+            // {
+            //     claims.Add(new Claim("Policy", policy.Value));
+            // }
 
             context.IssuedClaims.AddRange(claims);
         }

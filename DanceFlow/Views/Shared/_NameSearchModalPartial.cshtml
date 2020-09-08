@@ -1,0 +1,59 @@
+﻿<div class="modal fade" id="modal-xl">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="name-on-display">Name</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <table id="tblContains" class="table w-100">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date Submitted</th>
+                                <th>Type Of Business</th>
+                                <th>Status</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table id="tblNamesStartWith" class="table w-100">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date Submitted</th>
+                                <th>Type Of Business</th>
+                                <th>Status</th>
+                                
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-dark" id="btn-blacklist" data-dismiss="modal">Blacklist</button>
+                    <button type="button" class="btn btn-danger" id="btn-reject" data-dismiss="modal">Reject</button>
+                    <button type="button" class="btn btn-success" id="btn-approve" data-dismiss="modal">Approve</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

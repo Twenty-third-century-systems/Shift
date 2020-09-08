@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DanceFlow.Dtos;
+using DanceFlow.Models;
 using DJ.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,24 @@ namespace DanceFlow.Controllers {
         public IActionResult PvtEntity(int task)
         {
             return View();
+        }
+
+        [HttpGet("examimination/{name}/contain")]
+        public async Task<IActionResult> NamesThatContain(string name)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/contain").Result.Content
+                    .ReadAsStringAsync();
+                var nameToExaminer = JsonConvert.DeserializeObject<List<NameOnExaminationDto>>(response);
+                return Ok(nameToExaminer);
+            }            
+        }
+        
+        [HttpGet("examimination/{name}/starts")]
+        public IActionResult NamesThatStartWith(string name)
+        {
+            return Ok();
         }
     }
 }

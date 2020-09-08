@@ -11,9 +11,8 @@ namespace IdentityServerHost.Quickstart.UI {
         public string NationalId { get; set; }
         
         [Required]
-        public string HouseNumber { get; set; }
-        [Required]
-        public string Street { get; set; }
+        public string ResidentialAddress { get; set; }
+        
         [Required]
         public string City { get; set; }
         [Required]
@@ -33,5 +32,6 @@ namespace IdentityServerHost.Quickstart.UI {
         public string ConfirmPassword { get; set; }
 
         public string RedirectUrl { get; set; }
+        
     }
 }

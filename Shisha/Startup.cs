@@ -4,6 +4,7 @@
 
 using Cooler.DataModels;
 using IdentityServer4;
+using IdentityServer4.Services;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using Shisha.Data;
@@ -15,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shish.Profiles;
 
 namespace Shisha {
     public class Startup {
@@ -34,7 +36,9 @@ namespace Shisha {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(option => 
+                    option.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -"
+                )
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -55,6 +59,9 @@ namespace Shisha {
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
+            
+            // IProfile implementation
+            builder.Services.AddTransient<IProfileService, CustomProfileService>();
 
             services.AddAuthentication()
                 .AddGoogle(options =>
