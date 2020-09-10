@@ -1,2 +1,74 @@
-﻿@model TModel
+﻿<div class="row">
+    <div class="col-md-4">
+        <!-- card -->
+        <div class="card card-default">
+            <!-- card-header -->
+            <div class="card-header">
+                <h3 class="card-title">
+                    <small>Select the table of articles</small>
+                </h3>
+            </div>
+            <!-- /.card-header -->
+            <form id="articlesForm">
+                <!-- card-body -->
+                <div class="card-body">
 
+                    <div class="form-group">
+                        <label>Table of articles</label>
+                        <select class="form-control select2" name="tableOfArticles" style="width: 100%;">
+                            <option selected="selected"></option>
+                            <option>Table A</option>
+                            <option>Table B</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <!-- /.form-group -->
+
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-clipboard-list"></i> Save</button>
+                    <!-- /.submit button-->
+                </div>
+                <!-- /.card-footer -->
+            </form>
+        </div>
+    </div>
+    <!-- /.card -->
+    <!-- /.col -->
+    <div class="col-md-8">
+        <div class="card card-widget">
+            <div class="card-header">
+                <div class="user-block">
+                    <h3 class="card-title">
+                        <small>Articles</small>
+                    </h3>
+                </div>
+                <!-- /.title -->
+                <button type="button" class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-article">
+                    <i class="fas fa-plus"></i> Add
+                </button>
+            </div>
+            <!-- /.card-header -->
+            <!-- form begin -->
+            <div class="card-body">
+                <table id="tblArticles" class="table table-striped w-100">
+                    <thead>
+                    <tr>
+                        <th>Article</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-clipboard-list"></i> Save</button>
+                <!-- /.submit button-->
+            </div>
+            <!-- /.card-footer -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>

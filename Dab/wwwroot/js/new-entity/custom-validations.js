@@ -1,9 +1,10 @@
-﻿$(document).ready(function () {
-    $.validator.setDefaults({
-        submitHandler: function () {
-            alert( "Form successful submitted!" );
-        }
-    });
+﻿
+$(document).ready(function () {
+    // $.validator.setDefaults({
+    //     submitHandler: function () {
+    //         alert( "Form successful submitted!" );
+    //     }
+    // });
 
     $('#officeForm').validate({
         rules: {
@@ -15,11 +16,7 @@
                 required: true,
                 minlength: 5
             },
-            country: {
-                required: true,
-                minlength: 5
-            },
-            city: {
+            officeCity: {
                 required: true,
                 minlength: 5
             },
@@ -68,6 +65,9 @@
                 email: 'This is not a valid email'
             },
         },
+        submitHandler: function(form){
+            alert("Office");
+        },
         errorElement: 'span',
         errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
@@ -81,5 +81,299 @@
         }
     });
     
-    $().validate()
+    $('#clausesForm').validate({
+        rules: {
+            liabilityClause: {
+                required: true,
+                minlength: 5,
+            },
+            shareClause: {
+                required: true,
+                minlength: 5
+            },
+        },
+        messages: {
+            liabilityClause: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            shareClause: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+        },
+        submitHandler: function(form){
+            alert("Clauses");
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+    
+    $('#objectiveForm').validate({
+        rules: {
+            objective: {
+                required: true,
+                minlength: 5,
+            },
+        },
+        messages: {
+            objective: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+        },
+        submitHandler: function(form){
+            alert("Objective");
+        },        
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
+    $('#articlesForm').validate({
+        rules: {
+            tableOfArticles: {
+                required: true,
+            },
+        },
+        messages: {
+            tableOfArticles: {
+                required: 'This information is required',
+            },
+        },
+        submitHandler: function(form){
+            alert("Articles");
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
+    $('#articleModalForm').validate({
+        rules: {
+            article: {
+                required: true,
+                minlength: 5,
+            },
+        },
+        messages: {
+            article: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+        },
+        submitHandler: function(form){
+            alert("Articles 2");
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
+    $('#peopleForm').validate({
+        rules: {
+            peopleCountry: {
+                required: true,
+                minlength: 5,
+            },
+            nationalId: {
+                required: true,
+                minlength: 5,
+            },
+            memberSurname: {
+                required: true,
+                minlength: 5,
+            },
+            memberName: {
+                required: true,
+                minlength: 5,
+            },
+            gender: {
+                required: true,
+                minlength: 5,
+            },
+            phyAddress: {
+                required: true,
+                minlength: 5,
+            },
+            ordShares: {
+                required: true,
+                minlength: 5,
+            },
+            prefShares: {
+                required: true,
+                minlength: 5,
+            },
+            totShares: {
+                required: true,
+                minlength: 5,
+            },
+        },
+        messages: {
+            peopleCountry: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            nationalid: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            memberSurname: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            memberName: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            gender: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            phyAddress: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            isSecretary: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            isMember: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            isDirector: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            ordShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            prefShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            totShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+        },
+        submitHandler: function(form){
+            alert("People");
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
+    $('#entityForm').validate({
+        rules: {
+            entityCountry: {
+                required: true,
+                minlength: 5,
+            },
+            entityRef: {
+                required: true,
+                minlength: 5,
+            },
+            entityName: {
+                required: true,
+                minlength: 5,
+            },
+            entityOrdShares: {
+                required: true,
+                minlength: 5,
+            },
+            entityPrefShares: {
+                required: true,
+                minlength: 5,
+            },
+            entityTotShares: {
+                required: true,
+                minlength: 5,
+            },
+        },
+        messages: {
+            entityCountry: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            entityRef: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            entityName: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            entityOrdShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            entityPrefShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+            entityTotShares: {
+                required: 'This information is required',
+                minlength: 'Must be at least Five characters'
+            },
+        },
+        submitHandler: function(form){
+            alert("Entity form");
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
 });

@@ -1,2 +1,64 @@
-﻿@model TModel
+﻿<div class="modal fade" id="modal-entity">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Enter entity details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="entityForm">
+                <div class="modal-body">
+                    <!-- /.form-group -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="objective">Country</label>
+                                <input type="text" name="entityCountry" class="form-control" id="entityCountry"/>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="entityRef">Entity Ref/ number</label>
+                                <input type="text" name="entityRef" class="form-control" id="entityRef"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="entityName">Name</label>
+                        <input type="text" name="entityName" class="form-control" id="entityName"/>
+                    </div>
 
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="objective">Ordinary shares subscribed</label>
+                                <input type="text" name="entityOrdShares" class="form-control" id="entityOrdShares"/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="objective">Preference shares subscribed</label>
+                                <input type="text" name="entityPrefShares" class="form-control" id="entityPrefShares"/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="objective">Total shares subscribed</label>
+                                <input type="text" name="entityTotShares" class="form-control" id="entityTotShares"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default btn sm" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-plus"></i> Add</button>
+                        <!-- /.submit button-->
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
