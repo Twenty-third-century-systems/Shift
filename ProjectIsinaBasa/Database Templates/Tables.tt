@@ -57,7 +57,7 @@
 	GetSchemaOptions.GetTables             = true;
 	// Enables loading of foreign key relations for associations
 	GetSchemaOptions.GetForeignKeys        = false;
-	LoadSqlServerMetadata("DESKTOP-RMM46MK", "counter", "sa", "password123");
+	LoadSqlServerMetadata("DESKTOP-RMM46MK", "each", "sa", "password123");
 //	LoadSqlServerMetadata(".", "MyDatabase"); // Integrated Security
 //	LoadSqlServerMetadata(string connectionString);
 
