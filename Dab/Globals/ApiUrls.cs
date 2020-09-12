@@ -10,5 +10,7 @@
         public static readonly string CheckNameAvailability = $"{ApiBaseUrl}name";
         public static readonly string RegisteredNames = $"{ApiBaseUrl}entity/names";
         public static readonly string NameOnApplication = $"{ApiBaseUrl}entity";
+        public static readonly string InitialisePvtApplication = $"{ApiBaseUrl}entity/i";
+        public static readonly string SubmitPvtApplicationOffice = $"{ApiBaseUrl}entity/o";
     }
 }

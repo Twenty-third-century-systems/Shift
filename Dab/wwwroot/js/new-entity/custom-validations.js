@@ -1,5 +1,4 @@
-﻿
-$(document).ready(function () {
+﻿$(document).ready(function () {
     // $.validator.setDefaults({
     //     submitHandler: function () {
     //         alert( "Form successful submitted!" );
@@ -66,7 +65,20 @@ $(document).ready(function () {
             },
         },
         submitHandler: function(form){
-            alert("Office");
+            $.ajax({
+                type: 'Post',
+                url: '/entity/office',
+                data: {
+                    applicationId: $('#applicationId').val(),
+                    pvtEntityId: $('#pvtEntityId').val(),
+                    office: $(form).serializeToJSON()
+                },
+                success: function () {
+                    officeSaved = true;
+                    toastr.success("Office details have bee submitted");
+                },
+                error: toastr.error("Something went wrong in saving office details. Refresh page and resubmit"),
+            });
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -103,7 +115,17 @@ $(document).ready(function () {
             },
         },
         submitHandler: function(form){
-            alert("Clauses");
+            toastr.warning("Submit handler meet");
+            $.ajax({
+                type: 'Post',
+                url: '/entity/clause',
+                data: (form).serializeToJSON(),
+                success: function () {
+                    officeSaved = true;
+                    toastr.success("Clauses have been submitted");
+                },
+                error: toastr.error("Something went wrong in saving office details. Refresh page and resubmit"),
+            });
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

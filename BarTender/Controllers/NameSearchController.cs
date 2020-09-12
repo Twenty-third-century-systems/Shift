@@ -128,7 +128,7 @@ namespace BarTender.Controllers {
                     }
                     else
                     {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert NameOnApplicationDto search");
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert NewNameSearchApplicationDto search");
                     }
                 }
                 else

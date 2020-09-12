@@ -5,3 +5,7 @@
 .nav-item{
     cursor: pointer;
 }
+
+#tblRegNames tbody tr{
+    cursor: pointer;
+}

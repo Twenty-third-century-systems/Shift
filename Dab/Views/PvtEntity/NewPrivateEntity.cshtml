@@ -3,6 +3,9 @@
     Layout = "_Layout";
 }
 
+<input type="hidden" id="applicationId" value="@ViewBag.ApplicationId"/>
+<input type="hidden" id="pvtEntityId" value="@ViewBag.PvtEntityApplication"/>
+
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
@@ -82,6 +85,11 @@
     <partial name="_ValidationScriptsPartial"/>
     <partial name="_StepWizardScriptsPartial"/>
     <partial name="_DataTablesScriptsPartial"/>
+    <partial name="_ToastRScriptsPartal"/>
+    <!-- Form to JSON serializer-->
+    <script type="text/javascript" src="~/lib/serialize-form-into-JSON/dist/jquery.serializeToJSON.min.js"></script>
+    <!-- new-entity-js -->
+    <script type="text/javascript" src="~/js/new-entity/new-entity.js"></script>
     <!-- custom data-tables configuration -->
     <script type="text/javascript" src="~/js/new-entity/data-tables-conf.js"></script>
     <!-- custom validations for address form -->

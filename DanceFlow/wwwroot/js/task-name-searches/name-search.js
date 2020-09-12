@@ -34,8 +34,24 @@ function displayPage(refresh) {
                         updateStatuses(e.nameSearch.names);
                     })
                     .appendTo('#pending');
-            else
+            else {
+                $('#reason').val(e.nameSearch.reasonForSearch.toUpperCase());
+                $('#type').val(e.nameSearch.typeOfEntity.toUpperCase());
+                $('#designation').val(e.nameSearch.designation.toUpperCase());
+                $('#justification').val(e.nameSearch.justification.toUpperCase());
+
+                e.nameSearch.names.forEach((x, index) => {
+                    $('#name' + (index + 1)).val(x.value.toUpperCase());
+                    $('#name' + (index + 1) + '-toggle').click(function () {
+                        setupNameExaminationDialogue(x.value.toUpperCase());
+                        nameOnExamination = x;
+                        i = index;
+                    });
+                });
                 updateStatuses(e.nameSearch.names);
+            }
+
+
         } else {
             $('#completed').append(applicationSelect);
         }
