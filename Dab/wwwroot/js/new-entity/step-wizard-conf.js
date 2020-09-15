@@ -23,13 +23,14 @@
         console.log(stepNumber);
         console.log(stepDirection);
         if (stepNumber === 0 && stepDirection-stepNumber === 1) {
-            console.log(officeSaved);
-            return officeSaved;
+            // return officeSaved;
+            return true;
         }
-        // else if (stepNumber === 1 && stepDirection === 'forward') {
-        //     $('#submitOffice').trigger('click');
-        //     return true;
-        // } else if (stepNumber === 2 && stepDirection === 'forward') {
+        else if (stepNumber === 1 && stepDirection === 'forward') {
+            // return memorandumSaved;
+            return true;
+        } 
+        // else if (stepNumber === 2 && stepDirection === 'forward') {
         //     submitMembers();
         //     return true;
         // } else if (stepNumber === 3 && stepDirection === 'forward') {

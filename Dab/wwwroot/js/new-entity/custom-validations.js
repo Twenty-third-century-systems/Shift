@@ -64,7 +64,7 @@
                 email: 'This is not a valid email'
             },
         },
-        submitHandler: function(form){
+        submitHandler: function (form) {
             $.ajax({
                 type: 'Post',
                 url: '/entity/office',
@@ -77,7 +77,9 @@
                     officeSaved = true;
                     toastr.success("Office details have bee submitted");
                 },
-                error: toastr.error("Something went wrong in saving office details. Refresh page and resubmit"),
+                error: function (err) {
+                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit")
+                },
             });
         },
         errorElement: 'span',
@@ -92,7 +94,7 @@
             $(element).removeClass('is-invalid');
         }
     });
-    
+
     $('#clausesForm').validate({
         rules: {
             liabilityClause: {
@@ -114,17 +116,24 @@
                 minlength: 'Must be at least Five characters'
             },
         },
-        submitHandler: function(form){
+        submitHandler: function (form) {
             toastr.warning("Submit handler meet");
             $.ajax({
                 type: 'Post',
                 url: '/entity/clause',
-                data: (form).serializeToJSON(),
-                success: function () {
-                    officeSaved = true;
-                    toastr.success("Clauses have been submitted");
+                data: {
+                    applicationId: $('#applicationId').val(),
+                    pvtEntityId: $('#pvtEntityId').val(),
+                    clauses: $(form).serializeToJSON()
                 },
-                error: toastr.error("Something went wrong in saving office details. Refresh page and resubmit"),
+                success: function (data) {
+                    memoId = data;
+                    console.log(data);
+                    console.log(memoId);
+                },
+                error: function (err) {
+                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit");
+                }
             });
         },
         errorElement: 'span',
@@ -139,7 +148,7 @@
             $(element).removeClass('is-invalid');
         }
     });
-    
+
     $('#objectiveForm').validate({
         rules: {
             objective: {
@@ -153,9 +162,15 @@
                 minlength: 'Must be at least Five characters'
             },
         },
-        submitHandler: function(form){
-            alert("Objective");
-        },        
+        submitHandler: function (form) {
+            let input = $(form).serializeToJSON();
+            objects.push(input);
+            console.log(objects);
+            tblObjects.row.add([
+                input.objective
+            ]).draw(false);
+            $('#modal-objective').modal('toggle');
+        },
         errorElement: 'span',
         errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
@@ -180,8 +195,22 @@
                 required: 'This information is required',
             },
         },
-        submitHandler: function(form){
-            alert("Articles");
+        submitHandler: function (form) {
+            $.ajax({
+                type: 'Post',
+                url: '/entity/table',
+                data: {
+                    applicationId: $('#applicationId').val(),
+                    pvtEntityId: $('#pvtEntityId').val(),
+                    table: $(form).serializeToJSON()
+                },
+                success: function (data) {
+                    toastr.success("The table of articles Have been saved");
+                },
+                error: function (err) {
+                    toastr.error("Something went wrong in saving the table of articles. Refresh page and resubmit");
+                }
+            });
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -209,8 +238,14 @@
                 minlength: 'Must be at least Five characters'
             },
         },
-        submitHandler: function(form){
-            alert("Articles 2");
+        submitHandler: function (form) {
+            let input = $(form).serializeToJSON();
+            amendedArticles.push(input);
+            console.log(amendedArticles);
+            tblArticles.row.add([
+                input.article
+            ]).draw(false);
+            $('#modal-article').modal('toggle');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -314,8 +349,25 @@
                 minlength: 'Must be at least Five characters'
             },
         },
-        submitHandler: function(form){
-            alert("People");
+        submitHandler: function (form) {
+            let input = $(form).serializeToJSON();
+            memberPeople.push(input);
+            console.log(memberPeople);
+            tblPeople.row.add([
+                input.peopleCountry,
+                input.nationalId,
+                input.memberSurname,
+                input.memberName,
+                input.gender,
+                input.phyAddress,
+                input.isSecretary,
+                input.isMember,
+                input.isDirector,
+                input.ordShares,
+                input.prefShares,
+                input.totShares,
+            ]).draw(false);
+            $('#modal-people').modal('toggle');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -383,8 +435,19 @@
                 minlength: 'Must be at least Five characters'
             },
         },
-        submitHandler: function(form){
-            alert("Entity form");
+        submitHandler: function (form) {
+            let input = $(form).serializeToJSON();
+            memberEntities.push(input);
+            console.log(memberEntities);
+            tblEntities.row.add([
+                input.entityCountry,
+                input.entityRef,
+                input.entityName,
+                input.entityOrdShares,
+                input.entityPrefShares,
+                input.entityTotShares,
+            ]).draw(false);
+            $('#modal-entity').modal('toggle');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

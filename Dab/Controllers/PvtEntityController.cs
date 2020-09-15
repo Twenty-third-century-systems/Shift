@@ -72,10 +72,113 @@ namespace Dab.Controllers {
         }
 
         [HttpPost("clause")]
-        public IActionResult ShareAndLiabilityClauses(LiabilityShareClausesDto liabilityShareClausesDto)
+        public async Task<IActionResult> ShareAndLiabilityClauses(LiabilityShareClausesDto liabilityShareClausesDto)
         {
-            return Ok();
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<LiabilityShareClausesDto>(ApiUrls.SubmitPvtApplicationsClauses,
+                        liabilityShareClausesDto).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var resp = await response.Content.ReadAsStringAsync();                    
+                    return Ok(JsonConvert.DeserializeObject<int>(resp));
+                }
+            }
+            return BadRequest();
         }
+
+        [HttpPost("objects")]
+        public async Task<IActionResult> Objects(MemorandumObjectsDto memorandumObjectsDto)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<MemorandumObjectsDto>(ApiUrls.SubmitPvtApplicationsObjects,
+                        memorandumObjectsDto).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("table")]
+        public async Task<IActionResult> Table(ArticleTableDto articleTableDto)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<ArticleTableDto>(ApiUrls.SubmitPvtApplicationsArticleTable,
+                        articleTableDto).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("amends")]
+        public async Task<IActionResult> AmendedArticles(AmmendedArticleDto amendedArticleDto)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<AmmendedArticleDto>(ApiUrls.SubmitPvtApplicationsAmendedArticle,
+                        amendedArticleDto).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("people")]
+        public async Task<IActionResult> People(ShareHoldingPersonDto shareHoldingPersonDto)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<ShareHoldingPersonDto>(ApiUrls.SubmitPvtApplicationShareHoldingPeople,
+                        shareHoldingPersonDto).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("entity")]
+        public async Task<IActionResult> Entity(ShareHoldingEntityDto shareHoldingEntityDto)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<ShareHoldingEntityDto>(ApiUrls.SubmitPvtApplicationShareHoldingEntities,
+                        shareHoldingEntityDto).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }            
         
     }
 }

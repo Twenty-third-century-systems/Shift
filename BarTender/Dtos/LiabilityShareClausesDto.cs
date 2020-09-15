@@ -1,6 +1,6 @@
-﻿using Dab.Models;
+﻿using BarTender.Models;
 
-namespace Dab.Dtos {
+namespace BarTender.Dtos {
     public class LiabilityShareClausesDto {
         public int ApplicationId { get; set; }
         public string PvtEntityId { get; set; }

@@ -9,17 +9,17 @@
                 </h3>
             </div>
             <!-- /.card-header -->
-            <form id="articlesForm">
+            <form id="articlesForm">        
                 <!-- card-body -->
                 <div class="card-body">
 
                     <div class="form-group">
                         <label>Table of articles</label>
-                        <select class="form-control select2" name="tableOfArticles" style="width: 100%;">
+                        <select class="form-control select2" name="tableOfArticles" id="tableOfArticles" style="width: 100%;">
                             <option selected="selected"></option>
-                            <option>Table A</option>
-                            <option>Table B</option>
-                            <option>Other</option>
+                            <option value="table A">Table A</option>
+                            <option value="table B">Table B</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
                     <!-- /.form-group -->
@@ -36,7 +36,7 @@
     <!-- /.card -->
     <!-- /.col -->
     <div class="col-md-8">
-        <div class="card card-widget">
+        <div class="card card-widget" id="amendedArticlesDisplay">
             <div class="card-header">
                 <div class="user-block">
                     <h3 class="card-title">
@@ -63,7 +63,7 @@
             </div>
             <!-- /.card-body -->
             <div class="card-footer">
-                <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-clipboard-list"></i> Save</button>
+                <button type="submit" class="btn btn-default btn-sm float-right" id="submitAmendedArticles"><i class="fas fa-clipboard-list"></i> Save</button>
                 <!-- /.submit button-->
             </div>
             <!-- /.card-footer -->

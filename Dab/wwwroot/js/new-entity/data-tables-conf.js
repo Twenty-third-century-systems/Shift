@@ -6,7 +6,8 @@ let tblArticles = undefined;
 $(document).ready(function () {
 
         tblObjects = $('#tblObjects').DataTable({
-            responsive: true, 
+            responsive: true,
+            scrollX: true,
             lengthMenu: [
                 [4, 10, 25, 50, -1],
                 ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']
@@ -15,7 +16,7 @@ $(document).ready(function () {
 
         tblPeople = $('#tblPeople').DataTable({
             responsive: true, 
-            // scrollX: true,
+            scrollX: true,
             lengthMenu: [
                 [4, 10, 25, 50, -1],
                 ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']
@@ -24,7 +25,7 @@ $(document).ready(function () {
 
         tblEntities = $('#tblEntities').DataTable({
             responsive: true, 
-            // scrollX: true,
+            scrollX: true,
             lengthMenu: [
                 [4, 10, 25, 50, -1],
                 ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']
@@ -33,7 +34,7 @@ $(document).ready(function () {
 
         tblArticles = $('#tblArticles').DataTable({
             responsive: true, 
-            // scrollX: true,
+            scrollX: true,
             lengthMenu: [
                 [4, 10, 25, 50, -1],
                 ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']

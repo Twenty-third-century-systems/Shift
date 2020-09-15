@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 using BarTender.Dtos;
 using BarTender.Models;
@@ -43,8 +45,8 @@ namespace BarTender.Controllers {
                     from a in _eachDb.Applications
                     from ns in _eachDb.NameSearches.InnerJoin(k => k.ApplicationId == a.Id)
                     where a.UserId == user.Sub
-                          && a.ServiceId == 12
-                          && a.Status == 3
+                          && a.ServiceId == 12 || a.ServiceId == 13
+                          && a.Status == 3 || a.Status == 1002
                     select new
                     {
                         ns.Id,
@@ -106,9 +108,13 @@ namespace BarTender.Controllers {
                 from ns in _eachDb.NameSearches.InnerJoin(k => k.Id == n.NameSearchId)
                 from a in _eachDb.Applications.InnerJoin(k => k.Id == ns.ApplicationId)
                 where n.Id == nameId
+                      && n.Status == 1001
+                      && ns.Service == 13
+                      && ns.ReasonForSearch == 1
                       && a.UserId == user.Sub
                 select new
                 {
+                    n.Id,
                     n.Value,
                     n.NameSearchId,
                     a.SortingOffice
@@ -141,6 +147,7 @@ namespace BarTender.Controllers {
                         var entityId = _eachDb.PvtEntities
                             .Value(p => p.Id, pvtEntityId)
                             .Value(p => p.ApplicationId, applicationId)
+                            .Value(p => p.NameId, name.Id)
                             .Insert();
 
                         if (entityId > 0)
@@ -223,6 +230,405 @@ namespace BarTender.Controllers {
             }
 
             return BadRequest("Something went wrong");
+        }
+
+        [HttpPost("c")]
+        public IActionResult SubmitClauses([FromBody] LiabilityShareClausesDto liabilityShareClausesDto)
+        {
+            var entitity = (
+                from p in _eachDb.PvtEntities
+                from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+                where a.Id == liabilityShareClausesDto.ApplicationId
+                      && p.Id == liabilityShareClausesDto.PvtEntityId
+                select p
+            ).FirstOrDefault();
+
+            if (entitity != null)
+            {
+                if (entitity.MemorundumId == null)
+                {
+                    var memoId = _eachDb.Memorundums
+                        .Value(m => m.LiabilityClause, liabilityShareClausesDto.Clauses.LiabilityClause)
+                        .Value(m => m.ShareClause, liabilityShareClausesDto.Clauses.ShareClause)
+                        .InsertWithInt32Identity();
+
+                    if (memoId != null && memoId > 0)
+                    {
+                        entitity.MemorundumId = memoId;
+                        if (_eachDb.Update(entitity) == 1)
+                            return Ok(memoId);
+                    }
+                }
+                else
+                {
+                    var memo = (
+                        from m in _eachDb.Memorundums
+                        where m.Id == entitity.MemorundumId
+                        select m
+                    ).FirstOrDefault();
+
+                    memo.LiabilityClause = liabilityShareClausesDto.Clauses.LiabilityClause;
+                    memo.ShareClause = liabilityShareClausesDto.Clauses.ShareClause;
+                    if (_eachDb.Update(memo) == 1)
+                        return Ok(memo.Id);
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("ob")]
+        public IActionResult SubmitObjects([FromBody] MemorandumObjectsDto memorandumObjectsDto)
+        {
+            var entity = (
+                from p in _eachDb.PvtEntities
+                from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+                where a.Id == memorandumObjectsDto.ApplicationId
+                      && p.Id == memorandumObjectsDto.PvtEntityId
+                select p
+            ).FirstOrDefault();
+
+            if (entity != null)
+            {
+                if (entity.MemorundumId != null)
+                {
+                    int count = 0;
+                    foreach (var objective in memorandumObjectsDto.Objects)
+                    {
+                        var objectiveId = _eachDb.MemoObjects
+                            .Value(o => o.Value, objective.Objective)
+                            .Value(o => o.MemorundumId, entity.MemorundumId)
+                            .InsertWithInt32Identity();
+
+                        if (objectiveId != null && objectiveId > 0)
+                        {
+                            count++;
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+
+                    if (count == memorandumObjectsDto.Objects.Count)
+                    {
+                        return NoContent();
+                    }
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("a")]
+        public IActionResult SubmitTableArticle([FromBody] ArticleTableDto articleTableDto)
+        {
+            var entity = (
+                from p in _eachDb.PvtEntities
+                from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+                where a.Id == articleTableDto.ApplicationId
+                      && p.Id == articleTableDto.PvtEntityId
+                select p
+            ).FirstOrDefault();
+
+            if (entity != null)
+            {
+                if (entity.ArticlesId == null)
+                {
+                    int repackagedArticleId = 0;
+                    short populate = 1;
+                    if (articleTableDto.Table.TableOfArticles.Equals("table A"))
+                    {
+                        var articleId = _eachDb.ArticleOfAssociations
+                            .Value(a => a.TableA, populate)
+                            .InsertWithInt32Identity();
+                        if (articleId != null)
+                        {
+                            repackagedArticleId = (int) articleId;
+                        }
+                    }
+                    else if (articleTableDto.Table.TableOfArticles.Equals("table B"))
+                    {
+                        var articleId = _eachDb.ArticleOfAssociations
+                            .Value(a => a.TableB, populate)
+                            .InsertWithInt32Identity();
+                        if (articleId != null)
+                        {
+                            repackagedArticleId = (int) articleId;
+                        }
+                    }
+                    else
+                    {
+                        var articleId = _eachDb.ArticleOfAssociations
+                            .Value(a => a.Other, populate)
+                            .InsertWithInt32Identity();
+                        if (articleId != null)
+                        {
+                            repackagedArticleId = (int) articleId;
+                        }
+                    }
+
+                    if (repackagedArticleId > 0)
+                    {
+                        entity.ArticlesId = repackagedArticleId;
+                        if (_eachDb.Update(entity) == 1)
+                            return NoContent();
+                    }
+                }
+                else
+                {
+                    var articleTable = (
+                        from a in _eachDb.ArticleOfAssociations
+                        where a.Id == entity.ArticlesId
+                        select a
+                    ).FirstOrDefault();
+
+                    if (articleTable != null)
+                    {
+                        articleTable.TableA = null;
+                        articleTable.TableB = null;
+                        articleTable.Other = null;
+                        short tableValue = 1;
+                        if (articleTableDto.Table.TableOfArticles.Equals("table A"))
+                        {
+                            articleTable.TableA = tableValue;
+                        }
+                        else if (articleTableDto.Table.TableOfArticles.Equals("table B"))
+                        {
+                            articleTable.TableB = tableValue;
+                        }
+                        else
+                        {
+                            articleTable.Other = tableValue;
+                        }
+
+                        if (_eachDb.Update(articleTable) == 1)
+                            return NoContent();
+                    }
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("am")]
+        public IActionResult SubmitAmendedArticles([FromBody] AmendedArticleDto amendedArticleDto)
+        {
+            var entity = (
+                from p in _eachDb.PvtEntities
+                from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+                where a.Id == amendedArticleDto.ApplicationId
+                      && p.Id == amendedArticleDto.PvtEntityId
+                select p
+            ).FirstOrDefault();
+
+            if (entity != null)
+            {
+                if (entity.ArticlesId != null)
+                {
+                    var amendedArticlesFromDb = (
+                        from a in _eachDb.AmmendedArticles
+                        where a.ArticleId == entity.ArticlesId
+                        select a
+                    ).ToList();
+
+                    if (amendedArticlesFromDb.Count > 0)
+                    {
+                        var amendedArticlesDeleted = (
+                            from a in _eachDb.AmmendedArticles
+                            where a.ArticleId == entity.ArticlesId
+                            select a
+                        ).Delete();
+                    }
+
+                    int? amended = 0;
+                    foreach (var amendedArticle in amendedArticleDto.AmendedArticles)
+                    {
+                        amended += _eachDb.AmmendedArticles
+                            .Value(a => a.Value, amendedArticle.Article)
+                            .Value(a => a.ArticleId, entity.ArticlesId)
+                            .InsertWithInt32Identity();
+
+                        if (amended > 0)
+                            continue;
+                        else
+                            break;
+                    }
+
+                    if (amended > 0)
+                    {
+                        return NoContent();
+                    }
+                }
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("p")]
+        public IActionResult SubmitShareHoldingPeople([FromBody] ShareHoldingPersonDto shareHoldingPersonDto)
+        {
+            var entity = (
+                from p in _eachDb.PvtEntities
+                from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+                where a.Id == shareHoldingPersonDto.ApplicationId
+                      && p.Id == shareHoldingPersonDto.PvtEntityId
+                select p
+            ).FirstOrDefault();
+
+            if (entity != null)
+            {
+                int pple = 0;
+                foreach (var person in shareHoldingPersonDto.People)
+                {
+                    var subscriberInDb = (
+                        from s in _eachDb.Subcribers
+                        where s.NationalId.Equals(person.NationalId)
+                        select s
+                    ).FirstOrDefault();
+
+                    if (subscriberInDb == null)
+                    {
+                        int? subscriberId = null;
+                        try
+                        {
+                            subscriberId = _eachDb.Subcribers
+                                .Value(s => s.CountryCode, person.NationalId)
+                                .Value(s => s.NationalId, person.PeopleCountry)
+                                .Value(s => s.Surname, person.MemberSurname)
+                                .Value(s => s.MiddleNames, person.MemberName)
+                                .Value(s => s.FirstName, person.MemberName)
+                                .Value(s => s.Gender, 1)
+                                .Value(s => s.PhysicalAddress, person.PhyAddress)
+                                .InsertWithInt32Identity();
+                        }
+                        catch (Exception ex)
+                        {
+                            var a = 0;
+                        }
+
+                        if (subscriberId != null)
+                        {
+                            short? director = null;
+                            short? member = null;
+                            short? secretary = null;
+
+                            if (person.IsDirector)
+                                director = 1;
+                            if (person.IsMember)
+                                member = 1;
+                            if (person.IsSecretary)
+                                secretary = 1;
+
+                            var roleId = _eachDb.Roles.Value(r => r.Director, director).Value(r => r.Member, member)
+                                .Value(r => r.Secretary, secretary).InsertWithInt32Identity();
+
+
+                            // if (person.IsDirector)
+                            //     roles.Value(r => r.Director, val);
+                            // if ()
+                            //     roles.Value(r => r.Member, val);
+                            // if (person.IsSecretary)
+                            //     roles.Value(r => r.Secretary, val);
+
+
+                            if (roleId > 0)
+                            {
+                                var subscriptionId = _eachDb.Subscriptions
+                                    .Value(s => s.Ordinary, 100)
+                                    .Value(s => s.Preference, 100)
+                                    .InsertWithInt32Identity();
+
+                                if (subscriberId != null)
+                                {
+                                    var pvtSubscriber = _eachDb.PvtEntityHasSubcribers
+                                        .Value(s => s.Entity, entity.Id)
+                                        .Value(s => s.Subcriber, subscriberId)
+                                        .Value(s => s.RolesId, roleId)
+                                        .Value(s => s.SubscriptionId, subscriptionId)
+                                        .Insert();
+                                    if (pvtSubscriber > 0)
+                                        pple++;
+                                    else
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var subscriberHasSub = (
+                            from s in _eachDb.PvtEntityHasSubcribers
+                            where s.Entity == entity.Id
+                                  && s.Subcriber == subscriberInDb.Id
+                            select s
+                        ).FirstOrDefault();
+
+                        if (subscriberHasSub != null)
+                        {
+                            subscriberInDb.CountryCode = person.PeopleCountry;
+                            subscriberInDb.NationalId = person.NationalId;
+                            subscriberInDb.Surname = person.MemberSurname;
+                            subscriberInDb.MiddleNames = person.MemberName; // Deal with the removal of this field..
+                            subscriberInDb.FirstName = person.MemberName;
+                            //Handle gender here
+                            subscriberInDb.PhysicalAddress = person.PeopleCountry;
+
+                            if (_eachDb.Update(subscriberInDb) == 1)
+                            {
+                                var roles = (
+                                    from r in _eachDb.Roles
+                                    where r.Id == subscriberHasSub.RolesId
+                                    select r
+                                ).FirstOrDefault();
+
+                                roles.Director = null;
+                                roles.Member = null;
+                                roles.Secretary = null;
+
+                                short val = 1;
+
+                                if (person.IsDirector)
+                                    roles.Director = val;
+                                if (person.IsMember)
+                                    roles.Member = val;
+                                if (person.IsSecretary)
+                                    roles.Secretary = val;
+
+                                if (_eachDb.Update(roles) == 1)
+                                {
+                                    var subscription = (
+                                        from s in _eachDb.Subscriptions
+                                        where s.Id == subscriberHasSub.SubscriptionId
+                                        select s
+                                    ).FirstOrDefault();
+
+                                    if (subscription != null)
+                                    {
+                                        subscription.Ordinary = long.Parse(person.OrdShares);
+                                        subscription.Ordinary = long.Parse(person.PrefShares);
+
+                                        if (_eachDb.Update(subscription) == 1)
+                                            pple++;
+                                        else
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (pple == shareHoldingPersonDto.People.Count)
+                    return NoContent();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("e")]
+        public IActionResult SubmitShareHoldingEntities([FromBody] ShareHoldingEntityDto shareHoldingEntityDto)
+        {
+            return NoContent();
         }
     }
 }

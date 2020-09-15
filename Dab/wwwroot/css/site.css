@@ -1,4 +1,8 @@
-﻿.form-group select{
+﻿body {
+    table-layout: fixed;
+}
+
+.form-group select{
     width: 100%;
 }
 
