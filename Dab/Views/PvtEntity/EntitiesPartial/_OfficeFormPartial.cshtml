@@ -18,16 +18,29 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
-                        <label for="postalAddress">Postal address</label>
-                        <input type="text" name="postalAddress" class="form-control" id="postalAddress">
+                        <label for="officeCity">City</label>
+                        <select type="text" name="officeCity" class="form-control" id="officeCity">
+                            @foreach (var value in ViewBag.Cities)
+                            {
+                                if (value.Name.Equals("Harare"))
+                                {
+                                    <option selected value="@value.Id">@value.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@value.Id">@value.Name</option>
+                                }
+                            }
+                        </select>
                     </div>
                 </div>
+
             </div>
             <div class="row">
                 <div class="col-lg-6">
                     <div class="form-group">
-                        <label for="officeCity">City</label>
-                        <input type="text" name="officeCity" class="form-control" id="officeCity">
+                        <label for="postalAddress">Postal address</label>
+                        <input type="text" name="postalAddress" class="form-control" id="postalAddress">
                     </div>
                 </div>
                 <div class="col-lg-6">

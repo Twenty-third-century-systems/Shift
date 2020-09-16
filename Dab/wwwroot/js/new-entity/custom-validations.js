@@ -1,67 +1,54 @@
 ﻿$(document).ready(function () {
-    // $.validator.setDefaults({
-    //     submitHandler: function () {
-    //         alert( "Form successful submitted!" );
-    //     }
-    // });
+
+    jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[A-Za-z ]+$/i.test(value);
+    }, "Letters only please");
 
     $('#officeForm').validate({
         rules: {
             physicalAddress: {
                 required: true,
-                minlength: 5,
+                minlength: 3,
             },
             postalAddress: {
                 required: true,
-                minlength: 5
+                minlength: 3,
             },
             officeCity: {
                 required: true,
-                minlength: 5
-            },
-            telNumber: {
-                required: true,
-                minlength: 5
-            },
-            mobileNumber: {
-                required: true,
-                minlength: 5
             },
             emailAddress: {
                 required: true,
-                email: true
+                email: true,
+            },
+            telNumber: {
+                required: true,
+            },
+            mobileNumber: {
+                required: true,
             },
         },
         messages: {
             physicalAddress: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Three characters.'
             },
             postalAddress: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Three characters.'
             },
-            country: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
-            },
-            city: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
-            },
-            telNumber: {
-                required: 'This information is required',
-                // tel:'This is not a valid telephone number',
-                minlength: 'Must be at least Five characters'
-            },
-            mobileNumber: {
-                required: 'This information is required',
-                // tel:'This is not a valid mobile number',
-                minlength: 'Must be at least Five characters'
+            officeCity: {
+                required: 'This information is required.',
             },
             emailAddress: {
-                required: 'This information is required',
-                email: 'This is not a valid email'
+                required: 'This information is required.',
+                email: 'This is not a valid email.'
+            },
+            telNumber: {
+                required: 'This information is required.',
+            },
+            mobileNumber: {
+                required: 'This information is required.',
             },
         },
         submitHandler: function (form) {
@@ -100,24 +87,35 @@
             liabilityClause: {
                 required: true,
                 minlength: 5,
+                lettersonly: true,
             },
             shareClause: {
                 required: true,
-                minlength: 5
+                minlength: 5,
+                lettersonly: true,
+            },
+            shares: {
+                required: true,
+                digits: true
             },
         },
         messages: {
             liabilityClause: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Five characters.',
+                lettersonly: 'Only letters of the alphabet required.',
             },
             shareClause: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Five characters.',
+                lettersonly: 'Only letters of the alphabet required.',
+            },
+            shares: {
+                required: 'This information is required.',
+                digits: 'Only digits required.'
             },
         },
         submitHandler: function (form) {
-            toastr.warning("Submit handler meet");
             $.ajax({
                 type: 'Post',
                 url: '/entity/clause',
@@ -128,11 +126,10 @@
                 },
                 success: function (data) {
                     memoId = data;
-                    console.log(data);
-                    console.log(memoId);
+                    toastr.success("Share and liability clauses saved.");
                 },
                 error: function (err) {
-                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit");
+                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit.");
                 }
             });
         },
@@ -158,8 +155,8 @@
         },
         messages: {
             objective: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Five characters.'
             },
         },
         submitHandler: function (form) {
@@ -169,7 +166,7 @@
             tblObjects.row.add([
                 input.objective
             ]).draw(false);
-            $('#modal-objective').modal('toggle');
+            $('#objectiveForm').trigger('reset');            
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -192,7 +189,7 @@
         },
         messages: {
             tableOfArticles: {
-                required: 'This information is required',
+                required: 'This information is required.',
             },
         },
         submitHandler: function (form) {
@@ -234,8 +231,8 @@
         },
         messages: {
             article: {
-                required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                required: 'This information is required.',
+                minlength: 'Must be at least Five characters.'
             },
         },
         submitHandler: function (form) {
@@ -245,7 +242,7 @@
             tblArticles.row.add([
                 input.article
             ]).draw(false);
-            $('#modal-article').modal('toggle');
+            $('#articleModalForm').trigger('reset');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -280,23 +277,20 @@
             },
             gender: {
                 required: true,
-                minlength: 5,
             },
             phyAddress: {
                 required: true,
                 minlength: 5,
             },
             ordShares: {
-                required: true,
-                minlength: 5,
+                digits: true,
             },
             prefShares: {
-                required: true,
-                minlength: 5,
+                digits: true,
             },
             totShares: {
-                required: true,
-                minlength: 5,
+                // required: true,
+                digits: true,
             },
         },
         messages: {
@@ -338,15 +332,15 @@
             },
             ordShares: {
                 required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                digits: 'Only digits required.',
             },
             prefShares: {
                 required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                digits: 'Only digits required.',
             },
             totShares: {
                 required: 'This information is required',
-                minlength: 'Must be at least Five characters'
+                digits: 'Only digits required.',
             },
         },
         submitHandler: function (form) {
@@ -367,7 +361,7 @@
                 input.prefShares,
                 input.totShares,
             ]).draw(false);
-            $('#modal-people').modal('toggle');
+            $('#peopleForm').trigger('reset');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -447,7 +441,7 @@
                 input.entityPrefShares,
                 input.entityTotShares,
             ]).draw(false);
-            $('#modal-entity').modal('toggle');
+            $('#entityForm').trigger('reset');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

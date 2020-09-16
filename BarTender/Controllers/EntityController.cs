@@ -45,8 +45,8 @@ namespace BarTender.Controllers {
                     from a in _eachDb.Applications
                     from ns in _eachDb.NameSearches.InnerJoin(k => k.ApplicationId == a.Id)
                     where a.UserId == user.Sub
-                          && a.ServiceId == 12 || a.ServiceId == 13
-                          && a.Status == 3 || a.Status == 1002
+                        && a.ServiceId == 12 || a.ServiceId == 13
+                        && a.Status == 3 || a.Status == 1002
                     select new
                     {
                         ns.Id,
@@ -133,33 +133,66 @@ namespace BarTender.Controllers {
 
                 if (service != null)
                 {
-                    var applicationId = _eachDb.Applications
-                        .Value(a => a.UserId, user.Sub)
-                        .Value(a => a.ServiceId, service.Id)
-                        .Value(a => a.DateSubmitted, DateTime.Now)
-                        .Value(a => a.Status, status)
-                        .Value(a => a.SortingOffice, name.SortingOffice)
-                        .InsertWithInt32Identity();
+                    var entity = (
+                        from p in _eachDb.PvtEntities
+                        where p.NameId != null
+                              && p.NameId == name.Id
+                        select p
+                    ).FirstOrDefault();
 
-                    if (applicationId > 0)
+                    string pvtEntityId = "";
+                    int? applicationId = null;
+                    int entityRecordsInserted = 0;
+
+                    if (entity == null)
                     {
-                        var pvtEntityId = Guid.NewGuid().ToString();
-                        var entityId = _eachDb.PvtEntities
-                            .Value(p => p.Id, pvtEntityId)
-                            .Value(p => p.ApplicationId, applicationId)
-                            .Value(p => p.NameId, name.Id)
-                            .Insert();
+                        applicationId = _eachDb.Applications
+                            .Value(a => a.UserId, user.Sub)
+                            .Value(a => a.ServiceId, service.Id)
+                            .Value(a => a.DateSubmitted, DateTime.Now)
+                            .Value(a => a.Status, status)
+                            .Value(a => a.SortingOffice, name.SortingOffice)
+                            .InsertWithInt32Identity();
 
-                        if (entityId > 0)
+                        if (applicationId != null)
                         {
-                            return Ok(new NewNameSearchApplicationDto
-                            {
-                                Value = name.Value,
-                                NameSearchId = name.NameSearchId,
-                                ApplicationId = applicationId,
-                                PvtEntityId = pvtEntityId
-                            });
+                            pvtEntityId = Guid.NewGuid().ToString();
+                            entityRecordsInserted = _eachDb.PvtEntities
+                                .Value(p => p.Id, pvtEntityId)
+                                .Value(p => p.ApplicationId, applicationId)
+                                .Value(p => p.NameId, name.Id)
+                                .Insert();
                         }
+                    }
+                    else
+                    {
+                        pvtEntityId = entity.Id;
+                        applicationId = (
+                            from a in _eachDb.Applications
+                            where a.Id == entity.ApplicationId
+                            select a.Id
+                        ).FirstOrDefault();
+                        entityRecordsInserted = 1;
+                    }
+
+                    var cities = (
+                        from ct in _shwaDb.Cities
+                        where ct.CountryCode.Equals("ZWE")
+                        select new City
+                        {
+                            Id = ct.ID,
+                            Name = ct.Name
+                        }).ToList();
+
+                    if (entityRecordsInserted > 0)
+                    {
+                        return Ok(new NewNameSearchApplicationDto
+                        {
+                            Value = name.Value,
+                            ApplicationId = applicationId,
+                            PvtEntityId = pvtEntityId,
+                            Cities = cities
+                        });
                     }
                 }
             }
@@ -191,7 +224,7 @@ namespace BarTender.Controllers {
                         var officeId = _eachDb.Offices
                             .Value(o => o.PhysicalAddress, officeInformationDto.Office.PhysicalAddress)
                             .Value(o => o.PostalAddress, officeInformationDto.Office.PostalAddress)
-                            .Value(o => o.City, 1000)
+                            .Value(o => o.City, officeInformationDto.Office.OfficeCity)
                             .Value(o => o.MobileNumber, officeInformationDto.Office.MobileNumber)
                             .Value(o => o.TelephoneNumber, officeInformationDto.Office.TelNumber)
                             .Value(o => o.EmailAddress, officeInformationDto.Office.EmailAddress)
@@ -216,7 +249,7 @@ namespace BarTender.Controllers {
 
                         savedOffice.PhysicalAddress = officeInformationDto.Office.PhysicalAddress;
                         savedOffice.PostalAddress = officeInformationDto.Office.PostalAddress;
-                        // ADD City here
+                        savedOffice.City = officeInformationDto.Office.OfficeCity;
                         savedOffice.MobileNumber = officeInformationDto.Office.MobileNumber;
                         savedOffice.TelephoneNumber = officeInformationDto.Office.TelNumber;
                         savedOffice.EmailAddress = officeInformationDto.Office.EmailAddress;
@@ -295,10 +328,29 @@ namespace BarTender.Controllers {
                     int count = 0;
                     foreach (var objective in memorandumObjectsDto.Objects)
                     {
-                        var objectiveId = _eachDb.MemoObjects
-                            .Value(o => o.Value, objective.Objective)
-                            .Value(o => o.MemorundumId, entity.MemorundumId)
-                            .InsertWithInt32Identity();
+                        int? objectiveId = null;
+                        if (objective.Id == 0)
+                        {
+                            objectiveId = _eachDb.MemoObjects
+                                .Value(o => o.Value, objective.Objective)
+                                .Value(o => o.MemorundumId, entity.MemorundumId)
+                                .InsertWithInt32Identity();
+                        }
+                        else
+                        {
+                            var objectiveFromDb = (
+                                from o in _eachDb.MemoObjects
+                                where o.Id == objective.Id
+                                select o
+                            ).FirstOrDefault();
+
+                            if (objectiveFromDb != null)
+                            {
+                                objectiveFromDb.Value = objective.Objective;
+                                if (_eachDb.Update(objectiveFromDb) == 1)
+                                    objectiveId = objectiveFromDb.Id;
+                            }
+                        }
 
                         if (objectiveId != null && objectiveId > 0)
                         {
@@ -425,36 +477,43 @@ namespace BarTender.Controllers {
             {
                 if (entity.ArticlesId != null)
                 {
-                    var amendedArticlesFromDb = (
-                        from a in _eachDb.AmmendedArticles
-                        where a.ArticleId == entity.ArticlesId
-                        select a
-                    ).ToList();
-
-                    if (amendedArticlesFromDb.Count > 0)
-                    {
-                        var amendedArticlesDeleted = (
-                            from a in _eachDb.AmmendedArticles
-                            where a.ArticleId == entity.ArticlesId
-                            select a
-                        ).Delete();
-                    }
-
-                    int? amended = 0;
+                    int count = 0;
                     foreach (var amendedArticle in amendedArticleDto.AmendedArticles)
                     {
-                        amended += _eachDb.AmmendedArticles
-                            .Value(a => a.Value, amendedArticle.Article)
-                            .Value(a => a.ArticleId, entity.ArticlesId)
-                            .InsertWithInt32Identity();
+                        int? amendedArticleId = null;
+                        if (amendedArticle.Id == 0)
+                        {
+                            amendedArticleId = _eachDb.AmmendedArticles
+                                .Value(a => a.Value, amendedArticle.Article)
+                                .Value(a => a.ArticleId, entity.ArticlesId)
+                                .InsertWithInt32Identity();
+                        }
+                        else
+                        {
+                            var amendedArticleFromDb = (
+                                from a in _eachDb.AmmendedArticles
+                                where a.Id == amendedArticle.Id
+                                select a
+                            ).FirstOrDefault();
 
-                        if (amended > 0)
+                            if (amendedArticleFromDb != null)
+                            {
+                                amendedArticleFromDb.Value = amendedArticle.Article;
+                                if (_eachDb.Update(amendedArticleFromDb) == 1)
+                                    amendedArticleId = amendedArticleFromDb.Id;
+                            }
+                        }
+
+                        if (amendedArticleId != null && amendedArticleId > 0)
+                        {
+                            count++;
                             continue;
+                        }                            
                         else
                             break;
                     }
 
-                    if (amended > 0)
+                    if (count == amendedArticleDto.AmendedArticles.Count)
                     {
                         return NoContent();
                     }
@@ -493,12 +552,11 @@ namespace BarTender.Controllers {
                         {
                             subscriberId = _eachDb.Subcribers
                                 .Value(s => s.CountryCode, person.NationalId)
-                                .Value(s => s.NationalId, person.PeopleCountry)
-                                .Value(s => s.Surname, person.MemberSurname)
-                                .Value(s => s.MiddleNames, person.MemberName)
-                                .Value(s => s.FirstName, person.MemberName)
+                                .Value(s => s.NationalId, person.NationalId)
+                                .Value(s => s.Surname, person.MemberSurname.ToUpper())
+                                .Value(s => s.FirstName, person.MemberName.ToUpper())
                                 .Value(s => s.Gender, 1)
-                                .Value(s => s.PhysicalAddress, person.PhyAddress)
+                                .Value(s => s.PhysicalAddress, person.PhyAddress.ToUpper())
                                 .InsertWithInt32Identity();
                         }
                         catch (Exception ex)
@@ -568,7 +626,6 @@ namespace BarTender.Controllers {
                             subscriberInDb.CountryCode = person.PeopleCountry;
                             subscriberInDb.NationalId = person.NationalId;
                             subscriberInDb.Surname = person.MemberSurname;
-                            subscriberInDb.MiddleNames = person.MemberName; // Deal with the removal of this field..
                             subscriberInDb.FirstName = person.MemberName;
                             //Handle gender here
                             subscriberInDb.PhysicalAddress = person.PeopleCountry;

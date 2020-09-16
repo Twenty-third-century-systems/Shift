@@ -13,6 +13,33 @@ let memberEntities = [];
 $('#amendedArticlesDisplay').hide();
 
 $(document).ready(function () {
+
+    function calculateTotalShares() {
+        let ordShares = 0;
+        let prefShares = 0;
+
+        if ($('#ordShares').valid()) {
+            if ($('#ordShares').val() !== '')
+                ordShares = parseInt($('#ordShares').val());
+        }
+
+        if ($('#prefShares').valid()) {
+            if ($('#prefShares').val() !== '')
+                prefShares = parseInt($('#prefShares').val());
+        }
+
+        $('#totShares').val(ordShares + prefShares);
+    }
+
+
+    $("#ordShares").on("input", function () {
+        calculateTotalShares();
+    });
+
+    $("#prefShares").on("input", function () {
+        calculateTotalShares();
+    });
+
     $('#submitObjects').click(function () {
         if (objects.length > 0) {
             $.ajax({
@@ -58,7 +85,7 @@ $(document).ready(function () {
             toastr.warning("You haven't added any amended article yet.")
         }
     });
-    
+
     $('#submitShareHolders').click(function () {
         if (memberPeople.length > 0) {
             $.ajax({
@@ -101,7 +128,7 @@ $(document).ready(function () {
         } else {
             toastr.warning("You haven't added any amended article yet.")
         }
-    });    
+    });
 
     $('#tableOfArticles').change(function () {
         if ($('#tableOfArticles').val() === 'other') {
@@ -110,4 +137,6 @@ $(document).ready(function () {
             $('#amendedArticlesDisplay').hide();
         }
     });
-});
+})
+;
+

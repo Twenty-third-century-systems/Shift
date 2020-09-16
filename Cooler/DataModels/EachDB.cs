@@ -48,79 +48,79 @@ namespace Cooler.DataModels
 		// }
 
 		public EachDB(LinqToDbConnectionOptions<EachDB> options)
-			: base(options)
+		: base(options)
 		{
 			// InitDataContext();
 			// InitMappingSchema();
 		}
 
-		partial void InitDataContext  ();
-		partial void InitMappingSchema();
+		// partial void InitDataContext  ();
+		// partial void InitMappingSchema();
 	}
 
 	[Table(Schema="each", Name="ammended_article")]
 	public partial class AmmendedArticle
 	{
-		[Column("id"),         PrimaryKey, NotNull] public int    Id        { get; set; } // int
-		[Column("value"),                  NotNull] public string Value     { get; set; } // nvarchar(max)
-		[Column("article_id"),             NotNull] public int    ArticleId { get; set; } // int
+		[Column("id"),         PrimaryKey, Identity] public int    Id        { get; set; } // int
+		[Column("value"),      NotNull             ] public string Value     { get; set; } // nvarchar(max)
+		[Column("article_id"), NotNull             ] public int    ArticleId { get; set; } // int
 	}
 
 	[Table(Schema="each", Name="application")]
 	public partial class Application
 	{
-		[Column("id"),             PrimaryKey,  NotNull] public int       Id            { get; set; } // int
-		[Column("user_id"),                     NotNull] public string    UserId        { get; set; } // nvarchar(50)
-		[Column("service_id"),                  NotNull] public int       ServiceId     { get; set; } // int
-		[Column("date_submitted"),              NotNull] public DateTime  DateSubmitted { get; set; } // datetime2(6)
-		[Column("status"),                      NotNull] public int       Status        { get; set; } // int
-		[Column("sorting_office"),              NotNull] public int       SortingOffice { get; set; } // int
-		[Column("date_examined"),     Nullable         ] public DateTime? DateExamined  { get; set; } // datetime2(6)
-		[Column("credit_id"),         Nullable         ] public int?      CreditId      { get; set; } // int
-		[Column("task_id"),           Nullable         ] public int?      TaskId        { get; set; } // int
+		[Column("id"),             PrimaryKey,  Identity] public int       Id            { get; set; } // int
+		[Column("user_id"),        NotNull              ] public string    UserId        { get; set; } // nvarchar(50)
+		[Column("service_id"),     NotNull              ] public int       ServiceId     { get; set; } // int
+		[Column("date_submitted"), NotNull              ] public DateTime  DateSubmitted { get; set; } // datetime2(6)
+		[Column("status"),         NotNull              ] public int       Status        { get; set; } // int
+		[Column("sorting_office"), NotNull              ] public int       SortingOffice { get; set; } // int
+		[Column("date_examined"),     Nullable          ] public DateTime? DateExamined  { get; set; } // datetime2(6)
+		[Column("credit_id"),         Nullable          ] public int?      CreditId      { get; set; } // int
+		[Column("task_id"),           Nullable          ] public int?      TaskId        { get; set; } // int
 	}
 
 	[Table(Schema="each", Name="article_of_association")]
 	public partial class ArticleOfAssociation
 	{
-		[Column("id"),      PrimaryKey,  NotNull] public int    Id     { get; set; } // int
-		[Column("table_A"),    Nullable         ] public short? TableA { get; set; } // smallint
-		[Column("table_B"),    Nullable         ] public short? TableB { get; set; } // smallint
-		[Column("other"),      Nullable         ] public short? Other  { get; set; } // smallint
+		[Column("id"),      PrimaryKey, Identity] public int    Id     { get; set; } // int
+		[Column("table_A"), Nullable            ] public short? TableA { get; set; } // smallint
+		[Column("table_B"), Nullable            ] public short? TableB { get; set; } // smallint
+		[Column("other"),   Nullable            ] public short? Other  { get; set; } // smallint
 	}
 
 	[Table(Schema="each", Name="foreign_entity")]
 	public partial class ForeignEntity
 	{
-		[Column("id"),          PrimaryKey, NotNull] public int    Id         { get; set; } // int
-		[Column("country"),                 NotNull] public string Country    { get; set; } // nvarchar(45)
-		[Column("company_ref"),             NotNull] public string CompanyRef { get; set; } // nvarchar(45)
-		[Column("name"),                    NotNull] public string Name       { get; set; } // nvarchar(45)
+		[Column("id"),          PrimaryKey, Identity] public int    Id         { get; set; } // int
+		[Column("country"),     NotNull             ] public string Country    { get; set; } // nvarchar(45)
+		[Column("company_ref"), NotNull             ] public string CompanyRef { get; set; } // nvarchar(45)
+		[Column("name"),        NotNull             ] public string Name       { get; set; } // nvarchar(45)
 	}
 
 	[Table(Schema="each", Name="memo_object")]
 	public partial class MemoObject
 	{
-		[Column("id"),            PrimaryKey, NotNull] public int    Id           { get; set; } // int
-		[Column("value"),                     NotNull] public string Value        { get; set; } // nvarchar(max)
-		[Column("memorundum_id"),             NotNull] public int    MemorundumId { get; set; } // int
+		[Column("id"),            PrimaryKey, Identity] public int    Id           { get; set; } // int
+		[Column("value"),         NotNull             ] public string Value        { get; set; } // nvarchar(max)
+		[Column("memorundum_id"), NotNull             ] public int    MemorundumId { get; set; } // int
 	}
 
 	[Table(Schema="each", Name="memorundum")]
 	public partial class Memorundum
 	{
-		[Column("id"),               PrimaryKey, NotNull] public int    Id              { get; set; } // int
-		[Column("share_clause"),                 NotNull] public string ShareClause     { get; set; } // nvarchar(max)
-		[Column("liability_clause"),             NotNull] public string LiabilityClause { get; set; } // nvarchar(200)
+		[Column("id"),               PrimaryKey, Identity] public int    Id              { get; set; } // int
+		[Column("share_clause"),     NotNull             ] public string ShareClause     { get; set; } // nvarchar(max)
+		[Column("liability_clause"), NotNull             ] public string LiabilityClause { get; set; } // nvarchar(200)
 	}
 
 	[Table(Schema="each", Name="name")]
 	public partial class Name
 	{
-		[Column("id"),             PrimaryKey, NotNull] public int    Id           { get; set; } // int
-		[Column("value"),                      NotNull] public string Value        { get; set; } // nvarchar(200)
-		[Column("status"),                     NotNull] public int    Status       { get; set; } // int
-		[Column("name_search_id"),             NotNull] public string NameSearchId { get; set; } // nvarchar(50)
+		[Column("id"),             PrimaryKey, Identity] public int    Id           { get; set; } // int
+		[Column("value"),          NotNull             ] public string Value        { get; set; } // nvarchar(200)
+		[Column("status"),         NotNull             ] public int    Status       { get; set; } // int
+		[Column("name_search_id"), NotNull             ] public string NameSearchId { get; set; } // nvarchar(50)
 	}
 
 	[Table(Schema="each", Name="name_search")]
@@ -139,13 +139,13 @@ namespace Cooler.DataModels
 	[Table(Schema="each", Name="office")]
 	public partial class Office
 	{
-		[Column("id"),               PrimaryKey, NotNull] public int    Id              { get; set; } // int
-		[Column("physical_address"),             NotNull] public string PhysicalAddress { get; set; } // nvarchar(200)
-		[Column("postal_address"),               NotNull] public string PostalAddress   { get; set; } // nvarchar(200)
-		[Column("city"),                         NotNull] public int    City            { get; set; } // int
-		[Column("mobile_number"),                NotNull] public string MobileNumber    { get; set; } // nvarchar(45)
-		[Column("telephone_number"),             NotNull] public string TelephoneNumber { get; set; } // nvarchar(45)
-		[Column("email_address"),                NotNull] public string EmailAddress    { get; set; } // nvarchar(200)
+		[Column("id"),               PrimaryKey, Identity] public int    Id              { get; set; } // int
+		[Column("physical_address"), NotNull             ] public string PhysicalAddress { get; set; } // nvarchar(200)
+		[Column("postal_address"),   NotNull             ] public string PostalAddress   { get; set; } // nvarchar(200)
+		[Column("city"),             NotNull             ] public int    City            { get; set; } // int
+		[Column("mobile_number"),    NotNull             ] public string MobileNumber    { get; set; } // nvarchar(45)
+		[Column("telephone_number"), NotNull             ] public string TelephoneNumber { get; set; } // nvarchar(45)
+		[Column("email_address"),    NotNull             ] public string EmailAddress    { get; set; } // nvarchar(200)
 	}
 
 	[Table(Schema="each", Name="pvt_entity")]
@@ -189,42 +189,41 @@ namespace Cooler.DataModels
 	[Table(Schema="each", Name="roles")]
 	public partial class Role
 	{
-		[Column("id"),        PrimaryKey,  NotNull] public int    Id        { get; set; } // int
-		[Column("director"),     Nullable         ] public short? Director  { get; set; } // smallint
-		[Column("member"),       Nullable         ] public short? Member    { get; set; } // smallint
-		[Column("secretary"),    Nullable         ] public short? Secretary { get; set; } // smallint
+		[Column("id"),        PrimaryKey, Identity] public int    Id        { get; set; } // int
+		[Column("director"),  Nullable            ] public short? Director  { get; set; } // smallint
+		[Column("member"),    Nullable            ] public short? Member    { get; set; } // smallint
+		[Column("secretary"), Nullable            ] public short? Secretary { get; set; } // smallint
 	}
 
 	[Table(Schema="each", Name="subcriber")]
 	public partial class Subcriber
 	{
-		[Column("id"),               PrimaryKey, NotNull] public int    Id              { get; set; } // int
-		[Column("country_code"),                 NotNull] public string CountryCode     { get; set; } // nvarchar(10)
-		[Column("national_id"),                  NotNull] public string NationalId      { get; set; } // nvarchar(45)
-		[Column("surname"),                      NotNull] public string Surname         { get; set; } // nvarchar(45)
-		[Column("middle_names"),                 NotNull] public string MiddleNames     { get; set; } // nvarchar(200)
-		[Column("first_name"),                   NotNull] public string FirstName       { get; set; } // nvarchar(45)
-		[Column("gender"),                       NotNull] public int    Gender          { get; set; } // int
-		[Column("physical_address"),             NotNull] public string PhysicalAddress { get; set; } // nvarchar(200)
+		[Column("id"),               PrimaryKey,  Identity] public int    Id              { get; set; } // int
+		[Column("country_code"),     NotNull              ] public string CountryCode     { get; set; } // nvarchar(200)
+		[Column("national_id"),      NotNull              ] public string NationalId      { get; set; } // nvarchar(200)
+		[Column("surname"),          NotNull              ] public string Surname         { get; set; } // nvarchar(200)
+		[Column("first_name"),       NotNull              ] public string FirstName       { get; set; } // nvarchar(200)
+		[Column("gender"),           NotNull              ] public int    Gender          { get; set; } // int
+		[Column("physical_address"),    Nullable          ] public string PhysicalAddress { get; set; } // nvarchar(200)
 	}
 
 	[Table(Schema="each", Name="subscription")]
 	public partial class Subscription
 	{
-		[Column("id"),              PrimaryKey,  NotNull] public int    Id              { get; set; } // int
-		[Column("ordinary"),           Nullable         ] public long?  Ordinary        { get; set; } // bigint
-		[Column("preference"),         Nullable         ] public long?  Preference      { get; set; } // bigint
-		[Column("subscriptioncol"),    Nullable         ] public string Subscriptioncol { get; set; } // nvarchar(45)
+		[Column("id"),              PrimaryKey, Identity] public int    Id              { get; set; } // int
+		[Column("ordinary"),        Nullable            ] public long?  Ordinary        { get; set; } // bigint
+		[Column("preference"),      Nullable            ] public long?  Preference      { get; set; } // bigint
+		[Column("subscriptioncol"), Nullable            ] public string Subscriptioncol { get; set; } // nvarchar(45)
 	}
 
 	[Table(Schema="each", Name="task")]
 	public partial class Task
 	{
-		[Column("id"),                          PrimaryKey, NotNull] public int      Id                       { get; set; } // int
-		[Column("examiner_id"),                             NotNull] public string   ExaminerId               { get; set; } // nvarchar(45)
-		[Column("date_assigned"),                           NotNull] public DateTime DateAssigned             { get; set; } // datetime2(6)
-		[Column("assigned_by"),                             NotNull] public string   AssignedBy               { get; set; } // nvarchar(45)
-		[Column("expected_date_of_completion"),             NotNull] public DateTime ExpectedDateOfCompletion { get; set; } // datetime2(6)
+		[Column("id"),                          PrimaryKey, Identity] public int      Id                       { get; set; } // int
+		[Column("examiner_id"),                 NotNull             ] public string   ExaminerId               { get; set; } // nvarchar(45)
+		[Column("date_assigned"),               NotNull             ] public DateTime DateAssigned             { get; set; } // datetime2(6)
+		[Column("assigned_by"),                 NotNull             ] public string   AssignedBy               { get; set; } // nvarchar(45)
+		[Column("expected_date_of_completion"), NotNull             ] public DateTime ExpectedDateOfCompletion { get; set; } // datetime2(6)
 	}
 
 	public static partial class TableExtensions

@@ -38,6 +38,7 @@ namespace Dab.Controllers {
                 ViewBag.NameRacho = nameAndApplication.Value;
                 ViewBag.ApplicationId = nameAndApplication.ApplicationId;
                 ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
+                ViewBag.Cities = nameAndApplication.Cities;
             }
             return View();
         }
@@ -58,6 +59,8 @@ namespace Dab.Controllers {
         [HttpPost("office")]
         public async Task<IActionResult> Office(OfficeInformationDto officeInformationDto)
         {
+            officeInformationDto.Office.PhysicalAddress = officeInformationDto.Office.PhysicalAddress.ToUpper();
+            officeInformationDto.Office.PostalAddress = officeInformationDto.Office.PostalAddress.ToUpper();
             using (var client = new HttpClient())
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
@@ -93,6 +96,7 @@ namespace Dab.Controllers {
         [HttpPost("objects")]
         public async Task<IActionResult> Objects(MemorandumObjectsDto memorandumObjectsDto)
         {
+            // Handle Updates to objectives 
             using (var client = new HttpClient())
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
