@@ -3,7 +3,16 @@
     var btnDone = $('<button></button>').text('Done')
         .addClass('btn btn-info')
         .on('click', function () {
-            alert('Finish Clicked');
+            $.ajax({
+                type: 'Post',
+                url: '/entity/' + $('#applicationId').val() + '/submit',
+                success: function (data) {
+                    toastr.success("Your application has been submitted");
+                },
+                error: function (err) {
+                    toastr.error("Something went wrong in saving your application.");
+                }
+            });
         });
 
 
@@ -17,19 +26,18 @@
             btnDone.addClass('disabled');
         }
     });
-    
+
     //Step leave event
-    $('#smartwizard').on('leaveStep', function (e, anchorObject, stepNumber, stepDirection, stepPosition) {        
+    $('#smartwizard').on('leaveStep', function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
         console.log(stepNumber);
         console.log(stepDirection);
-        if (stepNumber === 0 && stepDirection-stepNumber === 1) {
+        if (stepNumber === 0 && stepDirection - stepNumber === 1) {
             // return officeSaved;
             return true;
-        }
-        else if (stepNumber === 1 && stepDirection === 'forward') {
+        } else if (stepNumber === 1 && stepDirection === 'forward') {
             // return memorandumSaved;
             return true;
-        } 
+        }
         // else if (stepNumber === 2 && stepDirection === 'forward') {
         //     submitMembers();
         //     return true;

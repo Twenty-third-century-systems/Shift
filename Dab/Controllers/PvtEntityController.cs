@@ -29,9 +29,9 @@ namespace Dab.Controllers {
                 client.SetBearerToken(accessToken);
                 var responce = await client.GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name").Result.Content
                     .ReadAsStringAsync();
-                var nameAndApplication = JsonConvert.DeserializeObject<NameAndApplication>(responce);
+                var nameAndApplication = JsonConvert.DeserializeObject<NameApplicationAndDefaults>(responce);
                 nameAndApplication.Id = nameId;
-                var imweResponse = await client.PostAsJsonAsync<NameAndApplication>($"{ApiUrls.InitialisePvtApplication}", nameAndApplication)
+                var imweResponse = await client.PostAsJsonAsync<NameApplicationAndDefaults>($"{ApiUrls.InitialisePvtApplication}", nameAndApplication)
                     .Result.Content
                     .ReadAsStringAsync();
                 
@@ -39,6 +39,8 @@ namespace Dab.Controllers {
                 ViewBag.ApplicationId = nameAndApplication.ApplicationId;
                 ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
                 ViewBag.Cities = nameAndApplication.Cities;
+                ViewBag.Countries = nameAndApplication.Countries;
+                ViewBag.Gender = nameAndApplication.Genders;
             }
             return View();
         }
@@ -182,7 +184,24 @@ namespace Dab.Controllers {
                 }
             }
             return BadRequest();
-        }            
-        
+        }
+
+        [HttpPost("{applicationId}/submit")]
+        public async Task<IActionResult> SubmitEntity(int applicationId)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .PostAsJsonAsync<int>(ApiUrls.SubmitPvtApplication,
+                        applicationId).Result;
+                if (response.IsSuccessStatusCode)
+                {                                        
+                    return NoContent();
+                }
+            }
+            return BadRequest();
+        }
     }
 }

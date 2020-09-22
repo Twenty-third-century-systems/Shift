@@ -1,12 +1,12 @@
 ﻿function displayNameSearchApplications(data, refresh) {
-    
+
     // Updating badges
     $('#nameSearchCount').text(data.nameSearchApplications.length);
     $('#pvtEntityCount').text(data.pvtEntityApplications.length);
 
     $('#applicationsContainer').empty(); // The actual applications container
 
-    if(refresh !== undefined ){
+    if (refresh !== undefined) {
         $('#service').val("name search");
         data.nameSearchApplications.forEach(function (e) {
             let applicationElement =
@@ -24,13 +24,14 @@
                 alert('Element clickable')
             });
         });
-    }else{
+    } else {
         // Setting up click listeners
         $('#nameSearchSelector').click(function () {
             if (data.nameSearchApplications.length > 0) {
                 $('#allocateTasks').show();   // The form
                 $('#onDisplay').text('Name search Application');  // Application container header text    
                 $('#service').val("name search");
+                $('#applicationsContainer').empty();
                 data.nameSearchApplications.forEach(function (e) {
                     let applicationElement =
                         '<div class="media text-muted pt-3 system-control" id="' + e.id + '">\n' +
@@ -56,15 +57,14 @@
             }
         });
     }
-   
 }
 
-function refreshNameSearchApplicationDisplay(refresh){
+function refreshNameSearchApplicationDisplay(refresh) {
     $.ajax({
         type: 'Get',
         url: '/applications/all',
         success: function (data) {
-            displayNameSearchApplications(data,refresh);
+            displayNameSearchApplications(data, refresh);
         }
     });
 }
@@ -114,7 +114,6 @@ $(document).ready(function () {
                     $('#allocateTasks').hide();
                 }
             });
-            
             console.log(data);
         },
         error: function (err) {

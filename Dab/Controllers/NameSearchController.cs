@@ -123,7 +123,7 @@ namespace Dab.Controllers {
                     return Ok(true);
                 }
 
-                return Ok("\"NameAndApplication not available\"");
+                return Ok("\"This name is not available\"");
             }
         }
     }

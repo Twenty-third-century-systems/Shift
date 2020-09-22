@@ -8,6 +8,7 @@ let objects = [];
 let amendedArticles = [];
 let memberPeople = [];
 let memberEntities = [];
+let shares = 0;
 
 
 $('#amendedArticlesDisplay').hide();
@@ -39,6 +40,10 @@ $(document).ready(function () {
     $("#prefShares").on("input", function () {
         calculateTotalShares();
     });
+    
+    // $('#shares').on("input", function () {
+    //     shares = $('#shares').val();
+    // });
 
     $('#submitObjects').click(function () {
         if (objects.length > 0) {

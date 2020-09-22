@@ -18,5 +18,6 @@
         public static readonly string SubmitPvtApplicationsAmendedArticle = $"{ApiBaseUrl}/entity/am";
         public static readonly string SubmitPvtApplicationShareHoldingPeople = $"{ApiBaseUrl}/entity/p";
         public static readonly string SubmitPvtApplicationShareHoldingEntities = $"{ApiBaseUrl}/entity/e";
+        public static readonly string SubmitPvtApplication = $"{ApiBaseUrl}/entity/s";
     }
 }

@@ -27,7 +27,8 @@ $('#smartwizard').smartWizard({
         animation: 'fade', // Effect on navigation, none/fade/slide-horizontal/slide-vertical/slide-swing
     },
     toolbarSettings: {
-        toolbarPosition: 'top', // both bottom
+        toolbarPosition: 'bottom', // both bottom
+        toolbarButtonPosition: 'center', // left, right, center
         toolbarExtraButtons: [btnDone]
     },
     keyboardSettings: {

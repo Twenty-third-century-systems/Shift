@@ -1,11 +1,10 @@
-﻿let tblObjects = undefined;
-let tblPeople = undefined;
-let tblEntities = undefined;
-let tblArticles = undefined;
+﻿let objectsTable = undefined;
+let peopleTable = undefined;
+let articlesTable = undefined;
 
 $(document).ready(function () {
 
-        tblObjects = $('#tblObjects').DataTable({
+        objectsTable = $('#tblObjects').DataTable({
             responsive: true,
             scrollX: true,
             lengthMenu: [
@@ -14,7 +13,7 @@ $(document).ready(function () {
             ],
         });
 
-        tblPeople = $('#tblPeople').DataTable({
+        peopleTable = $('#tblPeople').DataTable({
             responsive: true,
             scrollX: true,
             lengthMenu: [
@@ -23,16 +22,7 @@ $(document).ready(function () {
             ],
         });
 
-        tblEntities = $('#tblEntities').DataTable({
-            responsive: true,
-            scrollX: true,
-            lengthMenu: [
-                [4, 10],
-                ['4 rows', '10 rows']
-            ],
-        });
-
-        tblArticles = $('#tblArticles').DataTable({
+        articlesTable = $('#tblArticles').DataTable({
             responsive: true,
             scrollX: true,
             lengthMenu: [

@@ -38,7 +38,7 @@ namespace DJ.Controllers {
             if (unAllocatedApplications.Count > 0)
             {
                 foreach (var unAllocatedApplication in unAllocatedApplications)
-                {
+                { 
                     var serviceFromDb =
                     (
                         from serv in _poleDb.Services
@@ -61,16 +61,19 @@ namespace DJ.Controllers {
                                     Convert.ToDateTime(unAllocatedApplication.DateSubmitted.ToString("dd MMM yyy"))
                             });
                         }
-                        else
+                        else // use else if when new service introduced
                         {
-                            pvtEntity.Add(new Application
+                            if (unAllocatedApplication.Status == 7)
                             {
-                                Id = unAllocatedApplication.Id,
-                                Service = service.ToUpper(),
-                                User = unAllocatedApplication.UserId,
-                                SubmissionDate =
-                                    Convert.ToDateTime(unAllocatedApplication.DateSubmitted.ToString("dd MMM yyyy"))
-                            });
+                                pvtEntity.Add(new Application
+                                {
+                                    Id = unAllocatedApplication.Id,
+                                    Service = service.ToUpper(),
+                                    User = unAllocatedApplication.UserId,
+                                    SubmissionDate =
+                                        Convert.ToDateTime(unAllocatedApplication.DateSubmitted.ToString("dd MMM yyyy"))
+                                });
+                            }                            
                         }
                     }
                 }
@@ -91,6 +94,10 @@ namespace DJ.Controllers {
             if (task.Id == 0)
             {
                 var count = 0;
+                if (task.Service.Equals("Pvt Entity applications"))
+                {
+                    task.Service = "private limited company";
+                }
                 var service = (
                     from s in _poleDb.Services
                     where s.Description.Equals(task.Service.ToLower())
@@ -134,23 +141,10 @@ namespace DJ.Controllers {
                             return NotFound("The are no pending applications");
                         }
                     }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError,
-                            "Something went wrong in saving application");
-                    }
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Something went wrong in saving application");
                 }
             }
-            else
-            {
-                return BadRequest("Invalid task");
-            }
+
             return BadRequest("Something went wrong");
-        }        
+        }
     }
 }

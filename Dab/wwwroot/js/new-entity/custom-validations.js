@@ -166,7 +166,7 @@
             tblObjects.row.add([
                 input.objective
             ]).draw(false);
-            $('#objectiveForm').trigger('reset');            
+            $('#objectiveForm').trigger('reset');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -261,19 +261,15 @@
         rules: {
             peopleCountry: {
                 required: true,
-                minlength: 5,
             },
             nationalId: {
                 required: true,
-                minlength: 5,
             },
             memberSurname: {
                 required: true,
-                minlength: 5,
             },
             memberName: {
                 required: true,
-                minlength: 5,
             },
             gender: {
                 required: true,
@@ -345,8 +341,24 @@
         },
         submitHandler: function (form) {
             let input = $(form).serializeToJSON();
-            memberPeople.push(input);
+
             console.log(memberPeople);
+            console.log(shares);
+
+            if (input.isDirector == null) {
+                input.isDirector = false;
+            }
+            if (input.isSecretary == null) {
+                input.isSecretary = false;
+            }
+            if (input.isMember == null) {
+                input.isMember = false;
+            }
+
+            //Handle changes number of shares and those allocated before populating the database
+
+            // if (shares - (input.ordShares + input.prefShares) >= 0) {
+            memberPeople.push(input);
             tblPeople.row.add([
                 input.peopleCountry,
                 input.nationalId,
@@ -361,7 +373,15 @@
                 input.prefShares,
                 input.totShares,
             ]).draw(false);
+            shares = shares - (input.ordShares + input.prefShares);
             $('#peopleForm').trigger('reset');
+            // } else {
+            //     toastr.error('The total number of allocated shares ' +
+            //         'is now greater than the number of ' +
+            //         'shares specified in the share capital. ' +
+            //         '' + shares + ' are left for allocation');
+            // }
+
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

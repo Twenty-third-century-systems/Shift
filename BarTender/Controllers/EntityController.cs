@@ -13,6 +13,7 @@ using LinqToDB;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Gender = BarTender.Models.Gender;
 
 namespace BarTender.Controllers {
     [Route("api/entity")]
@@ -45,8 +46,10 @@ namespace BarTender.Controllers {
                     from a in _eachDb.Applications
                     from ns in _eachDb.NameSearches.InnerJoin(k => k.ApplicationId == a.Id)
                     where a.UserId == user.Sub
-                        && a.ServiceId == 12 || a.ServiceId == 13
-                        && a.Status == 3 || a.Status == 1002
+                        && a.ServiceId == 12
+                        && a.Status == 3 
+                        && ns.ReasonForSearch == 1
+                        && ns.Service == 13
                     select new
                     {
                         ns.Id,
@@ -75,14 +78,27 @@ namespace BarTender.Controllers {
                         if (name == null)
                             continue;
 
-                        names.Add(new RegisteredNameDto
+                        var companyApplication = (
+                            from a in _eachDb.Applications
+                            from p in _eachDb.PvtEntities.InnerJoin(k => k.ApplicationId == a.Id)
+                            where a.ServiceId == 13            //Pvt company
+                                  && a.Status != 1002         //Incomplete
+                                  && p.NameId == name.Id
+                            select a
+                        ).FirstOrDefault();
+
+                        if (companyApplication == null && DateTime.Now < application.ExpiryDate)
                         {
-                            NameId = name.Id,
-                            Ref = application.Reference,
-                            Name = name.Value,
-                            DateSubmitted = application.DateSubmitted,
-                            DateExp = application.ExpiryDate
-                        });
+                            names.Add(new RegisteredNameDto
+                            {
+                                NameId = name.Id,
+                                Ref = application.Reference,
+                                Name = name.Value,
+                                DateSubmitted = application.DateSubmitted,
+                                DateExp = application.ExpiryDate
+                            });
+                        }
+                        
                     }
                 }
 
@@ -183,7 +199,29 @@ namespace BarTender.Controllers {
                             Id = ct.ID,
                             Name = ct.Name
                         }).ToList();
+                    
+                    var countries = (
+                        from c in _shwaDb.Countries
+                        select new Country
+                        {
+                            Code = c.Code,
+                            Name = c.Name
+                        }).ToList();
 
+                    var gen = (
+                        from g in _poleDb.Genders
+                        select new Gender
+                        {
+                            Id = g.Id,
+                            Value = g.Description
+                        }
+                    ).ToList();
+
+                    foreach (var gender in gen)
+                    {
+                        gender.Format();
+                    }
+                    
                     if (entityRecordsInserted > 0)
                     {
                         return Ok(new NewNameSearchApplicationDto
@@ -191,7 +229,9 @@ namespace BarTender.Controllers {
                             Value = name.Value,
                             ApplicationId = applicationId,
                             PvtEntityId = pvtEntityId,
-                            Cities = cities
+                            Cities = cities,
+                            Countries = countries,
+                            Genders = gen
                         });
                     }
                 }
@@ -686,6 +726,34 @@ namespace BarTender.Controllers {
         public IActionResult SubmitShareHoldingEntities([FromBody] ShareHoldingEntityDto shareHoldingEntityDto)
         {
             return NoContent();
+        }
+
+        [HttpPost("s")]
+        public IActionResult SubmitApplication([FromBody]int applicationId)
+        {
+            var application = (
+                from a in _eachDb.Applications
+                where a.Id == applicationId
+                select a
+            ).FirstOrDefault();
+
+            if (application != null)
+            {
+                var status = (
+                    from s in _poleDb.Status
+                    where s.Description.Equals("pending")
+                    select s.Id
+                ).FirstOrDefault();
+
+                if (application.Status != status)
+                {
+                    application.Status = status;
+                    if (_eachDb.Update(application) == 1)
+                        return Ok();
+                }                
+            }
+
+            return BadRequest();
         }
     }
 }
