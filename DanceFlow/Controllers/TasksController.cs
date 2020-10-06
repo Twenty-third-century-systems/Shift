@@ -62,6 +62,7 @@ namespace DanceFlow.Controllers {
             ViewBag.TaskId = task;
             return View();
         }
+        
         [HttpGet("pvt-entity/{task}/applications")]
         public async Task<IActionResult> PvtEntityTaskApplications(int task)
         {

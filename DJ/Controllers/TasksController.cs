@@ -238,6 +238,11 @@ namespace DJ.Controllers {
                             SubmissionDate = application.DateSubmitted,
                             Examined = false
                         };
+                        
+                        if (application.DateExamined != null)
+                        {
+                            applicationTaskDto.Application.Examined = true;
+                        }
                     }
 
                     var pvtEntity = (

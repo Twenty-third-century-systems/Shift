@@ -11,5 +11,6 @@
         public static string ExamineName = $"{ApiBaseUrl}ex/name";
         public static string FinishNameSearchExamination = $"{ApiBaseUrl}ex/name/f";
         public static string AllNamesExamination = $"{ApiBaseUrl}ex/name";
+        public static string FinishPvtApplicationExamination = $"{ApiBaseUrl}ex/pvt/f";
     }
 }

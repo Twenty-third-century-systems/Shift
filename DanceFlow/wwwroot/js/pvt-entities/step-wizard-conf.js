@@ -1,8 +1,18 @@
-﻿// Toolbar extra buttons
-var btnDone = $('<button></button>').text('Done')
+﻿function markApplicationAsExamined(applicationId) {
+    finishExamination(applicationId)
+}
+
+// Toolbar extra buttons
+var btnDone = $('<button id="btn-done" ></button>').text('Done')
     .addClass('btn btn-info')
     .on('click', function () {
-        alert('Finish Clicked');
+        let applicationId = $('#applicationId').val();
+        console.log(typeof applicationId);
+        console.log('Application id:' + applicationId);
+        if (applicationId === "")
+            alert("Not set");
+        else
+            markApplicationAsExamined(applicationId);
     });
 
 

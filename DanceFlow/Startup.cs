@@ -57,6 +57,7 @@ namespace DanceFlow {
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 
                 endpoints.MapHub<NameExaminationHub>("/name/ex");
+                endpoints.MapHub<PvtExaminationHub>("/pvt/ex");
             });
         }
     }

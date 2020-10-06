@@ -54,8 +54,13 @@
                         $('#pvt-application-tasks').show();
                     });
                 }
+
+                if (data.pvtEntityTasks.length <= 0 && data.nameSearchTasks.length <= 0) {
+                    $('#parent-container').append('<p>You have no pending tasks at the moment. <a href="/tasks/allocated">Refresh</a> this page after some time.</p>');
+                }
+                
             } else {
-                $('#parent-container').append('<p>You have no pending tasks at the moment. <a href="/tasks/allocated">Refresh</a> this page after some time.</p>')
+                $('#parent-container').append('<p>You have no pending tasks at the moment. <a href="/tasks/allocated">Refresh</a> this page after some time.</p>');
             }
         },
         error: function (err) {

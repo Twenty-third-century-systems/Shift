@@ -50,8 +50,6 @@ function displayPage(refresh) {
                 });
                 updateStatuses(e.nameSearch.names);
             }
-
-
         } else {
             $('#completed').append(applicationSelect);
         }
