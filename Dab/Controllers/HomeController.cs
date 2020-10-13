@@ -24,7 +24,9 @@ namespace Dab.Controllers {
 
         public async Task<IActionResult> Index()
         {
-            var nameClaim = User.Claims.Where(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"))
+            var nameClaim = User
+                .Claims
+                .Where(c => c.Type.Equals("name")&& c.Issuer.Equals("https://localhost:5001"))
                 .FirstOrDefault();
             ViewBag.User = nameClaim.Value;
             return View();

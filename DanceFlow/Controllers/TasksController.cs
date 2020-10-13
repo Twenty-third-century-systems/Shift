@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using DanceFlow.Dtos;
 using DanceFlow.Models;
 using DJ.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace DanceFlow.Controllers {
+    [Authorize]
     [Route("tasks")]
     public class TasksController : Controller {
         // GET

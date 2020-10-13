@@ -2,11 +2,13 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using DanceFlow.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace DanceFlow.Controllers {
+    [Authorize]
     [Route("applications")]
     public class ApplicationsController : Controller {
         // GET

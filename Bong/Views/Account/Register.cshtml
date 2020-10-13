@@ -1,0 +1,99 @@
+﻿@model object
+
+@{
+    ViewBag.Title = "Register";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <form method="post" action="/Account/Register">
+        <div class="text-center mb-4">
+            <img class="mb-4" src="~/img/1200px-Coat_of_arms_of_Zimbabwe.png" alt="" width="72" height="72">
+            <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+            @* <p>Build form controls with floating labels via the <code>:placeholder-shown</code> pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in latest Chrome, Safari, and Firefox.</a></p> *@
+        </div>
+
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" name="firstName">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Middle name</label>
+                    <input type="text" class="form-control" name="middleName">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Surname</label>
+                    <input type="text" class="form-control" name="surname">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label id="idMode">National id</label>
+                    <input type="text" class="form-control" name="nationalId">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Office</label>
+                    <input class="form-control select2" id="country" name="office">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label>Reidential Address</label>
+                    <input type="text" class="form-control" name="residentialAddress">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>City</label>
+                    <input class="form-control select2" id="city" name="city">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="email">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Phone number</label>
+                    <input type="text" class="form-control" name="phoneNumber">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Confirm</label>
+                    <input type="password" class="form-control" name="confirmPassword">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-sm btn-dark float-right" id="btn-done">Done</button>
+    </form>
+</div>

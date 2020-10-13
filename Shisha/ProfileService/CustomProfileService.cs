@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4;
+using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
@@ -68,10 +69,11 @@ namespace Shish.Profiles {
 
         public async Task IsActiveAsync(IsActiveContext context)
         {
-            var user = await _userManager.GetUserAsync(context.Subject);
-
-            context.IsActive = true;
+            var sub = context.Subject.GetSubjectId();
+            var user = await _userManager.FindByIdAsync(sub);
+            context.IsActive = user != null;
             // (user != null) && user.IsActive;
+            //Todo Implement this method
         }
     }
 }

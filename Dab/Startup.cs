@@ -73,7 +73,7 @@ namespace Dab {
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();            
-            app.UseNodeModules();
+            // app.UseNodeModules();
             app.UseRouting();
 
             
