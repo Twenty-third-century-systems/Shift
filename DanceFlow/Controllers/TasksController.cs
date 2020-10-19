@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DanceFlow.Dtos;
@@ -8,8 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace DanceFlow.Controllers {
-    [Authorize]
+namespace DanceFlow.Controllers {    
+    [Authorize(Policy = "IsExaminer")]
     [Route("tasks")]
     public class TasksController : Controller {
         // GET
@@ -18,13 +19,18 @@ namespace DanceFlow.Controllers {
         {
             return View();
         }
+        
 
         [HttpGet("pending")]
         public async Task<IActionResult> Task(int task)
         {
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync(ApiUrls.AllAllocatedTasks	).Result.Content
+                var user = User
+                    .Claims
+                    .Where(c => c.Type.Equals("sub")&& c.Issuer.Equals("https://localhost:5002"))
+                    .FirstOrDefault();
+                var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{user.Value}"	).Result.Content
                     .ReadAsStringAsync();
                 try
                 {
@@ -38,6 +44,7 @@ namespace DanceFlow.Controllers {
                 
             }
         }
+        
 
         [HttpGet("name-search/{task}")]
         public IActionResult NameSearches(int task)
@@ -45,6 +52,7 @@ namespace DanceFlow.Controllers {
             ViewBag.TaskId = task;
             return View();
         }
+        
 
         [HttpGet("name-search/{task}/applications")]
         public async Task<IActionResult> NameSearchTaskApplications(int task)
@@ -57,6 +65,7 @@ namespace DanceFlow.Controllers {
                 return Ok(taskApplications);
             }
         }
+        
 
         [HttpGet("pvt-entity/{task}")]
         public IActionResult PvtEntities(int task)
@@ -64,6 +73,7 @@ namespace DanceFlow.Controllers {
             ViewBag.TaskId = task;
             return View();
         }
+        
         
         [HttpGet("pvt-entity/{task}/applications")]
         public async Task<IActionResult> PvtEntityTaskApplications(int task)
@@ -76,23 +86,39 @@ namespace DanceFlow.Controllers {
                 return Ok(taskApplications);
             }
         }
+        
 
         [HttpGet("examination/{name}/contain")]
         public async Task<IActionResult> NamesThatContain(string name)
         {
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/contain").Result.Content
-                    .ReadAsStringAsync();
-                var nameToExaminer = JsonConvert.DeserializeObject<List<NameOnExaminationDto>>(response);
-                return Ok(nameToExaminer);
+                var namesToExaminer = new List<NameUnderExaminationResultDto>();
+                var response =  client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/contain").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var strResp = await response.Content.ReadAsStringAsync();
+                    namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
+                }                
+                return Ok(namesToExaminer);
             }            
         }
         
+        
         [HttpGet("examination/{name}/starts")]
-        public IActionResult NamesThatStartWith(string name)
+        public async Task<IActionResult> NamesThatStartWith(string name)
         {
-            return Ok();
+            using (var client = new HttpClient())
+            {
+                var namesToExaminer = new List<NameUnderExaminationResultDto>();
+                var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/starts").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var strResp = await response.Content.ReadAsStringAsync();
+                    namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
+                }  
+                return Ok(namesToExaminer);
+            }  
         }
     }
 }

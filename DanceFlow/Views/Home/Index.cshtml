@@ -1,5 +1,10 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@{
     ViewData["Title"] = "Dashboard";
+    var isRegistrarAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsRegistrar");
+    var isExaminerAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsExaminer");
+    var canSignAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "CanSign");
 }
 
 <!-- Content Header (Page header) -->
@@ -22,142 +27,156 @@
 </div>
 <!-- /.content-header -->
 
+@* @if (isRegistrarAuthorizationResult.Succeeded) *@
+@* { *@
+@*     <!-- Principal examiner --> *@
+@* <div class="row"> *@
+@*     <div class="col-lg-3 col-6"> *@
+@*         <!-- small box --> *@
+@*         <div class="small-box bg-info elevation-3"> *@
+@*             <div class="inner"> *@
+@*                 <h3>150</h3> *@
+@* *@
+@*                 <p>Unallocated Applications</p> *@
+@*             </div> *@
+@*             <div class="icon"> *@
+@*                 <i class="ion ion-folder"></i> *@
+@*             </div> *@
+@*             <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*         </div> *@
+@*     </div> *@
+@*     <!-- ./col --> *@
+@* *@
+@*     <div class="col-lg-3 col-6"> *@
+@*         <!-- small box --> *@
+@*         <div class="small-box bg-warning elevation-3"> *@
+@*             <div class="inner"> *@
+@*                 <h3>44</h3> *@
+@* *@
+@*                 <p>Outstanding tasks</p> *@
+@*             </div> *@
+@*             <div class="icon"> *@
+@*                 <i class="ion ion-briefcase"></i> *@
+@*             </div> *@
+@*             <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*         </div> *@
+@*     </div> *@
+@*     <!-- ./col --> *@
+@* *@
+@*     <div class="col-lg-3 col-6"> *@
+@*         <!-- small box --> *@
+@*         <div class="small-box bg-success elevation-3"> *@
+@*             <div class="inner"> *@
+@*                 <h3><sup style="font-size: 20px">$</sup>53</h3> *@
+@* *@
+@*                 <p>Application Count</p> *@
+@*             </div> *@
+@*             <div class="icon"> *@
+@*                 <i class="ion ion-card"></i> *@
+@*             </div> *@
+@*             <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*         </div> *@
+@*     </div> *@
+@*     <!-- ./col --> *@
+@* *@
+@*     <div class="col-lg-3 col-6"> *@
+@*         <!-- small box --> *@
+@*         <div class="small-box bg-danger elevation-3"> *@
+@*             <div class="inner"> *@
+@*                 <h3 class="text-danger">registered</h3> *@
+@* *@
+@*                 <p>Registration Documents</p> *@
+@*             </div> *@
+@*             <div class="icon"> *@
+@*                 <i class="ion ion-document"></i> *@
+@*             </div> *@
+@*             <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*         </div> *@
+@*     </div> *@
+@*     <!-- ./col --> *@
+@* </div> *@
+@* <!-- /.row/.company examination --> *@
+@* } *@
+@* *@
+@* @if (isExaminerAuthorizationResult.Succeeded) *@
+@* { *@
+@*     <!-- examiner examination --> *@
+@*     <div class="row"> *@
+@*         <div class="col-lg-3 col-6"> *@
+@*             <!-- small box --> *@
+@*             <div class="small-box bg-info elevation-3"> *@
+@*                 <div class="inner"> *@
+@*                     <h3>150</h3> *@
+@* *@
+@*                     <p>Today's tasks</p> *@
+@*                 </div> *@
+@*                 <div class="icon"> *@
+@*                     <i class="ion ion-today"></i> *@
+@*                 </div> *@
+@*                 <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*             </div> *@
+@*         </div> *@
+@*         <!-- ./col --> *@
+@* *@
+@*         <div class="col-lg-3 col-6"> *@
+@*             <!-- small box --> *@
+@*             <div class="small-box bg-warning elevation-3"> *@
+@*                 <div class="inner"> *@
+@*                     <h3>44</h3> *@
+@* *@
+@*                     <p>Outstanding tasks</p> *@
+@*                 </div> *@
+@*                 <div class="icon"> *@
+@*                     <i class="ion ion-briefcase"></i> *@
+@*                 </div> *@
+@*                 <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*             </div> *@
+@*         </div> *@
+@*         <!-- ./col --> *@
+@* *@
+@*         <div class="col-lg-3 col-6"> *@
+@*             <!-- small box --> *@
+@*             <div class="small-box bg-success elevation-3"> *@
+@*                 <div class="inner"> *@
+@*                     <h3><sup style="font-size: 20px">$</sup>53</h3> *@
+@* *@
+@*                     <p>Application account</p> *@
+@*                 </div> *@
+@*                 <div class="icon"> *@
+@*                     <i class="ion ion-card"></i> *@
+@*                 </div> *@
+@*                 <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*             </div> *@
+@*         </div> *@
+@*         <!-- ./col --> *@
+@* *@
+@*         <div class="col-lg-3 col-6"> *@
+@*             <!-- small box --> *@
+@*             <div class="small-box bg-danger elevation-3"> *@
+@*                 <div class="inner"> *@
+@*                     <h3 class="text-danger">registered</h3> *@
+@* *@
+@*                     <p>Registration Documents</p> *@
+@*                 </div> *@
+@*                 <div class="icon"> *@
+@*                     <i class="ion ion-document"></i> *@
+@*                 </div> *@
+@*                 <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a> *@
+@*             </div> *@
+@*         </div> *@
+@*         <!-- ./col --> *@
+@*     </div> *@
+@*     <!-- /.row/.examiner examination --> *@
+@* } *@
 
-<!-- Principal examiner -->
-<div class="row">
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-info elevation-3">
-            <div class="inner">
-                <h3>150</h3>
 
-                <p>Unallocated Applications</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-folder"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
 
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-warning elevation-3">
-            <div class="inner">
-                <h3>44</h3>
 
-                <p>Outstanding tasks</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-briefcase"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
 
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-success elevation-3">
-            <div class="inner">
-                <h3><sup style="font-size: 20px">$</sup>53</h3>
+@* Gap of truth *@
 
-                <p>Application Count</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-card"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
 
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger elevation-3">
-            <div class="inner">
-                <h3 class="text-danger">registered</h3>
 
-                <p>Registration Documents</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-document"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
-</div>
-<!-- /.row/.company examination -->
-
-<!-- examiner examination -->
-<div class="row">
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-info elevation-3">
-            <div class="inner">
-                <h3>150</h3>
-
-                <p>Today's tasks</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-today"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
-
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-warning elevation-3">
-            <div class="inner">
-                <h3>44</h3>
-
-                <p>Outstanding tasks</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-briefcase"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
-
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-success elevation-3">
-            <div class="inner">
-                <h3><sup style="font-size: 20px">$</sup>53</h3>
-
-                <p>Application account</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-card"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
-
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger elevation-3">
-            <div class="inner">
-                <h3 class="text-danger">registered</h3>
-
-                <p>Registration Documents</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-document"></i>
-            </div>
-            <a class="small-box-footer" href="#">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <!-- ./col -->
-</div>
-<!-- /.row/.examiner examination -->
 
 
 @* <div class="row"> *@

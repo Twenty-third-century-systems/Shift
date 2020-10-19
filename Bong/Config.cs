@@ -39,15 +39,19 @@ namespace Bong {
                 // interactive client using code flow + pkce
                 new Client
                 {
-                    ClientId = "interactive",
+                    ClientId = "72FC2454-1401-42A0-B0DD-FBE0B7DBD482",
+                    ClientName = "Examination module",
                     ClientSecrets = {new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256())},
 
                     AllowedGrantTypes = GrantTypes.Code,
+                    
+                    AlwaysIncludeUserClaimsInIdToken = true,
 
                     RedirectUris = {"https://localhost:44372/signin-oidc"},
                     FrontChannelLogoutUri = "https://localhost:44372/signout-oidc",
                     PostLogoutRedirectUris = {"https://localhost:44372/signout-callback-oidc"},
 
+                    
                     AllowOfflineAccess = true,
                     AllowedScopes = {"openid", "profile", "scope1"}
                 },

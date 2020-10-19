@@ -30,15 +30,15 @@ namespace Dab {
 
             services.AddAuthentication(options =>
                 {
-                    options.DefaultScheme = "Cookies";
-                    options.DefaultChallengeScheme = "oidc";
+                    options.DefaultScheme = "EOnlineCookie";
+                    options.DefaultChallengeScheme = "EOnlineOidc";
                 })
-                .AddCookie("Cookies")
-                .AddOpenIdConnect("oidc", options =>
+                .AddCookie("EOnlineCookie")
+                .AddOpenIdConnect("EOnlineOidc", options =>
                 {
                     options.Authority = "https://localhost:5001";
 
-                    options.ClientId = "interactive";
+                    options.ClientId = "028BED7E-F9CA-4484-8ED7-7DE3A82F40BC";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
                     options.ResponseType = "code";
 

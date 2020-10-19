@@ -20,6 +20,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Cooler.DataModels;
+using Microsoft.EntityFrameworkCore;
 using Shish.Models;
 using Shisha.Data;
 using Task = System.Threading.Tasks.Task;
@@ -450,6 +451,16 @@ namespace IdentityServerHost.Quickstart.UI {
                     Name = ct.Name
                 }).ToList();
             return Ok(cities);
+        }
+        
+        [HttpGet("U/{userId}")]
+        public async Task<IActionResult> GetApplicant(string userId)
+        {
+            var user = _db.ExternalUsers
+                .Include(u=> u.UserDetails)
+                .Where(u => u.UserId.Equals(userId)).FirstOrDefault();
+
+            return Ok(user.UserDetails.Names + " " + user.UserDetails.Surname);
         }
 
         [AllowAnonymous]

@@ -45,13 +45,14 @@ namespace Bong.ProfileService {
                 policies.Add(polcy.Value);
             }
 
-            claims.Add(new Claim(JwtClaimTypes.Name, savedUser.Firstname + " " + savedUser.Surname));
+            claims.Add(new Claim("full name", savedUser.Firstname + " " + savedUser.Surname));
             claims.Add(new Claim(JwtClaimTypes.Role, JsonSerializer.Serialize(roles),
                 IdentityServerConstants.ClaimValueTypes.Json));
-            claims.Add(new Claim("policies", JsonSerializer.Serialize(policies),
+            claims.Add(new Claim("Policy", JsonSerializer.Serialize(policies),
                 IdentityServerConstants.ClaimValueTypes.Json));
+            claims.Add(new Claim("office", user.Office.ToString()));
 
-            context.IssuedClaims = claims;
+            context.IssuedClaims.AddRange(claims); 
         }
 
         public async Task IsActiveAsync(IsActiveContext context)

@@ -1,22 +1,56 @@
-﻿$('#tblContains').DataTable({
-    responsive: true,
-    scrollX: true,
-    autoWidth: true,
-    lengthMenu: [
-        [4, 10, 25, 50, -1],
-        ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']
-    ],
-});
+﻿let nameUnderExamination = ' ';
+let tblNamesThatContain;
+let tblNamesThatStartWith;
 
-$('#tblNamesStartWith').DataTable({
-    responsive: true,
-    scrollX: true,
-    autoWidth: true,
-    lengthMenu: [
-        [4, 10, 25, 50, -1],
-        ['4 rows', '10 rows', '25 rows', '50 rows', 'Show all']
-    ],
-});
+function initializeTables() {
+    if(tblNamesThatContain !== undefined){
+        tblNamesThatContain.destroy();
+    }
+
+    if(tblNamesThatStartWith !== undefined){
+        tblNamesThatStartWith.destroy();
+    }
+    
+    tblNamesThatContain = $('#tblContains').DataTable({
+        ajax: {
+            url: '/tasks/examination/' + nameUnderExamination + '/contain/',
+            dataSrc: ''
+        },
+        columns: [
+            {
+                data: 'id',
+                visible: false
+            },
+            {data: 'name'},
+            {data: 'dateSubmitted'},
+            {data: 'typeOfBusiness'},
+            {data: 'status'},
+        ]
+    });
+
+    tblNamesThatStartWith = undefined;
+    tblNamesThatStartWith = $('#tblNamesStartWith').DataTable({
+        ajax: {
+            url: '/tasks/examination/' + nameUnderExamination + '/starts',
+            dataSrc: ''
+        },
+        columns: [
+            {
+                data: 'id',
+                visible: false
+            },
+            {data: 'name'},
+            {data: 'dateSubmitted'},
+            {data: 'typeOfBusiness'},
+            {data: 'status'},
+        ]
+    });
+}
+
+// $(document).ready(function () {
+//     initializeTables();
+// });
+
 
 // var n = document.createElement('script');
 // n.setAttribute('language', 'JavaScript');

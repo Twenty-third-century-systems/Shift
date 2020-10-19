@@ -27,14 +27,12 @@ namespace DJ.Controllers {
             _shwaDb = shwaDb;
         }
 
-        [HttpGet("")]
-        public IActionResult GetTasks()
+        [HttpGet("{examinerId}")]
+        public IActionResult GetTasks(string examinerId)
         {
-            var examiner = "ex 1";
-
             var tasks = (
                 from t in _eachDb.Tasks
-                where t.ExaminerId == examiner
+                where t.ExaminerId == examinerId
                 select t
             ).ToList();
 

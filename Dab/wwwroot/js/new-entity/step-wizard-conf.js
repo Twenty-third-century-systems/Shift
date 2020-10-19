@@ -1,4 +1,8 @@
-﻿$(document).ready(function () {
+﻿function toHome() {
+    window.location.href = "/";
+}
+
+$(document).ready(function () {
     // Toolbar extra buttons
     var btnDone = $('<button></button>').text('Done')
         .addClass('btn btn-info')
@@ -8,6 +12,7 @@
                 url: '/entity/' + $('#applicationId').val() + '/submit',
                 success: function (data) {
                     toastr.success("Your application has been submitted");
+                    setTimeout(toHome,3000);
                 },
                 error: function (err) {
                     toastr.error("Something went wrong in saving your application.");

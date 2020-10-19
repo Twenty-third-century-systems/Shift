@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dab.Controllers {
+namespace DanceFlow.Controllers {
     [Authorize]
     [Route("account")]
     public class AccountController : Controller {
@@ -11,8 +11,8 @@ namespace Dab.Controllers {
         {
             return SignOut(new AuthenticationProperties
             {
-                RedirectUri = "https://localhost:44381"
-            }, "EOnlineCookie", "EOnlineOidc");
+                RedirectUri = "https://localhost:44372"
+            }, "ExamCookie", "ExamOidc");
         }
     }
 }

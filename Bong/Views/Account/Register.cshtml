@@ -45,7 +45,19 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Office</label>
-                    <input class="form-control select2" id="country" name="office">
+                    <select class="form-control select2" id="office" name="office">
+                        @foreach (var value in ViewBag.Cities)
+                        {
+                            if (value.Name.Equals("Harare"))
+                            {
+                                <option selected value="@value.Id">@value.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@value.Id">@value.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
             </div>
         </div>
@@ -53,7 +65,7 @@
         <div class="row mt-2">
             <div class="col-md-8">
                 <div class="form-group">
-                    <label>Reidential Address</label>
+                    <label>Residential Address</label>
                     <input type="text" class="form-control" name="residentialAddress">
                 </div>
             </div>

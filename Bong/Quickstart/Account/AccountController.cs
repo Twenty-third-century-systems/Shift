@@ -20,6 +20,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bong.Data;
 using Bong.Dtos;
+using Cooler.DataModels;
+using Task = System.Threading.Tasks.Task;
 
 namespace IdentityServerHost.Quickstart.UI {
     [SecurityHeaders]
@@ -33,6 +35,7 @@ namespace IdentityServerHost.Quickstart.UI {
         private readonly IEventService _events;
         private ApplicationDbContext _context;
         private RoleManager<IdentityRole> _roleManager;
+        private readonly ShwaDB _shwaDb;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -42,7 +45,8 @@ namespace IdentityServerHost.Quickstart.UI {
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             ApplicationDbContext context,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            ShwaDB shwaDb)
         {
             _roleManager = roleManager;
             _context = context;
@@ -52,6 +56,7 @@ namespace IdentityServerHost.Quickstart.UI {
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _shwaDb = shwaDb;
         }
 
         /// <summary>
@@ -215,6 +220,25 @@ namespace IdentityServerHost.Quickstart.UI {
         [HttpGet]
         public async Task<ViewResult> Register()
         {
+            var countries = (
+                from c in _shwaDb.Countries
+                select new Country
+                {
+                    Code = c.Code,
+                    Name = c.Name
+                }).ToList();
+
+            var cities = (
+                from ct in _shwaDb.Cities
+                where ct.CountryCode.Equals(countries.Where(c => c.Name.Equals("Zimbabwe")).FirstOrDefault().Code)
+                      && ct.CanSort != null
+                select new City
+                {
+                    Id = ct.ID,
+                    Name = ct.Name
+                }).ToList();
+
+            ViewBag.Cities = cities;
             return View();
         }
 
@@ -245,9 +269,9 @@ namespace IdentityServerHost.Quickstart.UI {
                 {
                     if (!await _roleManager.RoleExistsAsync("Examiner"))
                         await CreateRoles();
-                    
+                    // Registrar
                     await _userManager.AddToRoleAsync(user, "Examiner");
-                    
+
                     var policy = _context.Policies.Where(p => p.Value.Equals("cannot sign")).FirstOrDefault();
                     var savedUser = _context.Users.Where(u => u.UserName.Equals(user.UserName)).FirstOrDefault();
                     savedUser.Policies.Add(new ApplicationUserPolicy
@@ -270,6 +294,28 @@ namespace IdentityServerHost.Quickstart.UI {
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        [HttpGet("U/{office}")]
+        public async Task<IActionResult> GetExaminers(int office)
+        {
+            var userList = new List<ExaminersDto>();
+            var users = _context.Users.Where(u => u.Office == office).ToList();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.Where(r => r.Equals("Examiner")).FirstOrDefault();
+                if (!string.IsNullOrEmpty(role))
+                {
+                    userList.Add(new ExaminersDto
+                    {
+                        Id = user.Id,
+                        FullName = user.Firstname + " " + user.Surname
+                    });
+                }
+            }
+
+            return Ok(userList);
         }
 
 
@@ -405,7 +451,7 @@ namespace IdentityServerHost.Quickstart.UI {
             return vm;
         }
 
-        private async Task CreateRoles()    
+        private async Task CreateRoles()
         {
             // first we create Admin rool    
             var roles = new List<IdentityRole>();

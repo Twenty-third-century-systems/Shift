@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@{
+    var isRegistrarAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsRegistrar");
+    var isExaminerAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsExaminer");
+    var canSignAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "CanSign");
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -83,7 +91,7 @@
                 @*     <span class="float-right text-muted text-sm">2 days</span> *@
                 @* </a> *@
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item dropdown-footer">Logged In User</a>
+                <a class="dropdown-item dropdown-footer">@ViewBag.User</a>
             </div>
         </li>
         <li class="nav-item">
@@ -112,7 +120,7 @@
                 <img src="~/img/edited-avatar.png" class="img-circle" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Logged In User</a>
+                <a href="#" class="d-block">@ViewBag.User</a>
             </div>
         </div>
 
@@ -122,7 +130,7 @@
                 <!-- Add icons to the links using the .nav-icon class
                 with font-awesome or any other icon font library -->
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link active">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             Dashboard
@@ -155,47 +163,55 @@
                 @*     </ul> *@
                 @* </li> *@
 
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>
-                            Applications
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/applications/" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>All applications</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                @if (isRegistrarAuthorizationResult.Succeeded)
+                {
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>
+                                Applications
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/applications/" class="nav-link active">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>All applications</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
 
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>
-                            Tasks
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/tasks/allocated" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Pending tasks</p>
-                            </a>
-                        </li>
-                        @* <li class="nav-item"> *@
-                        @*     <a href="/tasks/pvt-entity/1" class="nav-link active"> *@
-                        @*         <i class="far fa-circle nav-icon"></i> *@
-                        @*         <p>Task</p> *@
-                        @*     </a> *@
-                        @* </li> *@
-                    </ul>
-                </li>
+
+                @if (isExaminerAuthorizationResult.Succeeded)
+                {
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>
+                                Tasks
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/tasks/allocated" class="nav-link active">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pending tasks</p>
+                                </a>
+                            </li>
+                            @* <li class="nav-item"> *@
+                            @*     <a href="/tasks/pvt-entity/1" class="nav-link active"> *@
+                            @*         <i class="far fa-circle nav-icon"></i> *@
+                            @*         <p>Task</p> *@
+                            @*     </a> *@
+                            @* </li> *@
+                        </ul>
+                    </li>
+                }
+
 
                 @* <li class="nav-item has-treeview"> *@
                 @*     <a href="#" class="nav-link"> *@

@@ -6,7 +6,10 @@ using IdentityServer4;
 using Bong.Data;
 using Bong.Models;
 using Bong.ProfileService;
+using Cooler.DataModels;
 using IdentityServer4.Services;
+using LinqToDB.AspNet;
+using LinqToDB.AspNet.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -69,6 +72,12 @@ namespace Bong {
                     options.ClientId = "copy client ID from Google here";
                     options.ClientSecret = "copy client secret from Google here";
                 });
+            
+            services.AddLinqToDbContext<ShwaDB>((provider, options) =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
+                    .UseDefaultLogging(provider);
+            });
         }
 
         public void Configure(IApplicationBuilder app)

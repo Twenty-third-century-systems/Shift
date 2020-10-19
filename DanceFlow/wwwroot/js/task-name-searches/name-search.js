@@ -1,4 +1,4 @@
-﻿﻿let tasksApplications, nameOnExamination, i, a = undefined;
+﻿﻿let tasksApplications, OnExamination, i, a = undefined;
 
 function displayPage(refresh) {
     $(':input[type="text"]').val('');
@@ -28,6 +28,12 @@ function displayPage(refresh) {
                             $('#name' + (index + 1) + '-toggle').click(function () {
                                 setupNameExaminationDialogue(x.value.toUpperCase());
                                 nameOnExamination = x;
+                                nameUnderExamination = x.value;
+                                // tblNamesThatContain.clear().draw();
+                                // tblNamesThatStartWith.clear().draw();
+                                // tblNamesThatContain.ajax.reload();
+                                // tblNamesThatStartWith.ajax.reload();
+                                initializeTables();
                                 i = index;
                             });
                         });

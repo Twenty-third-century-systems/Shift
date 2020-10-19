@@ -160,9 +160,14 @@ namespace DJ.Controllers {
                 select n
             ).ToList();
 
-            var namesToExaminer = new List<NameOnExaminationDto>();
+            var namesToExaminer = new List<NameUnderExaminationResultDto>();
             foreach (var zita in names)
             {
+                if (zita.Value.Equals(name))
+                {
+                    continue;
+                }
+
                 var nameSearchApplication = (
                     from a in _eachDb.Applications
                     join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
@@ -180,18 +185,72 @@ namespace DJ.Controllers {
                     select s.Description
                 ).FirstOrDefault();
 
-                var service = (
+                var status = (
                     from s in _poleDb.Status
                     where s.Id == zita.Status
                     select s.Description
                 ).FirstOrDefault();
 
-                namesToExaminer.Add(new NameOnExaminationDto
+                namesToExaminer.Add(new NameUnderExaminationResultDto
                 {
+                    Id = zita.Id,
                     Name = zita.Value,
-                    Date = nameSearchApplication.DateSubmitted,
-                    TypeOfBusiness = typeOfBusiness,
-                    Status = service
+                    DateSubmitted = nameSearchApplication.DateSubmitted,
+                    TypeOfBusiness = typeOfBusiness.ToUpper(),
+                    Status = status
+                });
+            }
+
+            return Ok(namesToExaminer);
+        }
+
+        [HttpGet("{name}/starts")]
+        public IActionResult NamesThatStartWith(string name)
+        {
+            var names = (
+                from n in _eachDb.Names
+                where n.Value.StartsWith(name)
+                select n
+            ).ToList();
+
+            var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            foreach (var zita in names)
+            {
+                if (zita.Value.Equals(name))
+                {
+                    continue;
+                }
+
+                var nameSearchApplication = (
+                    from a in _eachDb.Applications
+                    join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
+                    where n.Id == zita.NameSearchId
+                    select new
+                    {
+                        a.DateSubmitted,
+                        n.Service
+                    }
+                ).FirstOrDefault();
+
+                var typeOfBusiness = (
+                    from s in _poleDb.Services
+                    where s.Id == nameSearchApplication.Service
+                    select s.Description
+                ).FirstOrDefault();
+
+                var status = (
+                    from s in _poleDb.Status
+                    where s.Id == zita.Status
+                    select s.Description
+                ).FirstOrDefault();
+
+                namesToExaminer.Add(new NameUnderExaminationResultDto
+                {
+                    Id = zita.Id,
+                    Name = zita.Value,
+                    DateSubmitted = nameSearchApplication.DateSubmitted,
+                    TypeOfBusiness = typeOfBusiness.ToUpper(),
+                    Status = status
                 });
             }
 

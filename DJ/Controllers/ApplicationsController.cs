@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Cooler.DataModels;
 using DJ.Dtos;
+using DJ.Models;
+using IdentityModel.Client;
 using LinqToDB;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Application = DJ.Models.Application;
 
 namespace DJ.Controllers {
@@ -21,14 +27,15 @@ namespace DJ.Controllers {
         }
 
         // GET
-        [HttpGet("all")]
-        public IActionResult All()
+        [HttpGet("all/{office}")]
+        public IActionResult All(int office)
         {
             var unAllocatedApplications =
             (
                 from application in _eachDb.Applications
                 // where application.CreditId != null && ================ impliment after credit system
                 where application.TaskId == null
+                      && application.SortingOffice == office
                 select application
             ).ToList();
 
@@ -38,7 +45,7 @@ namespace DJ.Controllers {
             if (unAllocatedApplications.Count > 0)
             {
                 foreach (var unAllocatedApplication in unAllocatedApplications)
-                { 
+                {
                     var serviceFromDb =
                     (
                         from serv in _poleDb.Services
@@ -73,7 +80,7 @@ namespace DJ.Controllers {
                                     SubmissionDate =
                                         Convert.ToDateTime(unAllocatedApplication.DateSubmitted.ToString("dd MMM yyyy"))
                                 });
-                            }                            
+                            }
                         }
                     }
                 }
@@ -89,8 +96,18 @@ namespace DJ.Controllers {
         }
 
         [HttpPost("allocate")]
-        public IActionResult AllocateApplicationsToExaminers([FromBody] TaskFromPrincipalDto task)
+        public async Task<IActionResult> AllocateApplicationsToExaminers([FromBody] TaskFromPrincipalDto task)
         {
+            // User user;
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var response = await client.GetAsync("https://localhost:5002/connect/userinfo").Result.Content
+            //         .ReadAsStringAsync();
+            //     user = JsonConvert.DeserializeObject<User>(response);
+            // }
+
             if (task.Id == 0)
             {
                 var count = 0;
@@ -98,6 +115,7 @@ namespace DJ.Controllers {
                 {
                     task.Service = "private limited company";
                 }
+
                 var service = (
                     from s in _poleDb.Services
                     where s.Description.Equals(task.Service.ToLower())
@@ -109,7 +127,7 @@ namespace DJ.Controllers {
                     var taskId = _eachDb.Tasks
                         .Value(t => t.ExaminerId, task.Examiner)
                         .Value(t => t.DateAssigned, DateTime.Now)
-                        .Value(t => t.AssignedBy, "BK")
+                        .Value(t => t.AssignedBy, task.Allocator)
                         .Value(t => t.ExpectedDateOfCompletion, task.DateOfCompletion)
                         .InsertWithInt32Identity();
 

@@ -147,8 +147,11 @@
                             <label>Examiner </label>
                             <select class="form-control select2" name="examiner">
                                 <option selected="selected"></option>
-                                    <option value="ex 1">Examiner 1</option>
-                                <option value="ex 2">Examiner 1</option>
+                                @foreach (var examiner in ViewBag.Examiners)
+                                {
+                                    <option value="@examiner.Id">@examiner.FullName</option>
+                                }
+                                
                             </select>
                         </div>
                         <div class="form-group">

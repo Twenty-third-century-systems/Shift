@@ -2,7 +2,7 @@
     let countrySelect = $('#country');
     countrySelect.change(function () {
         if (countrySelect.val() !== 'ZWE') {
-            $('#idMode').text('Passport ID number')
+            $('#idMode').text('Passport number')
         } else {
             $('#idMode').text('National ID number')
         }

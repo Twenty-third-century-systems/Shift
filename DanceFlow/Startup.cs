@@ -30,30 +30,42 @@ namespace DanceFlow {
 
             services.AddAuthentication(options =>
                 {
-                    options.DefaultScheme = "Cookies";
-                    options.DefaultChallengeScheme = "oidc";
+                    options.DefaultScheme = "ExamCookie";
+                    options.DefaultChallengeScheme = "ExamOidc";
                 })
-                .AddCookie("Cookies")
-                .AddOpenIdConnect("oidc", options =>
+                .AddCookie("ExamCookie")
+                .AddOpenIdConnect("ExamOidc", options =>
                 {
                     options.Authority = "https://localhost:5002";
 
-                    options.ClientId = "interactive";
+                    options.ClientId = "72FC2454-1401-42A0-B0DD-FBE0B7DBD482";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
                     options.ResponseType = "code";
 
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
-                    options.Scope.Add("scope1");                    
+                    options.Scope.Add("scope1");
                     options.Scope.Add("offline_access");
 
                     options.ResponseMode = "form_post";
 
                     options.SaveTokens = true;
                     options.UsePkce = true;
+
+                    options.TokenValidationParameters.RoleClaimType = "role";
                 });
-            
-            services.AddControllersWithViews();            
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("IsExaminer", p => 
+                    p.RequireRole("Examiner"));
+                options.AddPolicy("IsRegistrar", p => 
+                    p.RequireRole("Registrar"));
+                options.AddPolicy("CanSign", p => 
+                    p.RequireClaim("Policy", "can sign"));
+            });
+
+            services.AddControllersWithViews();
 
             services.AddSignalR();
         }
@@ -64,7 +76,7 @@ namespace DanceFlow {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                IdentityModelEventSource.ShowPII = true; 
+                IdentityModelEventSource.ShowPII = true;
             }
             else
             {
@@ -86,7 +98,7 @@ namespace DanceFlow {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                
+
                 endpoints.MapHub<NameExaminationHub>("/name/ex");
                 endpoints.MapHub<PvtExaminationHub>("/pvt/ex");
             });

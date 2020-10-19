@@ -62,10 +62,10 @@
                 },
                 success: function () {
                     officeSaved = true;
-                    toastr.success("Office details have bee submitted");
+                    toastr.success("Office details saved.");
                 },
                 error: function (err) {
-                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit")
+                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit.")
                 },
             });
         },
@@ -126,7 +126,7 @@
                 },
                 success: function (data) {
                     memoId = data;
-                    toastr.success("Share and liability clauses saved.");
+                    toastr.success("Share and liability clause saved.");
                 },
                 error: function (err) {
                     toastr.error("Something went wrong in saving office details. Refresh page and resubmit.");
@@ -202,10 +202,10 @@
                     table: $(form).serializeToJSON()
                 },
                 success: function (data) {
-                    toastr.success("The table of articles Have been saved");
+                    toastr.success("Table of articles saved.");
                 },
                 error: function (err) {
-                    toastr.error("Something went wrong in saving the table of articles. Refresh page and resubmit");
+                    toastr.error("Something went wrong in saving the table of articles. Refresh page and resubmit.");
                 }
             });
         },

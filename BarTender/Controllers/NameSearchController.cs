@@ -47,12 +47,17 @@ namespace BarTender.Controllers {
                 from n in _eachDb.Names
                 where n.Value == name
                 select n
-            ).FirstOrDefault();
+            ).ToList();
 
-            if (namesInDataBase == null)
-                return NoContent();
-            else
-                return BadRequest("Not available");
+            foreach (var nameReturned in namesInDataBase)
+            {
+                if (nameReturned.Status != 4)
+                {
+                    return BadRequest();
+                }
+            }
+
+            return NoContent();
         }
 
         [HttpPost("submit")]
@@ -128,7 +133,8 @@ namespace BarTender.Controllers {
                     }
                     else
                     {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert NewNameSearchApplicationDto search");
+                        return StatusCode(StatusCodes.Status500InternalServerError,
+                            "Failed to insert NewNameSearchApplicationDto search");
                     }
                 }
                 else
