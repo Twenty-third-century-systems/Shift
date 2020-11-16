@@ -163,6 +163,7 @@
             let input = $(form).serializeToJSON();
             objects.push(input);
             console.log(objects);
+            console.log(input);
             tblObjects.row.add([
                 input.objective
             ]).draw(false);

@@ -15,7 +15,7 @@ $(document).ready(function () {
     connection
         .start()
         .then(function () {
-            toastr.success("Connection established");
+            console.log("Connection established");
         })
         .catch(function (err) {
             toastr.error("Something wen't wrong. You wont be able to examine.");

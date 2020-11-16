@@ -1,4 +1,5 @@
 ﻿let taskApplications = undefined;
+let index = undefined;
 
 function displayPage() {
     taskApplications.forEach((e, index) => {

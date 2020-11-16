@@ -9,6 +9,7 @@ using Dab.Models;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -27,20 +28,32 @@ namespace Dab.Controllers {
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 client.SetBearerToken(accessToken);
-                var responce = await client.GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name").Result.Content
-                    .ReadAsStringAsync();
-                var nameAndApplication = JsonConvert.DeserializeObject<NameApplicationAndDefaults>(responce);
-                nameAndApplication.Id = nameId;
-                var imweResponse = await client.PostAsJsonAsync<NameApplicationAndDefaults>($"{ApiUrls.InitialisePvtApplication}", nameAndApplication)
-                    .Result.Content
-                    .ReadAsStringAsync();
+                var responce = client
+                    .GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name")
+                    .Result;
                 
-                ViewBag.NameRacho = nameAndApplication.Value;
-                ViewBag.ApplicationId = nameAndApplication.ApplicationId;
-                ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
-                ViewBag.Cities = nameAndApplication.Cities;
-                ViewBag.Countries = nameAndApplication.Countries;
-                ViewBag.Gender = nameAndApplication.Genders;
+                // var imweResponse = client
+                //     .PostAsJsonAsync<NameApplicationAndDefaults>(
+                //         $"{ApiUrls.InitialisePvtApplication}", 
+                //         nameAndApplication
+                //         )
+                //     .Result;
+                
+                if(responce.IsSuccessStatusCode){
+                    var nameAndApplication = JsonConvert.DeserializeObject<NameApplicationAndDefaults>(await responce.Content.ReadAsStringAsync());
+                    nameAndApplication.Id = nameId;
+                    ViewBag.NameRacho = nameAndApplication.Value;
+                    ViewBag.ApplicationId = nameAndApplication.ApplicationId;
+                    ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
+                    ViewBag.Cities = nameAndApplication.Cities;
+                    ViewBag.Countries = nameAndApplication.Countries;
+                    ViewBag.Gender = nameAndApplication.Genders;
+                }
+                else
+                {
+                    return BadRequest("Something went wrong in trying to use");
+                }
+                
             }
             return View();
         }
@@ -202,6 +215,25 @@ namespace Dab.Controllers {
                 }
             }
             return BadRequest();
+        }
+
+        [HttpGet("{applicationId}/reload")]
+        public async Task<IActionResult> ReloadApplication(int applicationId)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = client
+                    .GetAsync($"{ApiUrls.ReloadPvtApplication}/{applicationId}/reload").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var populatedApplication =  JsonConvert
+                        .DeserializeObject<PopulatedApplicationDetailDto>(await response.Content.ReadAsStringAsync());
+                    return Ok(populatedApplication);
+                }
+            }
+            return BadRequest("Something went wrong in reloading the application");
         }
     }
 }

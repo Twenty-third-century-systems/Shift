@@ -14,24 +14,166 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Gender = BarTender.Models.Gender;
+using Office = BarTender.Models.Office;
 
 namespace BarTender.Controllers {
     [Route("api/entity")]
-    public class EntityController : Controller {
+    public class PvtEntityController : Controller {
         private PoleDB _poleDb;
         private ShwaDB _shwaDb;
         private EachDB _eachDb;
 
-        public EntityController(PoleDB poleDb, ShwaDB shwaDb, EachDB eachDb)
+        public PvtEntityController(PoleDB poleDb, ShwaDB shwaDb, EachDB eachDb)
         {
             _poleDb = poleDb;
             _shwaDb = shwaDb;
             _eachDb = eachDb;
         }
 
+        [HttpGet("{applicationId}/reload")]
+        public async Task<IActionResult> ReloadApplication(int applicationId)
+        {
+            var PopulatedApplicationDetails = new PopulatedApplicationDetailDto();
+            var pvtEntity = (
+                from p in _eachDb.PvtEntities
+                where p.ApplicationId == applicationId
+                select p
+            ).FirstOrDefault();
+
+            if (pvtEntity != null)
+            {
+                //Populating office details
+                var populatedOfficeDetails = (
+                    from o in _eachDb.Offices
+                    where o.Id == pvtEntity.OfficeId
+                    select o
+                ).FirstOrDefault();
+                if (populatedOfficeDetails != null)
+                {
+                    PopulatedApplicationDetails.Office = new Office
+                    {
+                        PhysicalAddress = populatedOfficeDetails.PhysicalAddress,
+                        OfficeCity = populatedOfficeDetails.City,
+                        PostalAddress = populatedOfficeDetails.PostalAddress,
+                        EmailAddress = populatedOfficeDetails.EmailAddress,
+                        TelNumber = populatedOfficeDetails.TelephoneNumber,
+                        MobileNumber = populatedOfficeDetails.MobileNumber
+                    };
+                }
+
+                //Populating Memo
+                var memorundum = (
+                    from m in _eachDb.Memorundums
+                    where m.Id == pvtEntity.MemorundumId
+                    select m
+                ).FirstOrDefault();
+                if (memorundum != null)
+                {
+                    PopulatedApplicationDetails.LiabilityClause = memorundum.LiabilityClause;
+                    PopulatedApplicationDetails.ShareClause = memorundum.ShareClause;
+
+                    var objects = (
+                        from m in _eachDb.MemoObjects
+                        where m.MemorundumId == memorundum.Id
+                        select m
+                    ).ToList();
+                    if (objects.Count > 0)
+                    {
+                        foreach (var memoObject in objects)
+                        {
+                            PopulatedApplicationDetails.Objectives.Add(new SingleObjective
+                            {
+                                Id = memoObject.Id,
+                                Objective = memoObject.Value
+                            });
+                        }
+                    }
+                }
+
+                //Populate Articles
+                var articles = (
+                    from art in _eachDb.ArticleOfAssociations
+                    where art.Id == pvtEntity.ArticlesId
+                    select art
+                ).FirstOrDefault();
+                if (articles != null)
+                {
+                    if (articles.TableA != null)
+                    {
+                        PopulatedApplicationDetails.TableOfArticles = "Table A";
+                    }
+                    else if (articles.TableB != null)
+                    {
+                        PopulatedApplicationDetails.TableOfArticles = "Table B";
+                    }
+                    else
+                    {
+                        PopulatedApplicationDetails.TableOfArticles = "Other";
+                    }
+
+                    var objects = (
+                        from a in _eachDb.AmmendedArticles
+                        where a.ArticleId == articles.Id
+                        select a
+                    ).ToList();
+                    if (objects.Count > 0)
+                    {
+                        foreach (var o in objects)
+                        {
+                            PopulatedApplicationDetails.AmendedArticles.Add(new AmendedArticle
+                            {
+                                Id = o.Id,
+                                Article = o.Value
+                            });
+                        }
+                    }
+                }
+
+                //Subscribers here
+                var subscribers = (
+                    from p in _eachDb.PvtEntityHasSubcribers
+                    from s in _eachDb.Subcribers.InnerJoin(s => p.Subcriber == s.Id)
+                    from r in _eachDb.Roles.InnerJoin(r => r.Id == p.RolesId)
+                    from sr in _eachDb.Subscriptions.InnerJoin(sr => sr.Id == p.SubscriptionId)
+                    where p.Entity == pvtEntity.Id
+                    select new
+                    {
+                        s,
+                        r,
+                        sr
+                    }).ToList();
+                if (subscribers.Count > 0)
+                {
+                    foreach (var subscriber in subscribers)
+                    {
+                        bool isMember = subscriber.r.Member == null;
+                        bool isDirector = subscriber.r.Director == null;
+                        bool isSecretary = subscriber.r.Secretary == null;
+                        PopulatedApplicationDetails.Members.Add(new ShareHoldingMember
+                        {
+                            PeopleCountry = subscriber.s.CountryCode,
+                            NationalId = subscriber.s.NationalId,
+                            MemberSurname = subscriber.s.Surname,
+                            MemberName = subscriber.s.FirstName,
+                            PhyAddress = subscriber.s.PhysicalAddress,
+                            IsSecretary = isSecretary,
+                            IsMember = isMember,
+                            IsDirector = isDirector,
+                            OrdShares = subscriber.sr.Ordinary.ToString(),
+                            PrefShares = subscriber.sr.Preference.ToString()
+                        });
+                    }
+                }
+
+                return Ok(PopulatedApplicationDetails);
+            }
+
+            return BadRequest("Could not reload application");
+        }
+
         // GET
         [HttpGet("names")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetApplicableNames()
         {
             User user;
             using (var client = new HttpClient())
@@ -46,10 +188,10 @@ namespace BarTender.Controllers {
                     from a in _eachDb.Applications
                     from ns in _eachDb.NameSearches.InnerJoin(k => k.ApplicationId == a.Id)
                     where a.UserId == user.Sub
-                        && a.ServiceId == 12
-                        && a.Status == 3 
-                        && ns.ReasonForSearch == 1
-                        && ns.Service == 13
+                          && a.ServiceId == 12
+                          && a.Status == 3
+                          && ns.ReasonForSearch == 1
+                          && ns.Service == 13
                     select new
                     {
                         ns.Id,
@@ -81,8 +223,8 @@ namespace BarTender.Controllers {
                         var companyApplication = (
                             from a in _eachDb.Applications
                             from p in _eachDb.PvtEntities.InnerJoin(k => k.ApplicationId == a.Id)
-                            where a.ServiceId == 13            //Pvt company
-                                  && a.Status != 1002         //Incomplete
+                            where a.ServiceId == 13 //Pvt company
+                                  && a.Status != 1002 //Incomplete
                                   && p.NameId == name.Id
                             select a
                         ).FirstOrDefault();
@@ -98,7 +240,6 @@ namespace BarTender.Controllers {
                                 DateExp = application.ExpiryDate
                             });
                         }
-                        
                     }
                 }
 
@@ -199,7 +340,7 @@ namespace BarTender.Controllers {
                             Id = ct.ID,
                             Name = ct.Name
                         }).ToList();
-                    
+
                     var countries = (
                         from c in _shwaDb.Countries
                         select new Country
@@ -221,7 +362,7 @@ namespace BarTender.Controllers {
                     {
                         gender.Format();
                     }
-                    
+
                     if (entityRecordsInserted > 0)
                     {
                         return Ok(new NewNameSearchApplicationDto
@@ -548,7 +689,7 @@ namespace BarTender.Controllers {
                         {
                             count++;
                             continue;
-                        }                            
+                        }
                         else
                             break;
                     }
@@ -729,7 +870,7 @@ namespace BarTender.Controllers {
         }
 
         [HttpPost("s")]
-        public IActionResult SubmitApplication([FromBody]int applicationId)
+        public IActionResult SubmitApplication([FromBody] int applicationId)
         {
             var application = (
                 from a in _eachDb.Applications
@@ -750,7 +891,7 @@ namespace BarTender.Controllers {
                     application.Status = status;
                     if (_eachDb.Update(application) == 1)
                         return Ok();
-                }                
+                }
             }
 
             return BadRequest();

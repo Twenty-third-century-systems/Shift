@@ -88,13 +88,13 @@ namespace DanceFlow.Controllers {
         }
         
 
-        [HttpGet("examination/{name}/contain")]
-        public async Task<IActionResult> NamesThatContain(string name)
+        [HttpGet("examination/{name}/{id}/contain")]
+        public async Task<IActionResult> NamesThatContain(string name,int id)
         {
             using (var client = new HttpClient())
             {
                 var namesToExaminer = new List<NameUnderExaminationResultDto>();
-                var response =  client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/contain").Result;
+                var response =  client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/contain").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     var strResp = await response.Content.ReadAsStringAsync();
@@ -105,13 +105,13 @@ namespace DanceFlow.Controllers {
         }
         
         
-        [HttpGet("examination/{name}/starts")]
-        public async Task<IActionResult> NamesThatStartWith(string name)
+        [HttpGet("examination/{name}/{id}/starts")]
+        public async Task<IActionResult> NamesThatStartWith(string name, int id)
         {
             using (var client = new HttpClient())
             {
                 var namesToExaminer = new List<NameUnderExaminationResultDto>();
-                var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/starts").Result;
+                var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/starts").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     var strResp = await response.Content.ReadAsStringAsync();

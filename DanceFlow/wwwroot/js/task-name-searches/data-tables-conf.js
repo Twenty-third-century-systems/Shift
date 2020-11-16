@@ -2,7 +2,7 @@
 let tblNamesThatContain;
 let tblNamesThatStartWith;
 
-function initializeTables() {
+function initializeTables(nameId) {
     if(tblNamesThatContain !== undefined){
         tblNamesThatContain.destroy();
     }
@@ -13,7 +13,7 @@ function initializeTables() {
     
     tblNamesThatContain = $('#tblContains').DataTable({
         ajax: {
-            url: '/tasks/examination/' + nameUnderExamination + '/contain/',
+            url: '/tasks/examination/' + nameUnderExamination + '/' + nameId + '/contain/',
             dataSrc: ''
         },
         columns: [
@@ -31,7 +31,7 @@ function initializeTables() {
     tblNamesThatStartWith = undefined;
     tblNamesThatStartWith = $('#tblNamesStartWith').DataTable({
         ajax: {
-            url: '/tasks/examination/' + nameUnderExamination + '/starts',
+            url: '/tasks/examination/' + nameUnderExamination + '/' + nameId + '/starts',
             dataSrc: ''
         },
         columns: [

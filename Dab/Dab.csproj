@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="IdentityModel" Version="4.3.0" />
+      <PackageReference Include="IronPdf" Version="2020.10.3.3" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
@@ -26,6 +27,19 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-smart-wizard\dist\js\bootstrap\bootstrap.js.map" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-smart-wizard\dist\js\bootstrap\bootstrap.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-smart-wizard\dist\js\bootstrap\bootstrap.min.js.map" />
+    </ItemGroup>
+
+    
+
+    <ItemGroup>
+      <Content Update="wwwroot\js\new-entity\application-reload.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\css\adminlte.css">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

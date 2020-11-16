@@ -23,7 +23,8 @@ using Bong.Dtos;
 using Cooler.DataModels;
 using Task = System.Threading.Tasks.Task;
 
-namespace IdentityServerHost.Quickstart.UI {
+namespace IdentityServerHost.Quickstart.UI 
+{
     [SecurityHeaders]
     [AllowAnonymous]
     public class AccountController : Controller {

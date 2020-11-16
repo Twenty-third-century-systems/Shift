@@ -1,4 +1,5 @@
 ﻿﻿let tasksApplications, OnExamination, i, a = undefined;
+let ind = -1;
 
 function displayPage(refresh) {
     $(':input[type="text"]').val('');
@@ -11,6 +12,7 @@ function displayPage(refresh) {
             '                    </a>\n' +
             '                </li>';
 
+        console.log(refresh);
         if (!e.application.examined) {
             if (refresh === undefined)
                 $(applicationSelect)
@@ -33,7 +35,7 @@ function displayPage(refresh) {
                                 // tblNamesThatStartWith.clear().draw();
                                 // tblNamesThatContain.ajax.reload();
                                 // tblNamesThatStartWith.ajax.reload();
-                                initializeTables();
+                                initializeTables(x.id);
                                 i = index;
                             });
                         });
@@ -41,12 +43,13 @@ function displayPage(refresh) {
                     })
                     .appendTo('#pending');
             else {
-                $('#reason').val(e.nameSearch.reasonForSearch.toUpperCase());
-                $('#type').val(e.nameSearch.typeOfEntity.toUpperCase());
-                $('#designation').val(e.nameSearch.designation.toUpperCase());
-                $('#justification').val(e.nameSearch.justification.toUpperCase());
+                let application = tasksApplications[a];
+                $('#reason').val(application.nameSearch.reasonForSearch.toUpperCase());
+                $('#type').val(application.nameSearch.typeOfEntity.toUpperCase());
+                $('#designation').val(application.nameSearch.designation.toUpperCase());
+                $('#justification').val(application.nameSearch.justification.toUpperCase());
 
-                e.nameSearch.names.forEach((x, index) => {
+                application.nameSearch.names.forEach((x, index) => {
                     $('#name' + (index + 1)).val(x.value.toUpperCase());
                     $('#name' + (index + 1) + '-toggle').click(function () {
                         setupNameExaminationDialogue(x.value.toUpperCase());
@@ -54,7 +57,7 @@ function displayPage(refresh) {
                         i = index;
                     });
                 });
-                updateStatuses(e.nameSearch.names);
+                updateStatuses(application.nameSearch.names);
             }
         } else {
             $('#completed').append(applicationSelect);

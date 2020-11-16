@@ -151,8 +151,8 @@ namespace DJ.Controllers {
             return BadRequest("Application has incorrect information");
         }
 
-        [HttpGet("{name}/contain")]
-        public IActionResult NamesThatContain(string name)
+        [HttpGet("{name}/{id}/contain")]
+        public IActionResult NamesThatContain(string name, int id)
         {
             var names = (
                 from n in _eachDb.Names
@@ -163,7 +163,7 @@ namespace DJ.Controllers {
             var namesToExaminer = new List<NameUnderExaminationResultDto>();
             foreach (var zita in names)
             {
-                if (zita.Value.Equals(name))
+                if (zita.Value.Equals(name) && zita.Id == id)
                 {
                     continue;
                 }
@@ -204,8 +204,8 @@ namespace DJ.Controllers {
             return Ok(namesToExaminer);
         }
 
-        [HttpGet("{name}/starts")]
-        public IActionResult NamesThatStartWith(string name)
+        [HttpGet("{name}/{id}/starts")]
+        public IActionResult NamesThatStartWith(string name, int id)
         {
             var names = (
                 from n in _eachDb.Names
@@ -216,7 +216,7 @@ namespace DJ.Controllers {
             var namesToExaminer = new List<NameUnderExaminationResultDto>();
             foreach (var zita in names)
             {
-                if (zita.Value.Equals(name))
+                if (zita.Value.Equals(name) && zita.Id == id)
                 {
                     continue;
                 }

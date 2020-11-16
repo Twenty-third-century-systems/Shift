@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shisha", "Shisha\Shisha.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bong", "Bong\Bong.csproj", "{07676825-DCB3-4757-9A50-6D55A5CB073C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Till", "Till\Till.csproj", "{12A0CAB1-9E62-49F9-830B-0C71E375E23D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{07676825-DCB3-4757-9A50-6D55A5CB073C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07676825-DCB3-4757-9A50-6D55A5CB073C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07676825-DCB3-4757-9A50-6D55A5CB073C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12A0CAB1-9E62-49F9-830B-0C71E375E23D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12A0CAB1-9E62-49F9-830B-0C71E375E23D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12A0CAB1-9E62-49F9-830B-0C71E375E23D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12A0CAB1-9E62-49F9-830B-0C71E375E23D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

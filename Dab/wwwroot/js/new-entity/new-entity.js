@@ -142,6 +142,5 @@ $(document).ready(function () {
             $('#amendedArticlesDisplay').hide();
         }
     });
-})
-;
+});
 
