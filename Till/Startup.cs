@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -26,18 +27,47 @@ namespace Till {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = "EOnlinePaymentCookie";
+                    options.DefaultChallengeScheme = "EOnlinePaymentOidc";
+                })
+                .AddCookie("EOnlinePaymentCookie")
+                .AddOpenIdConnect("EOnlinePaymentOidc", options =>
+                {
+                    options.Authority = "https://localhost:5001";
+
+                    options.ClientId = "f4cc9d9a-e9fd-4c16-ab32-50c19e29492c";
+                    options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
+                    options.ResponseType = "code";
+
+                    options.Scope.Add("openid");
+                    options.Scope.Add("profile");
+                    options.Scope.Add("scope1");
+                    options.Scope.Add("offline_access");
+
+                    options.ResponseMode = "form_post";
+
+                    options.SaveTokens = true;
+                    options.UsePkce = true;
+                });
+            
             services.AddDbContext<DatabaseContext>(o =>
             {
                 o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-            
+
             //CUSTOM SERVICES
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            
+
             services.AddTransient<ICounterService, CounterService>();
-            
+
+            services.AddSingleton<IPaynowService, PaynowService>();
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            
+
             services.AddControllersWithViews();
         }
 
@@ -59,7 +89,9 @@ namespace Till {
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            
+            app.UseAuthentication();
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

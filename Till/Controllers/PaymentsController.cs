@@ -14,53 +14,54 @@ namespace Till.Controllers {
     public class PaymentsController : Controller {
         private IMapper _mapper;
         private ICounterService _counterService;
+        private IPaynowService _paynowService;
 
-        public PaymentsController(IMapper mapper, ICounterService counterService)
+        public PaymentsController(IMapper mapper, ICounterService counterService, IPaynowService paynowService)
         {
+            _paynowService = paynowService;
             _counterService = counterService;
             _mapper = mapper;
         }
 
         [HttpPost("Topup")]
-        public async Task<IActionResult> Topup([FromForm] PaymentDataDto data)
+        public async Task<IActionResult> Topup([FromForm] TopUpDataDto data)
         {
-            var payment = _mapper.Map<PaymentData, Payment>(data.PaymentData);
+            //Initialising Payment record
+            var payment = _mapper.Map<TopupData, Payment>(data.TopupData);
 
-            payment.UserId = Guid.Parse("0cf502e8-3c92-48f6-ab59-9421efb532dc");
-            payment.PaymentId = Guid.NewGuid();
-            payment.Date = DateTime.Now;
-            payment.Description = "Top up";
+            // Saving to db
+            var addedPayment = await _counterService.AddTopup(payment, data);
 
-            var addPayment = await _counterService.AddPayment(payment);
-
-            var paynow = new Paynow("9945", "1a42766b-1fea-48f6-ac39-1484dddfeb62");
-            paynow.ResultUrl = "https://localhost:44313/Payments/Result";
-            paynow.ReturnUrl = "https://localhost:44313";
-
+            // Initialising Paynow
+            var paynow = await _paynowService.GetPaynow();
             var paynowPayment = paynow.CreatePayment(payment.PaymentId.ToString(), payment.Email);
-            paynowPayment.Add("Top up", 1);
+            paynowPayment.Add("Top up", (float) data.TopupData.Amount);
 
-            string instr = "";
-
-            var response = paynow.SendMobile(paynowPayment, data.PaymentData.PNumber, "ecocash");
+            var response = paynow.SendMobile(paynowPayment, data.TopupData.PNumber, data.TopupData.Mode);
             if (response.Success())
             {
-                // Get the url to redirect the user to so they can make payment
-                var link = response.RedirectLink();
-
                 // Get the poll url (used to check the status of a transaction). You might want to save this in your DB
-                var pollUrl = response.PollUrl();
+                payment.PollUrl = response.PollUrl();
                 // await checkTransactionAsync(paynow, pollUrl);
-
-                // Get the instructions
-                instr = response.Instructions();
-                return Ok(
-                    "Please attend to the prompt displayed on your device.\nIf nothing is displayed kindly dial\n");
+                var updatePaymentAsync = await _counterService.UpdateTopupAsync(addedPayment, payment);
+                if (updatePaymentAsync != null)
+                    return Created(String.Empty, response.Instructions());
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
             else
             {
-                return StatusCode(StatusCodes.Status502BadGateway,"Something happened while trying to process topup");
+                await _counterService.DeletePayment(addedPayment);
+                return StatusCode(StatusCodes.Status502BadGateway, "Something happened while trying to process top up");
             }
+        }
+
+        [HttpPost("Service/Pay")]
+        public async Task<ActionResult> Payment(PaymentDataDto paymentDataDto)
+        {
+            var addPayment = await _counterService.AddPayment(paymentDataDto);
+            if (addPayment != null)
+                return Created(String.Empty, addPayment);
+            return BadRequest("Insufficient funds");
         }
     }
 }

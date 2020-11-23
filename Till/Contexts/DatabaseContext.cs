@@ -31,6 +31,14 @@ namespace Till.Contexts {
                 
                 entity.Property(e => e.Date).HasColumnName("date");
                 
+                entity.Property(e => e.ModeOfPayment).HasColumnName("mode");
+                
+                entity.Property(e => e.PollUrl).HasColumnName("poll_url");
+                
+                entity.Property(e => e.Success)
+                    .HasColumnName("paid")
+                    .HasDefaultValue(false);
+                
                 entity.Property(e => e.Description).HasColumnName("description");
                 
                 entity.Property(e => e.CreditAmount).HasColumnName("cr");

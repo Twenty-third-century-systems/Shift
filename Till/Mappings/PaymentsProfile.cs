@@ -3,10 +3,15 @@ using Till.Dtos;
 using Till.Models;
 
 namespace Till.Mappings {
-    public class PaymentsProfile:Profile {
+    public class PaymentsProfile : Profile {
         public PaymentsProfile()
         {
-            CreateMap<PaymentData, Payment>();
+            CreateMap<TopupData, Payment>();
+            
+            CreateMap<PaymentDataDto, Payment>()
+                .ForMember(dest => dest.DebitAmount,
+                    options =>
+                        options.MapFrom(src => src.Amount));  
         }
     }
 }

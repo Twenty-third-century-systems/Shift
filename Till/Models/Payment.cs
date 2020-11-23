@@ -14,6 +14,8 @@ namespace Till.Models {
         public string Email { get; set; }
         public string? PaynowRef { get; set; }
         public DateTime Date { get; set; }
+        public string? ModeOfPayment { get; set; }
+        public string? PollUrl { get; set; }
         public bool Success { get; set; }
         public string Description { get; set; }
         public double? CreditAmount { get; set; }

@@ -43,6 +43,16 @@
                 success: function (data) {
                     console.log(data);
                     alert(data);
+                    let instructionsAlertElement = '' +
+                        '<div class="alert alert-info">\n' +
+                        '        <p id="Instructions">Please attend to a prompt displayed on your handset<br>' +
+                        'If nothing is displayed follow these steps:<br>' + 
+                        data + 
+                        '<br> Click the <i class="fas fa-sync-alt text-white"></i> on your top right corner when done.</p>\n' +
+                        '    </div>';
+                    $('#instructionContainer').append(instructionsAlertElement);
+                    $('#modal-lg').modal('toggle');
+                    $('#paymentForm').trigger('reset');
                 },
                 error: function (err) {
                     alert(err.toString());

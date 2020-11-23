@@ -55,6 +55,26 @@ namespace Shisha {
                     AllowOfflineAccess = true,
                     AllowedScopes = {"openid", "profile", "scope1","examiner"}
                 },
+                
+                // interactive client using code flow + pkce
+                new Client
+                {
+                    ClientId = "f4cc9d9a-e9fd-4c16-ab32-50c19e29492c",
+                    ClientName = "Entities online payments",
+                    ClientSecrets = {new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256())},
+
+                    AllowedGrantTypes = GrantTypes.Code,
+                    
+                    AlwaysIncludeUserClaimsInIdToken = true,
+
+                    RedirectUris = {"https://localhost:44375/signin-oidc"},
+                    FrontChannelLogoutUri = "https://localhost:44375/signout-oidc",
+                    PostLogoutRedirectUris = {"https://localhost:44375/signout-callback-oidc"},
+
+                    
+                    AllowOfflineAccess = true,
+                    AllowedScopes = {"openid", "profile", "scope1","examiner"}
+                },
             };
     }
 }

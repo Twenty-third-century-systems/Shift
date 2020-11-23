@@ -1,5 +1,5 @@
 ﻿namespace Till.Dtos {
-    public class PaymentData {
+    public class TopupData {
         public string Email { get; set; }
         public string Mode { get; set; }
         public string PNumber { get; set; }
