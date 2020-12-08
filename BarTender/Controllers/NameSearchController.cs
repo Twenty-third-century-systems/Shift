@@ -68,83 +68,116 @@ namespace BarTender.Controllers {
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 client.SetBearerToken(accessToken);
-                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
-                    .ReadAsStringAsync();
-                user = JsonConvert.DeserializeObject<User>(response);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo");
+                if (response.IsSuccessStatusCode)
+                {
+                    var userDetailsFromAuth = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(userDetailsFromAuth);
+                }
+                else
+                {
+                    // TODO: to substitute with NOT ALLOWED
+                    return BadRequest("Not allowed");
+                }
             }
 
 
-            int status = 1;
-
-            var service = (
-                from value in _poleDb.Services
-                where value.Description == "name search"
-                select value
-            ).FirstOrDefault();
-
-            if (service != null)
+            using (var client = new HttpClient())
             {
-                var applicationId = _eachDb.Applications
-                    .Value(a => a.UserId, user.Sub)
-                    .Value(a => a.ServiceId, service.Id)
-                    .Value(a => a.DateSubmitted, DateTime.Now)
-                    .Value(a => a.Status, status)
-                    .Value(a => a.SortingOffice, details.Details.SortingOffice)
-                    .InsertWithInt32Identity();
-
-                if (applicationId != null)
+                var paymentDataDto = new PaymentDataDto
                 {
-                    Guid nameSearchId = Guid.NewGuid();
-                    int nameSearchSubmissionResult = _eachDb.NameSearches
-                        .Value(b => b.Id, nameSearchId.ToString())
-                        .Value(b => b.Service, details.Details.TypeOfEntity)
-                        .Value(b => b.Justification, details.Details.Justification)
-                        .Value(b => b.DesignationId, details.Details.Designation)
-                        .Value(b => b.ApplicationId, applicationId)
-                        .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
-                        .Value(b => b.Reference, Guid.NewGuid().ToString())
-                        .Insert();
-                    if (nameSearchSubmissionResult == 1)
-                    {
-                        int namesSubmited = 0;
-                        foreach (var name in details.Names)
-                        {
-                            int nameStatus = 7;
-                            namesSubmited += _eachDb.Names
-                                .Value(c => c.Value, name)
-                                .Value(c => c.Status, nameStatus)
-                                .Value(c => c.NameSearchId, nameSearchId.ToString())
-                                .Insert();
-                        }
+                    Email = "brightonkofu@outlook.com",
+                    Service = 1,
+                    UserId = Guid.Parse(user.Sub)
+                };
+                
+                //TODO: get email from authority
 
-                        if (namesSubmited >= 2)
+
+                var responce = await client
+                    .PostAsJsonAsync<PaymentDataDto>("https://localhost:44375/api/Payments/Service", paymentDataDto);
+
+
+                if (responce.IsSuccessStatusCode)
+                {
+                    int status = 1;
+
+                    var service = (
+                        from value in _poleDb.Services
+                        where value.Description == "name search"
+                        select value
+                    ).FirstOrDefault();
+
+                    if (service != null)
+                    {
+                        var applicationId = _eachDb.Applications
+                            .Value(a => a.UserId, user.Sub)
+                            .Value(a => a.ServiceId, service.Id)
+                            .Value(a => a.DateSubmitted, DateTime.Now)
+                            .Value(a => a.Status, status)
+                            .Value(a => a.SortingOffice, details.Details.SortingOffice)
+                            .InsertWithInt32Identity();
+
+                        if (applicationId != null)
                         {
-                            return Created("/submited", new NameSearchResponseDto
+                            Guid nameSearchId = Guid.NewGuid();
+                            int nameSearchSubmissionResult = _eachDb.NameSearches
+                                .Value(b => b.Id, nameSearchId.ToString())
+                                .Value(b => b.Service, details.Details.TypeOfEntity)
+                                .Value(b => b.Justification, details.Details.Justification)
+                                .Value(b => b.DesignationId, details.Details.Designation)
+                                .Value(b => b.ApplicationId, applicationId)
+                                .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
+                                .Value(b => b.Reference, Guid.NewGuid().ToString())
+                                .Insert();
+                            if (nameSearchSubmissionResult == 1)
                             {
-                                Id = nameSearchId,
-                                Details = details.Details,
-                                Names = details.Names
-                            });
+                                int namesSubmited = 0;
+                                foreach (var name in details.Names)
+                                {
+                                    int nameStatus = 7;
+                                    namesSubmited += _eachDb.Names
+                                        .Value(c => c.Value, name)
+                                        .Value(c => c.Status, nameStatus)
+                                        .Value(c => c.NameSearchId, nameSearchId.ToString())
+                                        .Insert();
+                                }
+
+                                if (namesSubmited >= 2)
+                                {
+                                    return Created("/submited", new NameSearchResponseDto
+                                    {
+                                        Id = nameSearchId,
+                                        Details = details.Details,
+                                        Names = details.Names
+                                    });
+                                }
+                                else
+                                {
+                                    return StatusCode(StatusCodes.Status500InternalServerError,
+                                        "Failed to insert Names");
+                                }
+                            }
+                            else
+                            {
+                                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Failed to insert NewNameSearchApplicationDto search");
+                            }
                         }
                         else
                         {
-                            return StatusCode(StatusCodes.Status500InternalServerError, "Failed to insert Names");
+                            return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create application");
                         }
                     }
                     else
                     {
-                        return StatusCode(StatusCodes.Status500InternalServerError,
-                            "Failed to insert NewNameSearchApplicationDto search");
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong");
                     }
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create application");
+                    return BadRequest("Insufficient funds");
                 }
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong");
             }
         }
     }

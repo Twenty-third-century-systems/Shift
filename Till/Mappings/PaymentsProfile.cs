@@ -8,10 +8,9 @@ namespace Till.Mappings {
         {
             CreateMap<TopupData, Payment>();
             
-            CreateMap<PaymentDataDto, Payment>()
-                .ForMember(dest => dest.DebitAmount,
-                    options =>
-                        options.MapFrom(src => src.Amount));  
+            CreateMap<PaymentDataDto, Payment>();
+
+            CreateMap<PriceList, PriceListItemDto>();
         }
     }
 }

@@ -20,9 +20,9 @@ namespace Till.Services {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Payment> AddTopup(Payment payment, TopUpDataDto data)
+        public async Task<Payment> AddTopupAsync(Payment payment, TopUpDataDto data, string value)
         {
-            payment.UserId = Guid.Parse("0cf502e8-3c92-48f6-ab59-9421efb532dc");
+            payment.UserId = Guid.Parse(value);
             payment.PaymentId = Guid.NewGuid();
             payment.Email = data.TopupData.Email;
             payment.Date = DateTime.Now;
@@ -42,7 +42,7 @@ namespace Till.Services {
             return paymentToBeUpdated;
         }
 
-        public async Task DeletePayment(Payment addedPayment)
+        public async Task DeletePaymentAsync(Payment addedPayment)
         {
             _unitOfWork.Payments.Remove(addedPayment);
             await _unitOfWork.CommitAsync();
@@ -57,7 +57,7 @@ namespace Till.Services {
             {
                 if (payment.PaynowRef == null && payment.ModeOfPayment != null && payment.PollUrl != null)
                 {
-                    recheck = await CheckPayment(payment);
+                    recheck = await CheckPaymentAsync(payment);
                 }
             }
 
@@ -73,18 +73,21 @@ namespace Till.Services {
                     p.UserId.ToString().Equals(user.ToString())
                     && p.Success
                 ).ToList();
-            account.Balance = await CalculateBalance(account.Transactions);
+            account.Balance = await CalculateBalanceAsync(account.Transactions);
             return account;
         }
 
-        public async Task<Payment> AddPayment(PaymentDataDto paymentDataDto)
+        public async Task<Payment> AddPaymentAsync(PaymentDataDto paymentDataDto)
         {
             var payment = _mapper.Map<PaymentDataDto, Payment>(paymentDataDto);
-            payment.UserId = Guid.Parse("0cf502e8-3c92-48f6-ab59-9421efb532dc");
+            // payment.UserId = pau;
             payment.PaymentId = Guid.NewGuid();
             payment.Date = DateTime.Now;
-            if (await CanPay(payment.UserId, paymentDataDto.Amount))
+            var byIdAsync = await _unitOfWork.PriceList.GetByIdAsync(paymentDataDto.Service);
+            payment.Description = byIdAsync.Service;
+            if (await CanPayAsync(payment.UserId, byIdAsync.Price))
             {
+                payment.DebitAmount = byIdAsync.Price;
                 payment.Success = true;
                 await _unitOfWork.Payments.AddAsync(payment);
                 await _unitOfWork.CommitAsync();
@@ -93,14 +96,19 @@ namespace Till.Services {
             return (null);
         }
 
-        private async Task<bool> CanPay(Guid paymentUserId, double amount)
+        public async Task<IEnumerable<PriceListItemDto>> GetPricesAsync()
+        {
+            var allAsync = await _unitOfWork.PriceList.GetAllAsync();
+            return _mapper.Map<IEnumerable<PriceList>, IEnumerable<PriceListItemDto>>(allAsync);
+        }
+
+        private async Task<bool> CanPayAsync(Guid paymentUserId, double amount)
         {
             var accountHistAndBalanceAsync = await GetAccountHistAndBalanceAsync(paymentUserId);
             return accountHistAndBalanceAsync.Balance - amount >= 0;
         }
 
-
-        private async Task<double> CalculateBalance(IEnumerable<Payment> paymentsByUser)
+        private async Task<double> CalculateBalanceAsync(IEnumerable<Payment> paymentsByUser)
         {
             double credit = 0;
             double debit = 0;
@@ -116,7 +124,7 @@ namespace Till.Services {
             return credit - debit;
         }
 
-        private async Task<Boolean> CheckPayment(Payment payment)
+        private async Task<Boolean> CheckPaymentAsync(Payment payment)
         {
             bool refresh = false;
             var paynow = await _paynowService.GetPaynow();

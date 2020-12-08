@@ -34,15 +34,15 @@
             },
         },
         submitHandler: function (form) {
+            $('#busy').show()
             $.ajax({
                 type: 'Post',
                 url: '/api/Payments/Topup',
                 data: {
-                    paymentData: $(form).serializeToJSON()
+                    topupData: $(form).serializeToJSON()
                 },
                 success: function (data) {
-                    console.log(data);
-                    alert(data);
+                    $('#busy').hide();
                     let instructionsAlertElement = '' +
                         '<div class="alert alert-info">\n' +
                         '        <p id="Instructions">Please attend to a prompt displayed on your handset<br>' +

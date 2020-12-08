@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Till.Dtos;
@@ -10,6 +12,7 @@ using Payment = Till.Models.Payment;
 
 namespace Till.Controllers {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class PaymentsController : Controller {
         private IMapper _mapper;
@@ -30,11 +33,15 @@ namespace Till.Controllers {
             var payment = _mapper.Map<TopupData, Payment>(data.TopupData);
 
             // Saving to db
-            var addedPayment = await _counterService.AddTopup(payment, data);
+            var userIdClaim = User
+                .Claims
+                .FirstOrDefault(c => c.Type.Equals("sub") && c.Issuer.Equals("https://localhost:5001"));
+            var addedPayment = await _counterService.AddTopupAsync(payment, data, userIdClaim.Value);
 
             // Initialising Paynow
             var paynow = await _paynowService.GetPaynow();
-            var paynowPayment = paynow.CreatePayment(payment.PaymentId.ToString(), payment.Email);
+            var paynowPayment =
+                paynow.CreatePayment(payment.PaymentId.ToString(), payment.Email);
             paynowPayment.Add("Top up", (float) data.TopupData.Amount);
 
             var response = paynow.SendMobile(paynowPayment, data.TopupData.PNumber, data.TopupData.Mode);
@@ -50,15 +57,16 @@ namespace Till.Controllers {
             }
             else
             {
-                await _counterService.DeletePayment(addedPayment);
+                await _counterService.DeletePaymentAsync(addedPayment);
                 return StatusCode(StatusCodes.Status502BadGateway, "Something happened while trying to process top up");
             }
         }
 
-        [HttpPost("Service/Pay")]
+        [AllowAnonymous]
+        [HttpPost("Service")]
         public async Task<ActionResult> Payment(PaymentDataDto paymentDataDto)
         {
-            var addPayment = await _counterService.AddPayment(paymentDataDto);
+            var addPayment = await _counterService.AddPaymentAsync(paymentDataDto);
             if (addPayment != null)
                 return Created(String.Empty, addPayment);
             return BadRequest("Insufficient funds");

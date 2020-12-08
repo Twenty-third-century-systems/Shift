@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - Till</title>
+    <title>@ViewData["Title"] || DCIP - Companies</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css"/>
     <!-- Admin lte -->
@@ -16,43 +16,53 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
             <a class="navbar-brand">
-                <small>ZWL</small><strong>@ViewBag.ReconsiledAcount.Balance</strong> 
+                @if (ViewBag.ReconsiledAcount != null)
+                {
+                    <small>ZWL</small>
+                    <strong>@ViewBag.ReconsiledAcount.Balance</strong>
+                }
+                else
+                {
+                    <strong>Price List</strong>
+                }
             </a>
             <div>
-                @* <a> *@
-                @*     <i class="fas fa-shopping-bag text-gray-dark ml-3" *@
-                @*        data-toggle="tooltip" *@
-                @*        data-placement="bottom" *@
-                @*        title="Purchase credits"> *@
-                @* *@
-                @*     </i> *@
-                @* </a> *@
-                <a>
-                    <i class="fas fa-wifi text-gray-dark ml-3"
-                       data-toggle="tooltip"
-                       data-placement="bottom"
-                       title="Processing">
+                @if (ViewBag.ReconsiledAcount != null)
+                {
+@*                     <a id="busy"> *@
+@*                         <i class="fas fa-wifi text-primary ml-3" *@
+@*                            data-toggle="tooltip" *@
+@*                            data-placement="bottom" *@
+@*                            title="Processing"> *@
+@* *@
+@*                         </i> *@
+@*                     </a> *@
+                    <a href="/Information/PriceList">
+                        <i class="far fa-shopping-bag text-gray-dark ml-3"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           title="Price list">
 
-                    </i>
-                </a>
-                <a
-                    data-toggle="modal"
-                    data-target="#modal-lg">
-                    <i class="far fa-credit-card text-gray-dark ml-3"
-                       data-toggle="tooltip"
-                       data-placement="bottom"
-                       title="Make payment">
+                        </i>
+                    </a>
+                    <a
+                        data-toggle="modal"
+                        data-target="#modal-lg">
+                        <i class="far fa-credit-card text-gray-dark ml-3"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           title="Make payment">
+                        </i>
+                    </a>
+                    <a href="/">
+                        <i class="fas fa-sync-alt text-gray-dark ml-3 mr-3"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           title="Sync">
+                        </i>
+                    </a>
+                }
 
-                    </i>
-                </a>
-                <a href="/">
-                    <i class="fas fa-sync-alt text-gray-dark ml-3 mr-3"
-                       data-toggle="tooltip"
-                       data-placement="bottom"
-                       title="Sync">
-
-                    </i>
-                </a>
             </div>
         </div>
     </nav>

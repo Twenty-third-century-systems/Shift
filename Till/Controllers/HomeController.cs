@@ -23,15 +23,27 @@ namespace Till.Controllers {
 
         public async Task<IActionResult> Index()
         {
-            await _counterService.ReconcileAccountsAsync(Guid.Parse("0cf502e8-3c92-48f6-ab59-9421efb532dc"));
+            var userIdClaim = User
+                .Claims
+                .FirstOrDefault(c => c.Type.Equals("sub")&& c.Issuer.Equals("https://localhost:5001"));
+
+            if (userIdClaim == null)
+                return Unauthorized();
+            
+            await _counterService.ReconcileAccountsAsync(Guid.Parse(userIdClaim.Value));
             var accountHistAndBalanceAsync = 
-                await _counterService.GetAccountHistAndBalanceAsync(Guid.Parse("0cf502e8-3c92-48f6-ab59-9421efb532dc"));
+                await _counterService.GetAccountHistAndBalanceAsync(Guid.Parse(userIdClaim.Value));
             accountHistAndBalanceAsync.Transactions =
                 accountHistAndBalanceAsync.Transactions.OrderByDescending(p => p.Date)
                     .ToList();
+            
+            var nameClaim = User
+                .Claims
+                .FirstOrDefault(c => c.Type.Equals("name")&& c.Issuer.Equals("https://localhost:5001"));
+            ViewBag.User = nameClaim.Value;
             ViewBag.ReconsiledAcount = accountHistAndBalanceAsync;
-            return View();
-        }
+            return View();            
+        }       
 
         public IActionResult Privacy()
         {

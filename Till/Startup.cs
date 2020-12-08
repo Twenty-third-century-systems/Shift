@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Till.Contexts;
 using Till.Repositories;
 using Till.Services;
@@ -41,17 +42,26 @@ namespace Till {
 
                     options.ClientId = "f4cc9d9a-e9fd-4c16-ab32-50c19e29492c";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
-                    options.ResponseType = "code";
 
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("scope1");
                     options.Scope.Add("offline_access");
 
+                    options.ResponseType = "code";
                     options.ResponseMode = "form_post";
 
                     options.SaveTokens = true;
                     options.UsePkce = true;
+                })
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "https://localhost:5001";
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
                 });
             
             services.AddDbContext<DatabaseContext>(o =>

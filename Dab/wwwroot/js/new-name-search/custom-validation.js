@@ -124,7 +124,8 @@ $(document).ready(function () {
                         $('#name-search-form').trigger('reset');
                     },
                     error: function (err) {
-                        toastr.error('Something went wrong in submitting the application');
+                        console.log(err.statusText);
+                        toastr.error(err.toString());
                     },
                 });
             } else {

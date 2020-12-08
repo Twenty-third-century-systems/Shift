@@ -870,27 +870,51 @@ namespace BarTender.Controllers {
         }
 
         [HttpPost("s")]
-        public IActionResult SubmitApplication([FromBody] int applicationId)
-        {
+        public async Task<IActionResult> SubmitApplication([FromBody] int applicationId)
+        {            
             var application = (
                 from a in _eachDb.Applications
                 where a.Id == applicationId
                 select a
-            ).FirstOrDefault();
+            ).FirstOrDefault();            
 
             if (application != null)
             {
-                var status = (
-                    from s in _poleDb.Status
-                    where s.Description.Equals("pending")
-                    select s.Id
-                ).FirstOrDefault();
-
-                if (application.Status != status)
+                using (var client = new HttpClient())
                 {
-                    application.Status = status;
-                    if (_eachDb.Update(application) == 1)
-                        return Ok();
+                    var paymentDataDto = new PaymentDataDto
+                    {
+                        Email = "brightonkofu@outlook.com",
+                        Service = 2,
+                        UserId = Guid.Parse(application.UserId)
+                    };
+                
+                    //TODO: get email from authority
+
+
+                    var responce = await client
+                        .PostAsJsonAsync<PaymentDataDto>("https://localhost:44375/api/Payments/Service", paymentDataDto);
+
+
+                    if (responce.IsSuccessStatusCode)
+                    {                        
+                        var status = (
+                            from s in _poleDb.Status
+                            where s.Description.Equals("pending")
+                            select s.Id
+                        ).FirstOrDefault();
+
+                        if (application.Status != status)
+                        {
+                            application.Status = status;
+                            if (_eachDb.Update(application) == 1)
+                                return Ok();
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("Insufficient funds");
+                    }
                 }
             }
 
