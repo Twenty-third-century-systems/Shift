@@ -21,5 +21,6 @@
         public static readonly string SubmitPvtApplication = $"{ApiBaseUrl}/entity/s";
         public static readonly string ReloadPvtApplication = $"{ApiBaseUrl}/entity";
         public static readonly string NameSearchSummary = "";
+        public static string DashboardValues = $"{ApiBaseUrl}Dashboard/external/dashboard";
     }
 }

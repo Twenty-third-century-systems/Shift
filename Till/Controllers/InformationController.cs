@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Till.Services;
@@ -19,6 +20,14 @@ namespace Till.Controllers {
             var priceListItemDtos = await _counterService.GetPricesAsync();
             ViewBag.PriceList = priceListItemDtos.ToList();
             return View();
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetAccountInformation(Guid userId)
+        {
+            var accountHistAndBalanceAsync =
+                await _counterService.GetAccountHistAndBalanceAsync(userId);
+            return Ok(accountHistAndBalanceAsync.Balance);
         }
     }
 }

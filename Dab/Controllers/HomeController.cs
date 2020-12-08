@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Dab.Dtos;
+using Dab.Globals;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Dab.Models;
@@ -28,6 +30,18 @@ namespace Dab.Controllers {
                 .Claims
                 .Where(c => c.Type.Equals("name")&& c.Issuer.Equals("https://localhost:5001"))
                 .FirstOrDefault();
+
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+
+                var responseMessage = await client.GetAsync(ApiUrls.DashboardValues);
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    ViewBag.DashData = await responseMessage.Content.ReadAsAsync<ExternalUserDashboardDto>();
+                }
+            }
             ViewBag.User = nameClaim.Value;
             return View();
         }
