@@ -36,6 +36,80 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+      <Content Update="wwwroot\lib\intl-tel-input-master\build\js\data.min.js">
+        <DependentUpon>data.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\intl-tel-input-master\build\js\intlTelInput.min.js">
+        <DependentUpon>intlTelInput.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\intl-tel-input-master\build\js\intlTelInput-jquery.min.js">
+        <DependentUpon>intlTelInput-jquery.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\intl-tel-input-master\build\css\intlTelInput.min.css">
+        <DependentUpon>intlTelInput.css</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\js\register\register.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="Views\Shared\_ValidationScriptsPartial.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\additional-methods.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\additional-methods.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>additional-methods.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>jquery.validate.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\additional-methods.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>additional-methods.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>jquery.validate.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation\LICENSE.md">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>jquery.validate.unobtrusive.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <DependentUpon>jquery.validate.unobtrusive.js</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\js\register\custom-validations.js">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

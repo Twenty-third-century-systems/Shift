@@ -1,5 +1,12 @@
 ﻿﻿$(document).ready(function () {
+    
+    $('#phoneNumber').intlTelInput({
+        preferredCountries: [ "zw", "za" ],
+        utilsScript:"/lib/intl-tel-input-master/build/js/utils.js"
+    });
+    
     let countrySelect = $('#country');
+    
     countrySelect.change(function () {
         if (countrySelect.val() !== 'ZWE') {
             $('#idMode').text('Passport number')

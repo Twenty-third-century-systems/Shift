@@ -6,10 +6,10 @@
 }
 
 <div class="container-fluid">
-    <form method="post" action="/Account/Register">
+    <form method="post" action="/Account/Register" id="registration-form">
         <div class="text-center mb-4">
             <img class="mb-4" src="~/img/1200px-Coat_of_arms_of_Zimbabwe.png" alt="" width="72" height="72">
-            <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+            <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
             @* <p>Build form controls with floating labels via the <code>:placeholder-shown</code> pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in latest Chrome, Safari, and Firefox.</a></p> *@
         </div>
 
@@ -86,8 +86,8 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Phone number</label>
-                    <input type="text" class="form-control" name="phoneNumber">
+                    <label>Mobile number</label>
+                    <input type="text" class="form-control" name="phoneNumber" id="phoneNumber">
                 </div>
             </div>
         </div>
@@ -109,3 +109,12 @@
         <button type="submit" class="btn btn-sm btn-dark float-right" id="btn-done">Done</button>
     </form>
 </div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial"/>
+    <link rel="stylesheet" href="~/lib/intl-tel-input-master/build/css/intlTelInput.min.css"/>
+    <script type="text/javascript" src="~/lib/intl-tel-input-master/build/js/intlTelInput-jquery.min.js"></script>
+    <script type="text/javascript" src="~/js/register/register.js"></script>
+    <script type="text/javascript" src="~/js/register/custom-validations.js"></script>
+}
