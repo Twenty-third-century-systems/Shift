@@ -82,7 +82,7 @@ namespace Dab.Controllers {
                         string finalhtml = string.Concat(htmlArray);
 
                         var pdf = renderer.RenderHtmlAsPdf(finalhtml);
-                        string OutputPath = "C:/My/HtmlToPDFRAW.pdf";
+                        string OutputPath = "C:/Backgrounds/_generated_certificate.pdf";
 
                         pdf.SaveAs(OutputPath);
 
@@ -104,10 +104,8 @@ namespace Dab.Controllers {
         }
 
         [HttpGet("pvt/sum/{applicationId}")]
-        public async Task<IActionResult> PvtOutputDoc(string applicationId)
+        public async Task<IActionResult> PvtSummaryDoc(string applicationId)
         {
-            //  string applicationId = "81f768d8-c454-47cb-8986-7544d50870b5"; 
-
             using (var client = new HttpClient())
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
@@ -376,21 +374,50 @@ namespace Dab.Controllers {
                             "</html>";
                         htmlList.Add(members);
 
-                        return await ConstructDocAndSend(renderer,htmlList);
+                        return await ConstructSummaryDocAndSend(renderer,htmlList);
                     }
                 }
                 else
                 {
-                    return NotFound();
+                    return NotFound("Application not found");
                 }
             }            
         }
+        
+        [HttpGet("pvt/cert/{applicationId}")]
+        public async Task<IActionResult> PvtCertificate(string applicationId)
+        {
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var httpResponseMessage =
+                    await client.GetAsync($"https://localhost:44312/Application/pvt/cert/{applicationId}");
 
-        private async Task<IActionResult> ConstructDocAndSend(HtmlToPdf renderer, List<string> htmlList)
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    //TODO add code to bind html with data here
+                    ConstructCertificateAndSend();
+                }
+                else
+                {
+                    return NotFound("Application not found");
+                }
+            }
+            
+            return null;
+        }
+
+        private void ConstructCertificateAndSend()
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<IActionResult> ConstructSummaryDocAndSend(HtmlToPdf renderer, List<string> htmlList)
         {
             string finalhtml = string.Concat(htmlList.ToArray());
 
-            string DocPath = @"C:/My/" + $"_Fiscalreport4.pdf";
+            string DocPath = @"C:/Backgrounds/" + $"_generated.pdf";
             renderer.PrintOptions.PaperSize = PdfPrintOptions.PdfPaperSize.A4;
             renderer.PrintOptions.PaperOrientation = PdfPrintOptions.PdfPaperOrientation.Portrait;
 
@@ -404,7 +431,7 @@ namespace Dab.Controllers {
             renderer.PrintOptions.MarginRight = 10;
             
             var bg = renderer.RenderHtmlAsPdf(finalhtml);
-            bg.AddBackgroundPdf(@"C:\\My\\bg.pdf");
+            bg.AddBackgroundPdf(@"C:\\Backgrounds\\summary_bg.pdf");
             bg.SaveAs(DocPath);
             
             var pdf = PdfDocument.FromFile(DocPath);

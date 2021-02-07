@@ -88,6 +88,8 @@ namespace BarTender {
                 options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
                     .UseDefaultLogging(provider);
             });
+
+            services.AddAutoMapper(typeof(Program));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

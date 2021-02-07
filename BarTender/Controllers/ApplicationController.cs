@@ -136,8 +136,9 @@ namespace BarTender.Controllers {
                                                     from a in _eachDb.AmmendedArticles
                                                     where a.ArticleId == articleOfAssociation.Id
                                                     select a
-                                                ).ToList();                                                
+                                                ).ToList();
                                             }
+
                                             return Ok(
                                                 ConstructDto(
                                                     application,
@@ -155,6 +156,48 @@ namespace BarTender.Controllers {
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            return NotFound();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("pvt/cert/{applicationId}")]
+        public IActionResult GetRegisteredPrivateEntityCertificate(int applicationId)
+        {
+            var application = (
+                from a in _eachDb.Applications
+                where a.Id == applicationId
+                select a).SingleOrDefault();
+
+            if (application != null && application.ServiceId == 13 && application.DateExamined != null)
+            {
+                var pvtEntityNameIdAndReference = (
+                    from p in _eachDb.PvtEntities
+                    where p.ApplicationId == applicationId
+                    select new
+                    {
+                        p.NameId,
+                        p.Reference
+                    }).SingleOrDefault();
+
+                if (pvtEntityNameIdAndReference.NameId != null && pvtEntityNameIdAndReference.Reference != null)
+                {
+                    var name = (
+                        from n in _eachDb.Names
+                        where n.Id == pvtEntityNameIdAndReference.NameId.Value
+                        select n.Value).SingleOrDefault();
+
+                    if (name != null)
+                    {
+                        return Ok(new RegisteredPvtEntityDto
+                        {
+                            EntityName = name,
+                            Reference = pvtEntityNameIdAndReference.Reference,
+                            DateRegistered = application.DateExamined.Value.ToString("d")
+                        });
                     }
                 }
             }
@@ -268,10 +311,10 @@ namespace BarTender.Controllers {
 
             dto.LiabilityClause = memorundum.LiabilityClause;
             dto.ShareCapital = memorundum.ShareClause;
-            
+
             if (memoObjects.Count > 0)
                 dto.MajorObject = memoObjects.FirstOrDefault().Value;
-            
+
             if (articleOfAssociation.Other == null)
             {
                 foreach (var article in ammendedArticle)
