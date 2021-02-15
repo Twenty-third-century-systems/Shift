@@ -196,7 +196,7 @@ namespace BarTender.Controllers {
                         {
                             EntityName = name,
                             Reference = pvtEntityNameIdAndReference.Reference,
-                            DateRegistered = application.DateExamined.Value.ToString("d")
+                            DateRegistered = application.DateExamined.Value
                         });
                     }
                 }

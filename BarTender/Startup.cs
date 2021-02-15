@@ -1,18 +1,23 @@
 using System;
+using System.Collections.Generic;
 using AutoMapper;
+using BarTender.Models;
 using BarTender.Repositories;
 using Cooler.DataModels;
+using Fridge.Contexts;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using LinqToDB.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TurnTable.ExternalServices;
 
 namespace BarTender {
     public class Startup {
@@ -26,11 +31,27 @@ namespace BarTender {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<MainDatabaseContext>(o =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
+            });
+
+            services.Configure<List<ServicesForNameSearchSelection>>(Configuration.GetSection("Services"));
+
+            services.Configure<List<ReasonForSearchForNameSearchSelection>>(Configuration.GetSection("Reason for search"));
+            
+            services.Configure<List<DesignationsForNameSearchSelection>>(Configuration.GetSection("Designation"));
             
             services.AddAutoMapper(typeof(Startup));
+
             services.AddTransient<INameSearchRepository, NameSearchRepository>();
+
+            services.AddTransient<IValuesService, ValuesService>();
+
+            services.AddTransient<IValuesService, ValuesService>();
+
             services.AddControllers(o => o.Filters.Add(new AuthorizeFilter()));
-            
+
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
@@ -41,7 +62,7 @@ namespace BarTender {
                         ValidateAudience = false
                     };
                 });
-            
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ApiScope", policy =>
@@ -50,7 +71,7 @@ namespace BarTender {
                     policy.RequireClaim("scope", "scope1");
                 });
             });
-            
+
             services.AddSwaggerGen(x =>
                 x.SwaggerDoc("v1", new OpenApiInfo
                 {
@@ -76,13 +97,13 @@ namespace BarTender {
                 options.UseSqlServer(Configuration.GetConnectionString("EachDatabase"))
                     .UseDefaultLogging(provider);
             });
-            
+
             services.AddLinqToDbContext<PoleDB>((provider, options) =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("PoleDatabase"))
                     .UseDefaultLogging(provider);
             });
-            
+
             services.AddLinqToDbContext<ShwaDB>((provider, options) =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
@@ -105,10 +126,7 @@ namespace BarTender {
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
 
             app.UseHttpsRedirection();
 

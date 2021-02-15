@@ -1,37 +1,28 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Cabinet.Dtos.Request;
 using Cabinet.Dtos.Response;
+using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
-using Fridge.Repository;
 
 namespace TurnTable.ExternalServices {
     public class NameSearchService : INameSearchService {
-        private readonly NameSearchRepository _nameSearchRepository;
-        private readonly ApplicationStatusRepository _applicationStatusRepository;
-        private readonly ServiceTypeRepository _serviceTypeRepository;
         private readonly IMapper _mapper;
-        private readonly ServiceApplicationRepository _serviceApplicationRepository;
         private MainDatabaseContext _context;
 
-        public NameSearchService(ServiceApplicationRepository serviceApplicationRepository,
-            NameSearchRepository nameSearchRepository,
-            ApplicationStatusRepository applicationStatusRepository, ServiceTypeRepository serviceTypeRepository,
-            IMapper mapper,MainDatabaseContext context)
+        public NameSearchService(IMapper mapper,MainDatabaseContext context)
         {
             _context = context;
-            _serviceApplicationRepository = serviceApplicationRepository;
             _mapper = mapper;
-            _serviceTypeRepository = serviceTypeRepository;
-            _applicationStatusRepository = applicationStatusRepository;
-            _nameSearchRepository = nameSearchRepository;
         }
 
-        public async Task<bool> NameAvailable(string suggestedName)
+        public bool NameAvailable(string suggestedName)
         {
-            return await _nameSearchRepository.IsNameAvailable(suggestedName);
+            var entityNames = _context.Names.Where(n => n.Value.Equals(suggestedName)).ToList();
+            return entityNames.Count == 0;
         }
         
         /// <summary>
@@ -49,11 +40,10 @@ namespace TurnTable.ExternalServices {
         public async Task<SubmittedNameSearchResponseDto> CreateNewNameSearch(Guid userId, NewNameSearchRequestDto dto)
         {
             // Initialize a new ServiceApplication
-            var serviceApplication = new ServiceApplication
+            var application = new Application
             {
-                ServiceType = await _serviceTypeRepository.GetNameSearchServiceAsync(),
                 DateSubmitted = DateTime.Now,
-                ApplicationStatus = await _applicationStatusRepository.GetSubmittedStatusAsync(),
+                Status = EApplicationStatus.Submited,
                 CityId = dto.SortingOffice
             };
 
@@ -63,23 +53,23 @@ namespace TurnTable.ExternalServices {
             nameSearch.Reference = NewNameSearchReference(dto.SortingOffice);
 
             // Mark all names as PENDING
-            var pendingStatus = await _applicationStatusRepository.GetPendingStatusAsync();
-            foreach (var name in nameSearch.EntityNames)
+            foreach (var name in nameSearch.Names)
             {
-                name.ApplicationStatus = pendingStatus;
+                name.Status = ENameStatus.Pending;
             }
 
             // Associate NameSearch with ServiceApplication and mark for creation
-            serviceApplication.NameSearches.Add(nameSearch);
-            await _serviceApplicationRepository.AddApplicationAsync(serviceApplication);
+            application.NameSearch = nameSearch;
+            await _context.AddAsync(application);
 
             // Commit to db
             await _context.SaveChangesAsync();
             
             // Creation and return of resource
+            // TODO: verify if SaveChangesSuccessful
             return new SubmittedNameSearchResponseDto
             {
-                Id = serviceApplication.ServiceApplicationId,
+                Id = application.ApplicationId,
                 NameSearch = nameSearch.NameSearchId,
                 Reference = nameSearch.Reference
             };

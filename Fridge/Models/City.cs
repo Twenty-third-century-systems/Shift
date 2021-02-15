@@ -13,7 +13,11 @@ namespace Fridge.Models
         public bool CanSort { get; set; }
         
         public Country Country { get; set; }
-        public ICollection<ServiceApplication> Applications { get; set; }
-        public ICollection<PrivateEntityOffice> EntityOffices { get; set; }
+        public ICollection<Application> Applications { get; set; }
+
+        public bool IsASortingOffice()
+        {
+            return CanSort;
+        }
     }
 }

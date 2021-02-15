@@ -6,7 +6,7 @@ using Cabinet.Dtos.Response;
 
 namespace TurnTable.ExternalServices {
     public interface INameSearchService {
-        public Task<bool> NameAvailable(string suggestedName);
+        public bool NameAvailable(string suggestedName);
 
         public Task<SubmittedNameSearchResponseDto> CreateNewNameSearch(Guid userId, NewNameSearchRequestDto dto);
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BarTender.Dtos {
+namespace Dab.Dtos {
     public class RegisteredPvtEntityDto {
         public string EntityName { get; set; }
         public string Reference { get; set; }

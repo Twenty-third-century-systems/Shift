@@ -9,6 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Cabinet\Cabinet.csproj" />
       <ProjectReference Include="..\Fridge\Fridge.csproj" />
     </ItemGroup>
 

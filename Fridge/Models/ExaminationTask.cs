@@ -9,7 +9,7 @@ namespace Fridge.Models
     {
         public ExaminationTask()
         {
-            Applications = new HashSet<ServiceApplication>();
+            Applications = new HashSet<Application>();
         }
 
         public int ExaminationTaskId { get; set; }
@@ -18,6 +18,6 @@ namespace Fridge.Models
         public Guid AssignedBy { get; set; }
         public DateTime ExpectedDateOfCompletion { get; set; }
 
-        public ICollection<ServiceApplication> Applications { get; set; }
+        public ICollection<Application> Applications { get; set; }
     }
 }

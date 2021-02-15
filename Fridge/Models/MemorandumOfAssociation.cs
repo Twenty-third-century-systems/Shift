@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-#nullable disable
-
-namespace Fridge.Models
-{
-    public class MemorandumOfAssociation
-    {
+namespace Fridge.Models {
+    public class MemorandumOfAssociation {
+        
         public MemorandumOfAssociation()
         {
-            MemorandumObjects = new HashSet<MemorandumObject>();
-            PrivateEntities = new HashSet<PrivateEntity>();
+            MemorandumObjects = new HashSet<MemorandumOfAssociationObject>();
+            ShareClauses = new HashSet<ShareClause>();
         }
 
         public int MemorandumOfAssociationId { get; set; }
-        public string ShareClause { get; set; }
+        public int PrivateEntityId { get; set; }
         public string LiabilityClause { get; set; }
 
-        public ICollection<MemorandumObject> MemorandumObjects { get; set; }
-        public ICollection<PrivateEntity> PrivateEntities { get; set; }
+        public PrivateEntity PrivateEntity { get; set; }
+        public ICollection<MemorandumOfAssociationObject> MemorandumObjects { get; set; }
+        public ICollection<ShareClause> ShareClauses { get; set; }
     }
 }

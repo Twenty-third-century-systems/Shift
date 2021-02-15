@@ -10,6 +10,8 @@ namespace Fridge.Models
         public Country()
         {
             Cities = new HashSet<City>();
+            ForeignEntities = new HashSet<ShareholdingForeignEntity>();
+            PrivateOwners = new HashSet<PrivateEntityOwner>();
         }
         
         public string Code { get; set; }
@@ -18,6 +20,7 @@ namespace Fridge.Models
         public string Region { get; set; }
 
         public ICollection<City> Cities { get; set; }
-        public ICollection<ForeignEntity> ForeignEntities { get; set; }
+        public ICollection<ShareholdingForeignEntity> ForeignEntities { get; set; }
+        public ICollection<PrivateEntityOwner> PrivateOwners { get; set; }
     }
 }

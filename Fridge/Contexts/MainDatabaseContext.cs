@@ -1,4 +1,6 @@
-﻿using Fridge.Models;
+﻿using System;
+using Fridge.Constants;
+using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
 
 #nullable disable
@@ -14,140 +16,93 @@ namespace Fridge.Contexts {
         {
         }
 
-        public DbSet<AmendedArticle> AmendedArticles { get; set; }
-        public DbSet<ServiceApplication> Applications { get; set; }
-        public DbSet<ArticleOfAssociation> ArticleOfAssociations { get; set; }
-        public DbSet<ForeignEntity> ForeignEntities { get; set; }
-        public DbSet<MemorandumObject> MemoObjects { get; set; }
-        public DbSet<MemorandumOfAssociation> Memorandums { get; set; }
-        public DbSet<EntityName> Names { get; set; }
+        //Uncomment this to app that moves country data
+        
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //     optionsBuilder.UseSqlServer("Server=localhost;Database=bigDB;Trusted_Connection=True;Enlist=False;");
+        // }
+
+        public DbSet<Application> Applications { get; set; }
+        public DbSet<ShareholdingForeignEntity> ForeignEntities { get; set; }
         public DbSet<NameSearch> NameSearches { get; set; }
-        public DbSet<PrivateEntityOffice> PrivateEntityOffices { get; set; }
+        public DbSet<EntityName> Names { get; set; }
         public DbSet<PrivateEntity> PrivateEntities { get; set; }
-        public DbSet<PrivateEntityHasForeignEntity> PvtEntityHasForeignEntities { get; set; }
-        public DbSet<PrivateEntityHasPrivateEntity> PvtEntityHasPvtEntities { get; set; }
-        public DbSet<PrivateEntityHasSubscriber> PvtEntityHasSubscribers { get; set; }
-        public DbSet<PrivateEntityRoles> Roles { get; set; }
-        public DbSet<PrivateEntitySubscriber> Subscribers { get; set; }
-        public DbSet<PrivateEntitySubscription> Subscriptions { get; set; }
         public DbSet<ExaminationTask> ExaminationTasks { get; set; }
-        public DbSet<ProcessingDepartment> Departments { get; set; }
-        public DbSet<Designation> Designations { get; set; }
-        public DbSet<Gender> Genders { get; set; }
-        public DbSet<ReasonForNameSearch> ReasonForSearches { get; set; }
-        public DbSet<ServiceType> Services { get; set; }
-        public DbSet<ApplicationStatus> Statuses { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
+        public DbSet<PrivateEntityHasPrivateEntityOwner> EntityOwners { get; set; }
+        public DbSet<PrivateEntityOwner> Subscribers { get; set; }
+        public DbSet<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
+        public DbSet<PrivateEntityOwnerHasShareClause> Subscriptions { get; set; }
+        public DbSet<ShareClause> ShareClasses { get; set; }
+        public DbSet<ShareHoldingForeignEntityHasPrivateEntityOwner> ForeignEntityShareholders { get; set; }
+        public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
+        public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the EntityName= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer(
-                    "Server=localhost;Database=bigDB;Trusted_Connection=True;Enlist=False;");
-            }
-        }
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<AmendedArticle>(entity =>
-            {
-                entity.ToTable("amended_article");
-
-                entity.HasIndex(e => e.ArticleId);
-
-                entity.Property(e => e.AmendedArticleId).HasColumnName("id");
-
-                entity.Property(e => e.ArticleId).HasColumnName("article");
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasColumnName("value");
-
-                entity.HasOne(d => d.ArticleOfAssociation)
-                    .WithMany(p => p.AmendedArticles)
-                    .HasForeignKey(d => d.ArticleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<ServiceApplication>(entity =>
+            modelBuilder.Entity<Application>(entity =>
             {
                 entity.ToTable("application");
 
                 entity.HasIndex(e => e.TaskId);
 
-                entity.HasIndex(e => e.ServiceId);
-
-                entity.HasIndex(e => e.StatusId);
-
                 entity.HasIndex(e => e.CityId);
 
-                entity.Property(e => e.ServiceApplicationId).HasColumnName("id");
-
-                entity.Property(e => e.DateExamined).HasColumnName("examined_on");
-
-                entity.Property(e => e.DateSubmitted).HasColumnName("submitted_on");
-
-                entity.Property(e => e.ServiceId).HasColumnName("service");
-
-                entity.Property(e => e.CityId).HasColumnName("sorting_office");
-
-                entity.Property(e => e.StatusId).HasColumnName("status");
-
-                entity.Property(e => e.TaskId).HasColumnName("task");
-
-                entity.Property(e => e.SoftDeleted)
-                    .HasColumnName("deleted")
-                    .HasDefaultValue(false);
+                entity.Property(e => e.ApplicationId).HasColumnName("id");
 
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasColumnName("user");
 
+                entity.Property(e => e.Service)
+                    .HasColumnName("service")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EService>(c));
+
+                entity.Property(e => e.DateSubmitted).HasColumnName("submitted_on");
+
+                entity.Property(e => e.DateExamined).HasColumnName("examined_on");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EApplicationStatus>(c));
+
+                entity.Property(e => e.CityId).HasColumnName("sorting_office");
+
+                entity.Property(e => e.TaskId).HasColumnName("task");
+
+                entity.HasQueryFilter(e => !e.SoftDeleted);
+
                 entity.Property(e => e.SoftDeleted)
-                    .HasColumnName("deleted");                
+                    .HasColumnName("deleted");
+
+                entity.OwnsMany(e => e.RaisedQueries, r =>
+                {
+                    r.ToTable("query");
+                    
+                    r.Property(e => e.Step).HasColumnName("application_step");
+
+                    r.Property(e => e.Comment).HasColumnName("comment");
+                });
+
 
                 entity.HasOne(d => d.ExaminationTask)
                     .WithMany(p => p.Applications)
                     .HasForeignKey(d => d.TaskId);
 
-                entity.HasOne(d => d.ServiceType)
-                    .WithMany(p => p.Applications)
-                    .HasForeignKey(d => d.ServiceId);
-
-                entity.HasOne(d => d.ApplicationStatus)
-                    .WithMany(p => p.Applications)
-                    .HasForeignKey(d => d.StatusId);
-
-                entity.HasOne(d => d.City)
+                entity.HasOne(d => d.SortingOffice)
                     .WithMany(p => p.Applications)
                     .HasForeignKey(d => d.CityId);
             });
 
-            modelBuilder.Entity<ServiceApplication>().HasQueryFilter(e => !e.SoftDeleted);
-
-            modelBuilder.Entity<ArticleOfAssociation>(entity =>
-            {
-                entity.ToTable("article_of_association");
-
-                entity.Property(e => e.ArticleOfAssociationId).HasColumnName("id");
-
-                entity.Property(e => e.Other).HasColumnName("other");
-
-                entity.Property(e => e.TableA).HasColumnName("table_A");
-
-                entity.Property(e => e.TableB).HasColumnName("table_B");
-            });
-
-            modelBuilder.Entity<ForeignEntity>(entity =>
+            modelBuilder.Entity<ShareholdingForeignEntity>(entity =>
             {
                 entity.ToTable("foreign_entity");
 
-                entity.Property(e => e.ForeignEntityId).HasColumnName("id");
+                entity.Property(e => e.ShareholdingForeignEntityId).HasColumnName("id");
 
                 entity.Property(e => e.CompanyReference)
                     .IsRequired()
@@ -166,157 +121,62 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.CountryCode);
             });
 
-            modelBuilder.Entity<MemorandumObject>(entity =>
-            {
-                entity.ToTable("memorandum_object");
-
-                entity.HasIndex(e => e.MemorandumId);
-
-                entity.Property(e => e.MemorandumObjectId).HasColumnName("id");
-
-                entity.Property(e => e.MemorandumId).HasColumnName("memorandum");
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasColumnName("value");
-
-                entity.HasOne(d => d.MemorandumOfAssociation)
-                    .WithMany(p => p.MemorandumObjects)
-                    .HasForeignKey(d => d.MemorandumId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<MemorandumOfAssociation>(entity =>
-            {
-                entity.ToTable("memorandum_of_association");
-
-                entity.Property(e => e.MemorandumOfAssociationId).HasColumnName("id");
-
-                entity.Property(e => e.LiabilityClause)
-                    .IsRequired()
-                    .HasColumnName("liability_clause");
-
-                entity.Property(e => e.ShareClause)
-                    .IsRequired()
-                    .HasColumnName("share_clause");
-            });
-
-            modelBuilder.Entity<EntityName>(entity =>
-            {
-                entity.ToTable("suggested_name");
-
-                entity.HasIndex(e => e.StatusId);
-
-                entity.HasIndex(e => e.NameSearchId);
-
-                entity.Property(e => e.EntityNameId).HasColumnName("id");
-
-                entity.Property(e => e.NameSearchId).HasColumnName("name_search");
-
-                entity.Property(e => e.StatusId).HasColumnName("status");
-
-                entity.Property(e => e.Value)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("value");
-
-                entity.HasOne(d => d.NameSearch)
-                    .WithMany(p => p.EntityNames)
-                    .HasForeignKey(d => d.NameSearchId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.ApplicationStatus)
-                    .WithMany(p => p.EntityNames)
-                    .HasForeignKey(d => d.StatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
             modelBuilder.Entity<NameSearch>(entity =>
             {
                 entity.ToTable("name_search");
-
-                entity.HasIndex(e => e.ServiceApplicationId);
 
                 entity.HasIndex(e => e.Reference)
                     .IsUnique();
 
                 entity.Property(e => e.NameSearchId).HasColumnName("id");
 
-                entity.Property(e => e.ServiceApplicationId).HasColumnName("application");
+                entity.Property(e => e.ApplicationId).HasColumnName("application");
 
-                entity.Property(e => e.DesignationId).HasColumnName("designation");
-
-                entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
+                entity.Property(e => e.Service)
+                    .HasColumnName("service")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EService>(c));
 
                 entity.Property(e => e.Justification)
                     .IsRequired()
                     .HasMaxLength(200)
                     .HasColumnName("justification");
 
-                entity.Property(e => e.ReasonForSearchId).HasColumnName("reason_for_search");
+                entity.Property(e => e.Designation)
+                    .HasColumnName("designation")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EDesignation>(c));
+
+                entity.Property(e => e.ReasonForSearch)
+                    .HasColumnName("reason_for_search")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EReasonForSearch>(c));
 
                 entity.Property(e => e.Reference).HasColumnName("ref");
 
-                entity.Property(e => e.ServiceId).HasColumnName("service");                    
-                    
-                entity.HasOne(d => d.ServiceApplication)
+                entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
+
+                entity.HasOne(d => d.Application)
                     .WithOne(p => p.NameSearch)
-                    .HasForeignKey<NameSearch>(p => p.ServiceApplicationId);
-                
-                entity.HasOne(d => d.Service)
-                    .WithMany(p => p.NameSearches)
-                    .HasForeignKey(d => d.ServiceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.Designation)
-                    .WithMany(p => p.NameSearches)
-                    .HasForeignKey(d => d.DesignationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.ReasonForNameSearch)
-                    .WithMany(p => p.NameSearches)
-                    .HasForeignKey(d => d.ReasonForSearchId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                    .HasForeignKey<NameSearch>(p => p.ApplicationId);
             });
 
-            modelBuilder.Entity<PrivateEntityOffice>(entity =>
+            modelBuilder.Entity<EntityName>(entity =>
             {
-                entity.ToTable("office");
-
-                entity.HasIndex(e => e.CityId);
+                entity.ToTable("name");
                 
-                entity.Property(e => e.PrivateEntityOfficeId).HasColumnName("id");
+                entity.HasIndex(e => e.NameSearchId);
 
-                entity.Property(e => e.CityId).HasColumnName("city");
+                entity.Property(e => e.EntityNameId).HasColumnName("id");
 
-                entity.Property(e => e.EmailAddress)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("email_address");
+                entity.Property(e => e.NameSearchId).HasColumnName("name_search");
 
-                entity.Property(e => e.MobileNumber)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .HasColumnName("mobile_number");
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<ENameStatus>(c));
 
-                entity.Property(e => e.PhysicalAddress)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("physical_address");
+                entity.Property(e => e.Value).HasColumnName("value");
 
-                entity.Property(e => e.PostalAddress)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("postal_address");
-
-                entity.Property(e => e.TelephoneNumber)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .HasColumnName("telephone_number");
-
-                entity.HasOne(d => d.City)
-                    .WithMany(p => p.EntityOffices)
-                    .HasForeignKey(p => p.CityId);
+                entity.HasOne(d => d.NameSearch)
+                    .WithMany(p => p.Names)
+                    .HasForeignKey(d => d.NameSearchId);
             });
 
             modelBuilder.Entity<PrivateEntity>(entity =>
@@ -327,35 +187,53 @@ namespace Fridge.Contexts {
 
                 entity.HasIndex(e => e.LastApplicationId);
 
-                entity.HasIndex(e => e.ArticlesOfAssociationId);
-
-                entity.HasIndex(e => e.MemorandumOfAssociationId);
-
-                entity.HasIndex(e => e.EntityNameId);
-
-                entity.HasIndex(e => e.EntityOfficeId);
-
                 entity.Property(e => e.PrivateEntityId)
                     .HasMaxLength(50)
                     .HasColumnName("id");
 
                 entity.Property(e => e.ApplicationId).HasColumnName("application");
 
-                entity.Property(e => e.ArticlesOfAssociationId).HasColumnName("articles");
-
                 entity.Property(e => e.LastApplicationId).HasColumnName("last_application");
-
-                entity.Property(e => e.MemorandumOfAssociationId).HasColumnName("memorandum");
-
-                entity.Property(e => e.EntityNameId).HasColumnName("name");
-
-                entity.Property(e => e.EntityOfficeId).HasColumnName("office");
 
                 entity.Property(e => e.Reference)
                     .HasMaxLength(45)
                     .HasColumnName("reference");
 
-                entity.HasOne(d => d.ServiceApplication)
+                entity.OwnsOne(e => e.Office, o =>
+                {
+                    o.Property(e => e.MobileNumber).HasColumnName("mobile");
+
+                    o.Property(e => e.TelephoneNumber).HasColumnName("telephone");
+
+                    o.Property(e => e.EmailAddress).HasColumnName("email");
+
+                    o.OwnsOne(o => o.Address, a =>
+                    {
+                        a.Property(e => e.CityTown).HasColumnName("city");
+
+                        a.Property(e => e.PhysicalAddress).HasColumnName("physical_address");
+
+                        a.Property(e => e.PostalAddress).HasColumnName("postal_address");
+                    }).ToTable("address");
+                }).ToTable("office");
+
+                entity.OwnsOne(e => e.ArticlesOfAssociation, a =>
+                {
+                    a.Property(e => e.TableOfArticles)
+                        .HasColumnName("table")
+                        .HasConversion(c => c.ToString(), c => Enum.Parse<EArticlesOfAssociation>(c));
+
+                    a.Property(e => e.Other).HasColumnName("custom_table");
+
+                    a.OwnsMany(e => e.AmendedArticles, am =>
+                    {
+                        am.Property(e => e.AmendedArticleId).HasColumnName("id");
+
+                        am.Property(e => e.Value).HasColumnName("value");
+                    }).ToTable("amended_article");
+                }).ToTable("article_of_association");
+
+                entity.HasOne(d => d.CurrentApplication)
                     .WithOne(p => p.PrivateEntity)
                     .HasForeignKey<PrivateEntity>(d => d.ApplicationId)
                     .OnDelete(DeleteBehavior.ClientSetNull);
@@ -365,219 +243,14 @@ namespace Fridge.Contexts {
                     .HasForeignKey<PrivateEntity>(d => d.LastApplicationId)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.ArticleOfAssociation)
-                    .WithMany(p => p.PvtEntities)
-                    .HasForeignKey(d => d.ArticlesOfAssociationId);
-
-                entity.HasOne(d => d.MemorandumOfAssociation)
-                    .WithMany(p => p.PrivateEntities)
-                    .HasForeignKey(d => d.MemorandumOfAssociationId);
-
-                entity.HasOne(d => d.EntityName)
-                    .WithMany(p => p.PvtEntities)
-                    .HasForeignKey(d => d.EntityNameId);
-
-                entity.HasOne(d => d.PrivateEntityOffice)
-                    .WithMany(p => p.PrivateEntities)
-                    .HasForeignKey(d => d.EntityOfficeId);
-            });
-            
-            
-            // TODO: the following two relationships should be dissolved
-            modelBuilder.Entity<PrivateEntityHasForeignEntity>(entity =>
-            {
-                entity.HasKey(e => new {PvtEntity = e.PrivateEntityId, ForeignEntity = e.ForeignEntityId});
-
-                entity.ToTable("pvt_entity_has_foreign_entity");
-
-                entity.HasIndex(e => e.ForeignEntityId);
-
-                entity.HasIndex(e => e.PrivateEntityId);
-
-                entity.HasIndex(e => e.SubscriptionId);
-
-                entity.Property(e => e.PrivateEntityId)
-                    .HasMaxLength(50)
-                    .HasColumnName("pvt_entity");
-
-                entity.Property(e => e.ForeignEntityId).HasColumnName("foreign_entity");
-
-                entity.Property(e => e.SubscriptionId).HasColumnName("subscription");
-
-                entity.HasOne(d => d.ForeignEntityNavigation)
-                    .WithMany(p => p.PvtEntityHasForeignEntities)
-                    .HasForeignKey(d => d.ForeignEntityId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.PrivateEntity)
-                    .WithMany(p => p.PvtEntityHasForeignEntities)
-                    .HasForeignKey(d => d.PrivateEntityId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.PrivateEntitySubscription)
-                    .WithMany(p => p.PrivateEntityHasForeignEntities)
-                    .HasForeignKey(d => d.SubscriptionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<PrivateEntityHasPrivateEntity>(entity =>
-            {
-                entity.HasKey(e => new {Owner = e.OwnerId, Owned = e.OwnsId});
-
-                entity.ToTable("pvt_entity_has_pvt_entity");
-
-                entity.HasIndex(e => e.OwnerId);
-
-                entity.HasIndex(e => e.OwnsId);
-
-                entity.HasIndex(e => e.SubscriptionId);
-
-                entity.Property(e => e.OwnerId)
-                    .HasMaxLength(50)
-                    .HasColumnName("owner");
-
-                entity.Property(e => e.OwnsId)
-                    .HasMaxLength(50)
-                    .HasColumnName("owned");
-
-                entity.Property(e => e.SubscriptionId).HasColumnName("subscription");
-
-                entity.HasOne(d => d.OwnsNavigation)
-                    .WithMany(p => p.PvtEntityHasPvtEntityOwnedNavigations)
-                    .HasForeignKey(d => d.OwnsId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.OwnerNavigation)
-                    .WithMany(p => p.PvtEntityHasPvtEntityOwnerNavigations)
-                    .HasForeignKey(d => d.OwnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.PrivateEntitySubscription)
-                    .WithMany(p => p.PrivateEntityHasPvtEntities)
-                    .HasForeignKey(d => d.SubscriptionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<PrivateEntityHasSubscriber>(entity =>
-            {
-                entity.HasKey(e => new {Entity = e.PrivateEntityId, Subcriber = e.SubscriberId});
-
-                entity.ToTable("pvt_entity_has_subscriber");
-
-                entity.HasIndex(e => e.PrivateEntityId);
-
-                entity.HasIndex(e => e.RolesId);
-
-                entity.HasIndex(e => e.SubscriberId);
-
-                entity.HasIndex(e => e.SubscriptionId);
-
-                entity.Property(e => e.PrivateEntityId)
-                    .HasMaxLength(50)
-                    .HasColumnName("entity");
-
-                entity.Property(e => e.SubscriberId).HasColumnName("subscriber");
-
-                entity.Property(e => e.RolesId).HasColumnName("role");
-
-                entity.Property(e => e.SubscriptionId).HasColumnName("subscription");
-
-                entity.HasOne(d => d.PrivateEntity)
-                    .WithMany(p => p.PvtEntityHasSubcribers)
-                    .HasForeignKey(d => d.PrivateEntityId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.RolesInPrivateEntityRoles)
-                    .WithMany(p => p.PvtEntityHasSubscribers)
-                    .HasForeignKey(d => d.RolesId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.Subscriber)
-                    .WithMany(p => p.PrivateEntityHasSubscribers)
-                    .HasForeignKey(d => d.SubscriberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.PrivateEntitySubscription)
-                    .WithMany(p => p.PrivateEntityHasSubscribers)
-                    .HasForeignKey(d => d.SubscriptionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<PrivateEntityRoles>(entity =>
-            {
-                entity.ToTable("private_entity_roles");
-
-                entity.Property(e => e.PrivateEntityRolesId).HasColumnName("id");
-
-                entity.Property(e => e.Director)
-                    .HasColumnName("director")
-                    .HasDefaultValue(false);
-
-                entity.Property(e => e.Member)
-                    .HasColumnName("member")
-                    .HasDefaultValue(false);
-
-                entity.Property(e => e.Secretary)
-                    .HasColumnName("secretary")
-                    .HasDefaultValue(false);
-            });
-
-            modelBuilder.Entity<PrivateEntitySubscriber>(entity =>
-            {
-                entity.ToTable("subscriber");
-
-                entity.HasIndex(e => e.GenderId);
-
-                entity.Property(e => e.PrivateEntitySubscriberId).HasColumnName("id");
-
-                entity.Property(e => e.CountryCode)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("country_code");
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("first_name");
-
-                entity.Property(e => e.GenderId).HasColumnName("gender");
-
-                entity.Property(e => e.NationalId)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("national_id");
-
-                entity.Property(e => e.PhysicalAddress)
-                    .HasMaxLength(200)
-                    .HasColumnName("physical_address");
-
-                entity.Property(e => e.Surname)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("surname");
-
-                entity.Property(e => e.IsARepresentative).HasColumnName("Represants");
-
-                entity.HasOne(d => d.Gender)
-                    .WithMany(p => p.PrivateEntitySubscribers)
-                    .HasForeignKey(d => d.GenderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<PrivateEntitySubscription>(entity =>
-            {
-                entity.ToTable("subscription");
-
-                entity.Property(e => e.PrivateEntitySubscriptionId).HasColumnName("id");
-
-                entity.Property(e => e.OrdinaryShares).HasColumnName("ordinary");
-
-                entity.Property(e => e.PreferenceShares).HasColumnName("preference");
+                entity.HasOne(d => d.NameSearchApplication)
+                    .WithOne(p => p.PrivateEntityNameSearchApplication)
+                    .HasForeignKey<PrivateEntity>(d => d.NameSearchApplicationId);
             });
 
             modelBuilder.Entity<ExaminationTask>(entity =>
             {
-                entity.ToTable("task");
+                entity.ToTable("application_task");
 
                 entity.Property(e => e.ExaminationTaskId).HasColumnName("id");
 
@@ -596,94 +269,6 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.ExpectedDateOfCompletion)
                     .HasPrecision(6)
                     .HasColumnName("expected_date_of_completion");
-            });
-
-            modelBuilder.Entity<ProcessingDepartment>(entity =>
-            {
-                entity.ToTable("department");
-
-                entity.Property(e => e.ProcessingDepartmentId).HasColumnName("id");
-
-                entity.Property(e => e.Title)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("title");
-
-                entity.Property(e => e.Description).HasColumnName("description");
-            });
-
-            modelBuilder.Entity<Designation>(entity =>
-            {
-                entity.ToTable("designation");
-
-                entity.Property(e => e.DesignationId).HasColumnName("id");
-
-                entity.Property(e => e.Title)
-                    .IsRequired()
-                    .HasColumnName("title");
-
-                entity.Property(e => e.Description).HasColumnName("description");
-            });
-
-            modelBuilder.Entity<Gender>(entity =>
-            {
-                entity.ToTable("gender");
-
-                entity.Property(e => e.GenderId).HasColumnName("id");
-
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .HasColumnName("description");
-            });
-
-            modelBuilder.Entity<ReasonForNameSearch>(entity =>
-            {
-                entity.ToTable("reason_for_search");
-
-                entity.Property(e => e.ReasonForNameSearchId).HasColumnName("id");
-
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("description");
-            });
-
-            modelBuilder.Entity<ServiceType>(entity =>
-            {
-                entity.ToTable("service");
-
-                entity.HasIndex(e => e.ProcessingDepartmentId);
-
-                entity.Property(e => e.ServiceTypeId).HasColumnName("id");
-
-                entity.Property(e => e.CanBeApplied).HasColumnName("can_be_applied");
-
-                entity.Property(e => e.ProcessingDepartmentId).HasColumnName("department_id");
-
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("description");
-
-                // entity.Property(e => e.IsAnEntity).HasColumnName("is_an_entity");
-
-                entity.HasOne(d => d.ProcessingDepartment)
-                    .WithMany(p => p.Services)
-                    .HasForeignKey(d => d.ProcessingDepartmentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<ApplicationStatus>(entity =>
-            {
-                entity.ToTable("status");
-
-                entity.Property(e => e.ApplicationStatusId).HasColumnName("id");
-
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .HasColumnName("description");
             });
 
             modelBuilder.Entity<City>(entity =>
@@ -716,7 +301,7 @@ namespace Fridge.Contexts {
                     .IsUnicode(false)
                     .HasDefaultValueSql("(N'')")
                     .IsFixedLength(true);
-                
+
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.Cities)
                     .HasForeignKey(d => d.CountryCode)
@@ -740,7 +325,7 @@ namespace Fridge.Contexts {
                     .HasMaxLength(13)
                     .IsUnicode(false)
                     .HasDefaultValueSql("(N'Asia')");
-                
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(52)
@@ -754,6 +339,198 @@ namespace Fridge.Contexts {
                     .IsUnicode(false)
                     .HasDefaultValueSql("(N'')")
                     .IsFixedLength(true);
+            });
+
+            modelBuilder.Entity<MemorandumOfAssociation>(entity =>
+            {
+                entity.ToTable("memo");
+                
+                entity.HasIndex(e => e.PrivateEntityId);
+
+                entity.Property(e => e.MemorandumOfAssociationId).HasColumnName("id");
+                
+                entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
+                
+                entity.Property(e => e.LiabilityClause).HasColumnName("liability_clause");
+
+                entity.HasOne(d => d.PrivateEntity)
+                    .WithOne(p => p.MemorandumOfAssociation)
+                    .HasForeignKey<MemorandumOfAssociation>(d => d.PrivateEntityId);
+            });
+
+            modelBuilder.Entity<MemorandumOfAssociationObject>(entity =>
+            {
+                entity.ToTable("memo_objects");
+                
+                entity.HasIndex(e => e.MemorandumId);
+
+                entity.Property(e => e.MemorandumOfAssociationObjectId).HasColumnName("id");
+                
+                entity.Property(e => e.MemorandumId).HasColumnName("memo");
+                
+                entity.Property(e => e.Value).HasColumnName("value");
+
+                entity.HasOne(d => d.Memorandum)
+                    .WithMany(p => p.MemorandumObjects)
+                    .HasForeignKey(d => d.MemorandumId);
+            });
+
+            modelBuilder.Entity<PrivateEntityOwner>(entity =>
+            {
+                entity.ToTable("subscriber_nominee");
+                
+                entity.HasIndex(e => e.CountryCode);
+
+                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("id");
+
+                entity.Property(e => e.CountryCode).HasColumnName("country");
+
+                entity.Property(e => e.Surname).HasColumnName("surname");
+
+                entity.Property(e => e.Names).HasColumnName("names");
+
+                entity.Property(e => e.Gender)
+                    .HasColumnName("sex")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EGender>(c));
+
+                entity.Property(e => e.DateOfBirth).HasColumnName("dob");
+
+                entity.Property(e => e.NationalIdentification).HasColumnName("national_id_passport");
+
+                entity.Property(e => e.PhysicalAddress).HasColumnName("physical_address");
+
+                entity.Property(e => e.MobileNumber).HasColumnName("mobile_number");
+
+                entity.Property(e => e.EmailAddress).HasColumnName("email_address");
+
+                entity.Property(e => e.DateOfAppointment).HasColumnName("date_of_appointment");
+
+                entity.Property(e => e.IsSecretary).HasColumnName("secretary");
+
+                entity.Property(e => e.IsDirector).HasColumnName("director");
+
+                entity.Property(e => e.Occupation).HasColumnName("occupation");
+
+                entity.Property(e => e.DateOfTakeUp).HasColumnName("take_up_date");
+
+                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("id");
+
+                entity.HasOne(d => d.Country)
+                    .WithMany(p => p.PrivateOwners)
+                    .HasForeignKey(d => d.CountryCode);
+            });
+
+            modelBuilder.Entity<ShareClause>(entity =>
+            {
+                entity.ToTable("share_clause");
+                
+                entity.HasIndex(e => e.MemorandumId);
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("id");
+
+                entity.Property(e => e.Tittle).HasColumnName("title");
+
+                entity.Property(e => e.NominalValue).HasColumnName("value");
+
+                entity.Property(e => e.MemorandumId).HasColumnName("memo");
+
+                entity.HasOne(d => d.MemorandumOfAssociation)
+                    .WithMany(p => p.ShareClauses)
+                    .HasForeignKey(d => d.MemorandumId);
+            });
+
+            modelBuilder.Entity<PrivateEntityHasPrivateEntityOwner>(entity =>
+            {
+                entity.ToTable("private_entity_has_private_entity_owner");
+                
+                entity.HasKey(e => new {e.PrivateEntityId, e.PrivateEntityOwnerId});
+
+                entity.HasIndex(e => e.PrivateEntityId);
+
+                entity.HasIndex(e => e.PrivateEntityOwnerId);
+
+                entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
+
+                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("subscriber");
+
+                entity.HasOne(d => d.Entity)
+                    .WithMany(p => p.Members)
+                    .HasForeignKey(d => d.PrivateEntityId);
+
+                entity.HasOne(d => d.Member)
+                    .WithMany(p => p.ShareHoldingEntities)
+                    .HasForeignKey(d => d.PrivateEntityId);
+            });
+
+            modelBuilder.Entity<PrivateEntityOwnerHasPrivateEntityOwner>(entity =>
+            {
+                entity.ToTable("private_entity_owner_has_private_entity_owner");
+                
+                entity.HasKey(e => new {e.BeneficiaryId, e.NomineeId});
+
+                entity.HasIndex(e => e.BeneficiaryId);
+
+                entity.HasIndex(e => e.NomineeId);
+
+                entity.Property(e => e.BeneficiaryId).HasColumnName("beneficiary");
+
+                entity.Property(e => e.NomineeId).HasColumnName("nominee");
+
+                entity.HasOne(d => d.Beneficiary)
+                    .WithMany(p => p.Nominees)
+                    .HasForeignKey(d => d.BeneficiaryId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.Nominee)
+                    .WithMany(p => p.Beneficiaries)
+                    .HasForeignKey(d => d.NomineeId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+            
+            modelBuilder.Entity<PrivateEntityOwnerHasShareClause>(entity =>
+            {
+                entity.ToTable("private_entity_owner_has_share_clause");
+                
+                entity.HasKey(e => new {e.PrivateEntityOwnerId, e.ShareClauseId});
+
+                entity.HasIndex(e => e.PrivateEntityOwnerId);
+
+                entity.HasIndex(e => e.ShareClauseId);
+
+                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("subscriber");
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("subcriptions");
+
+                entity.HasOne(d => d.Subscriber)
+                    .WithMany(p => p.Subscriptions)
+                    .HasForeignKey(d => d.PrivateEntityOwnerId);
+                
+                entity.HasOne(d => d.ShareClauseClass)
+                    .WithMany(p => p.Subscribers)
+                    .HasForeignKey(d => d.ShareClauseId);
+            });
+            
+            modelBuilder.Entity<ShareHoldingForeignEntityHasPrivateEntityOwner>(entity =>
+            {
+                entity.ToTable("share_holding_foreign_entity_has_private_entity_owner");
+                
+                entity.HasKey(e => new {e.ForeignEntityId, e.PrivateEntityOwnerId});
+
+                entity.HasIndex(e => e.ForeignEntityId);
+
+                entity.HasIndex(e => e.PrivateEntityOwnerId);
+
+                entity.Property(e => e.ForeignEntityId).HasColumnName("foreign_entity");
+
+                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("represantative");
+
+                entity.HasOne(d => d.ForeignEntity)
+                    .WithMany(p => p.Representatives)
+                    .HasForeignKey(d => d.ForeignEntityId);
+                
+                entity.HasOne(d => d.Nominee)
+                    .WithMany(p => p.RepresentedForeignEntities)
+                    .HasForeignKey(d => d.PrivateEntityOwnerId);
             });
 
             base.OnModelCreating(modelBuilder);

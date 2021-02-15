@@ -3,9 +3,9 @@ using BarTender.Models;
 
 namespace BarTender.Dtos {
     public class NameSearchDefaultsDto {
-        public List<Val> Reasons { get; set; }
-        public List<Val> Types { get; set; }
-        public List<Val> Designations { get; set; }
-        public List<Val> Sorters { get; set; }
+        public IEnumerable<Val> Reasons { get; set; }
+        public IEnumerable<Val> Types { get; set; }
+        public IEnumerable<Val> Designations { get; set; }
+        public IEnumerable<Val> Sorters { get; set; }
     }
 }

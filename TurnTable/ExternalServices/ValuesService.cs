@@ -1,35 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Cabinet.Dtos;
 using Cabinet.Dtos.Response;
 using Fridge.Contexts;
 using Fridge.Models;
-using Fridge.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace TurnTable.ExternalServices {
     public class ValuesService : IValuesService {
-        private ServiceApplicationRepository _applicationRepository;
-        private PrivateEntityRepository _privateEntityRepository;
-        private NameSearchRepository _nameSearchRepository;
-        private ReasonForSearchRepository _reasonForSearchRepository;
-        private ServiceTypeRepository _serviceTypeRepository;
-        private DesignationRepository _designationRepository;
-        private CityRepository _cityRepository;
+        private readonly MainDatabaseContext _context;
+        private readonly IMapper _mapper;
 
-        public ValuesService(ServiceApplicationRepository applicationRepository,
-            PrivateEntityRepository privateEntityRepository,
-            NameSearchRepository nameSearchRepository, ReasonForSearchRepository reasonForSearchRepository,
-            ServiceTypeRepository serviceTypeRepository, DesignationRepository designationRepository, CityRepository cityRepository)
+        public ValuesService(MainDatabaseContext context, IMapper mapper)
         {
-            _cityRepository = cityRepository;
-            _designationRepository = designationRepository;
-            _serviceTypeRepository = serviceTypeRepository;
-            _reasonForSearchRepository = reasonForSearchRepository;
-            _nameSearchRepository = nameSearchRepository;
-            _privateEntityRepository = privateEntityRepository;
-            _applicationRepository = applicationRepository;
+            _mapper = mapper;
+            _context = context;
         }
 
         /// <summary>
@@ -41,38 +28,51 @@ namespace TurnTable.ExternalServices {
         /// </returns>
         public async Task<ExternalUserDashboardRequestDto> GetUserDashBoardValuesAsync(Guid userId)
         {
-            //Getting Values from Db
-            var serviceApplications =
-                await _applicationRepository.GetAllApplicationsByUserAsync(userId);
-            var registeredEntities =
-                await _privateEntityRepository.GetRegisteredEntitiesAsync(userId);
-            var approvedNameSearches =
-                await _nameSearchRepository.GetApprovedNameSearchesAsync(userId);
+            ExternalUserDashboardRequestDto dto = new ExternalUserDashboardRequestDto();
+            // All applications by user
+            var applicationsByUser = await _mapper
+                .ProjectTo<SubmittedApplicationResponseDto>(
+                    _context.Applications
+                        .Where(a => a.IsInACountableState() && a.ByUser(userId))).ToListAsync();
 
-            //Constructing and returning resource
-            return new ExternalUserDashboardRequestDto
+            if (applicationsByUser.Count > 0)
             {
-                SubmittedApplicationsCount = serviceApplications.Count,
-                RegisteredEntitiesCount = registeredEntities.Count,
-                RecentActivity = serviceApplications.Take(10),
-                ApprovedApplications = registeredEntities.Concat(approvedNameSearches)
-            };
+                // Submitted application count
+                dto.SubmittedApplicationsCount = applicationsByUser.Count;
+
+                //Account Use HttpService
+
+                // Recent Activity
+                dto.RecentActivity = applicationsByUser.Take(10);                
+                
+                // Approved applications
+                var approvedNameSearches = await _mapper
+                    .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
+                        .Include(a => a.NameSearch)
+                        .ThenInclude(n => n.Names)
+                        .Where(a => a.IsANameSearchApplication())).ToListAsync();
+
+                var approvedEntities = await _mapper
+                    .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
+                        .Include(a => a.PrivateEntity)
+                        .Where(a => a.PrivateEntity.WasExaminedAndApproved())).ToListAsync();
+                
+                
+                dto.ApprovedApplications = approvedNameSearches.Concat(approvedEntities);
+                dto.ApprovedApplications = dto.ApprovedApplications.OrderBy(a => a.DateSubmitted);
+
+                // Registered Entities count
+                dto.RegisteredEntitiesCount = approvedEntities.Count;
+            }
+
+            return dto;
         }
 
-        /// <summary>
-        /// Gathers values for selection on
-        /// the ns form
-        /// </summary>
-        /// <returns></returns>
-        public NameSearchSelectionValuesResponseDto GetNameSearchValuesForSelection()
+        public async Task<List<SelectionValueResponseDto>> GetSortingOffices()
         {
-            return new NameSearchSelectionValuesResponseDto
-            {
-                ReasonsForSearch = _reasonForSearchRepository.GetReasonsForSearchForSelection(),
-                TypesOfEntities = _serviceTypeRepository.GetServiceTypesForSearchForSelection(),
-                Designations = _designationRepository.GetDesignationsForSelection(),
-                SortingOffices = _cityRepository.GetSortingOfficesForSelection()
-            };
+            return await _mapper
+                .ProjectTo<SelectionValueResponseDto>(_context.Cities.Where(c => c.CanSort))
+                .ToListAsync();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Dab.Dtos;
@@ -31,7 +33,7 @@ namespace Dab.Controllers {
 
                     if (contentData != null)
                     {
-                        var renderer = new IronPdf.HtmlToPdf();
+                        var renderer = new HtmlToPdf();
 
                         List<string> htmlList = new List<string>();
 
@@ -78,19 +80,18 @@ namespace Dab.Controllers {
                         htmlList.Add(html);
 
 
-                        string[] htmlArray = htmlList.ToArray();
-                        string finalhtml = string.Concat(htmlArray);
+                        var htmlArray = htmlList.ToArray();
+                        var finalHtml = string.Concat(htmlArray);
 
-                        var pdf = renderer.RenderHtmlAsPdf(finalhtml);
-                        string OutputPath = "C:/Backgrounds/_generated_certificate.pdf";
+                        var pdf = renderer.RenderHtmlAsPdf(finalHtml);
+                        var outputPath = "C:/EOnline docs/generated_ns.pdf";
 
-                        pdf.SaveAs(OutputPath);
+                        pdf.SaveAs(outputPath);
 
 
-                        renderer.RenderHtmlAsPdf(finalhtml).SaveAs(OutputPath);
-                        System.Net.WebClient webClient = new System.Net.WebClient();
-                        Byte[] byteArray = webClient.DownloadData(OutputPath);
-                        ViewBag.title = "New Search";
+                        renderer.RenderHtmlAsPdf(finalHtml).SaveAs(outputPath);
+                        var webClient = new WebClient();
+                        var byteArray = webClient.DownloadData(outputPath);
                         return new FileContentResult(byteArray, "application/pdf");
                     }
                 }
@@ -116,8 +117,7 @@ namespace Dab.Controllers {
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     var docDto = await httpResponseMessage.Content.ReadAsAsync<PvtEntitySummaryDocDto>();
-                    using (var renderer = new IronPdf.HtmlToPdf())
-                    {
+                    
                         var htmlList = new List<string>();
 
                         var header =
@@ -374,16 +374,16 @@ namespace Dab.Controllers {
                             "</html>";
                         htmlList.Add(members);
 
-                        return await ConstructSummaryDocAndSend(renderer,htmlList);
-                    }
+                        return await ConstructSummaryDocAndSend(htmlList);
+                    
                 }
                 else
                 {
                     return NotFound("Application not found");
                 }
-            }            
+            }
         }
-        
+
         [HttpGet("pvt/cert/{applicationId}")]
         public async Task<IActionResult> PvtCertificate(string applicationId)
         {
@@ -396,49 +396,157 @@ namespace Dab.Controllers {
 
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    //TODO add code to bind html with data here
-                    ConstructCertificateAndSend();
+                    var docDto = await httpResponseMessage.Content.ReadAsAsync<RegisteredPvtEntityDto>();
+                    var htmlStamps = new List<HtmlStamp>();
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html = "<h1 style='color:black;font-size:36px'><b>Certificate of Incorporation</b></h1>",
+                        Top = 250,
+                        Rotation = 0,
+                        Width = 500,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html = "<h5 style='color:black;font-size:16px'>I hereby certify that</h5>",
+                        Top = 325,
+                        Rotation = 0,
+                        Width = 500,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html =
+                            $"<h5 style='color:black;font-size:18px'><b>{docDto.EntityName} (PRIVATE) LIMITED</b></h5>",
+                        Top = 350,
+                        Rotation = 0,
+                        Width = 500,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html = $"<h5 style='color:black;font-size:18px'><b>({docDto.Reference})</b></h5>",
+                        Top = 365,
+                        Rotation = 0,
+                        Width = 500,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html = "<h5 style='color:black;font-size:16px'>" +
+                               "<i>is this day incorporated under the Companies and Other Business Entities Act " +
+                               "[Chapter 24:31] and that the company is limited." +
+                               "</i>" +
+                               "</h5>",
+                        Top = 410,
+                        Rotation = 0,
+                        Width = 125,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html =
+                            $"<h5 style='color:black;font-size:16px'>Given under my hand this {docDto.DateRegistered.Day}" +
+                            $"<sup>{GetDaySuffix(docDto.DateRegistered.Day)}</sup> day of " +
+                            $"{DateTimeFormatInfo.CurrentInfo.GetMonthName(docDto.DateRegistered.Month)} " +
+                            $"{docDto.DateRegistered.Year}</h5>",
+                        Top = 455, 
+                        Rotation = 0, 
+                        Width = 505,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+                    
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html = $"<h5 style='color:black;font-size:11px'>" +
+                               $"<b>To see the full details of this entity scan QR Code <br>or visit " +
+                               $"<a style='color:blue;'>www.dcip.co.zw/verifycompanydetails</a>." +
+                               $"<br>This Certificate was generated on {DateTime.Now.ToString("f")}</b></h5>",
+                        Bottom = 35,
+                        Left = 370,
+                        Rotation = 0,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
+                    
+                    return ConstructCertificateAndSend(htmlStamps);
                 }
                 else
                 {
                     return NotFound("Application not found");
                 }
             }
-            
+
             return null;
         }
 
-        private void ConstructCertificateAndSend()
+        private string GetDaySuffix(int day)
         {
-            throw new NotImplementedException();
+            switch (day)
+            {
+                case 1:
+                case 21:
+                case 31:
+                    return "st";
+                case 2:
+                case 22:
+                    return "nd";
+                case 3:
+                case 23:
+                    return "rd";
+                default:
+                    return "th";
+            }
+
+            return String.Empty;
         }
 
-        private async Task<IActionResult> ConstructSummaryDocAndSend(HtmlToPdf renderer, List<string> htmlList)
+        private FileContentResult ConstructCertificateAndSend(List<HtmlStamp> htmlStamps)
         {
+            var pdfDocument = PdfDocument.FromFile("C:\\EOnline docs\\cert_bg.pdf");
+            foreach (var htmlStamp in htmlStamps)
+            {
+                pdfDocument.StampHTML(htmlStamp);
+                pdfDocument.SaveAs("C:\\EOnline docs\\generated_cert.pdf");
+            }            
+            
+            var client = new WebClient();
+            var byteArray = client.DownloadData("C:\\EOnline docs\\generated_cert.pdf");
+            return new FileContentResult(byteArray, "application/pdf");
+        }
+
+        private async Task<IActionResult> ConstructSummaryDocAndSend(List<string> htmlList)
+        {
+            var renderer = new HtmlToPdf();
             string finalhtml = string.Concat(htmlList.ToArray());
 
-            string DocPath = @"C:/Backgrounds/" + $"_generated.pdf";
+            string DocPath = @"C:/EOnline docs/" + $"generated_summary.pdf";
             renderer.PrintOptions.PaperSize = PdfPrintOptions.PdfPaperSize.A4;
             renderer.PrintOptions.PaperOrientation = PdfPrintOptions.PdfPaperOrientation.Portrait;
 
             renderer.PrintOptions.EnableJavaScript = true;
             renderer.PrintOptions.RenderDelay = 500; //milliseconds
-            renderer.PrintOptions.CssMediaType = IronPdf.PdfPrintOptions.PdfCssMediaType.Screen;
+            renderer.PrintOptions.CssMediaType = PdfPrintOptions.PdfCssMediaType.Screen;
 
             renderer.PrintOptions.MarginTop = 60;
             renderer.PrintOptions.MarginBottom = 60;
             renderer.PrintOptions.MarginLeft = 15;
             renderer.PrintOptions.MarginRight = 10;
-            
+
             var bg = renderer.RenderHtmlAsPdf(finalhtml);
-            bg.AddBackgroundPdf(@"C:\\Backgrounds\\summary_bg.pdf");
+            bg.AddBackgroundPdf(@"C:\\EOnline docs\\summary_bg.pdf");
             bg.SaveAs(DocPath);
-            
+
             var pdf = PdfDocument.FromFile(DocPath);
 
             System.Net.WebClient client = new System.Net.WebClient();
             Byte[] byteArray = client.DownloadData(DocPath);
-            
+
             return new FileContentResult(byteArray, "application/pdf");
         }
     }

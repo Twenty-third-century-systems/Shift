@@ -11,8 +11,4 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Cabinet\Cabinet.csproj" />
-    </ItemGroup>
-
 </Project>

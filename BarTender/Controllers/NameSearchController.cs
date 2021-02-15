@@ -1,18 +1,26 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BarTender.Dtos;
 using BarTender.Models;
 using BarTender.Repositories;
+using Cabinet.Dtos.Response;
 using Cooler.DataModels;
 using IdentityModel.Client;
 using LinqToDB;
+using LinqToDB.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using TurnTable.ExternalServices;
+using NameSearchResponseDto = BarTender.Dtos.NameSearchResponseDto;
 
 namespace BarTender.Controllers {
     [Route("api/name")]
@@ -21,22 +29,39 @@ namespace BarTender.Controllers {
         private PoleDB _poleDb;
         private ShwaDB _shwaDb;
         private EachDB _eachDb;
+        private readonly IOptions<List<Val>> _values;
+        private readonly IConfiguration _configuration;
+        private IOptions<List<ServicesForNameSearchSelection>> _serviceValues;
+        private IOptions<List<ReasonForSearchForNameSearchSelection>> _reasonsValues;
+        private IOptions<List<DesignationsForNameSearchSelection>> _designationValues;
+        private IValuesService _valuesService;
 
         public NameSearchController(INameSearchRepository nameSearchRepository, PoleDB poleDb, ShwaDB shwaDb,
-            EachDB eachDb)
+            EachDB eachDb, IOptions<List<ServicesForNameSearchSelection>> serviceValues,
+            IOptions<List<ReasonForSearchForNameSearchSelection>> reasonsValues,
+            IOptions<List<DesignationsForNameSearchSelection>> designationValues,IValuesService valuesService)
         {
+            _valuesService = valuesService;
+            _designationValues = designationValues;
+            _reasonsValues = reasonsValues;
+            _serviceValues = serviceValues;
             _nameSearchRepository = nameSearchRepository;
             _poleDb = poleDb;
             _shwaDb = shwaDb;
             _eachDb = eachDb;
         }
 
+        [AllowAnonymous]
         [HttpGet("defaults")]
-        public IActionResult GetDefaults()
+        public async Task<IActionResult> GetDefaults()
         {
-            var userClaims = User.Claims;
-            var defaults = _nameSearchRepository.GetDefaults(_poleDb, _shwaDb);
-            return Ok(defaults);
+            return Ok(new
+            {
+                Services = _serviceValues.Value.Where(v => !v.id.Equals(1)),
+                ReasonForSearch = _reasonsValues.Value,
+                Designations = _designationValues.Value,
+                SortingOffices  = await _valuesService.GetSortingOffices()
+            });
         }
 
         [AllowAnonymous]
@@ -90,7 +115,7 @@ namespace BarTender.Controllers {
                     Service = 1,
                     UserId = Guid.Parse(user.Sub)
                 };
-                
+
                 //TODO: get email from authority
 
 

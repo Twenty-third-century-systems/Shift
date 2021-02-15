@@ -1,35 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fridge.Constants;
 
 #nullable disable
 
-namespace Fridge.Models
-{
-    public class NameSearch
-    {
-        public NameSearch()
-        {
-            EntityNames = new HashSet<EntityName>();
-        }
-
+namespace Fridge.Models {
+    public class NameSearch {
         public int NameSearchId { get; set; }
-        public int ServiceId { get; set; }
+        public int ApplicationId { get; set; }
+        public EService Service { get; set; }
         public string Justification { get; set; }
-        public int DesignationId { get; set; }
-        public DateTime? ExpiryDate { get; set; }
-        public int ServiceApplicationId { get; set; }
-        public int ReasonForSearchId { get; set; }
+        public EDesignation Designation { get; set; }
+        public EReasonForSearch ReasonForSearch { get; set; }
         public string Reference { get; set; }
+        public DateTime? ExpiryDate { get; set; }
+        public ICollection<EntityName> Names { get; set; }
+        
+        
+        public Application Application { get; set; }
 
-        public ServiceType Service { get; set; }
-        public Designation Designation { get; set; }
-        public ServiceApplication ServiceApplication { get; set; }
-        public ReasonForNameSearch ReasonForNameSearch { get; set; }
-        public ICollection<EntityName> EntityNames { get; set; }
-
+        
         public bool WasApproved()
         {
-            return ExpiryDate != null;
+            foreach (var name in Names)
+            {
+                if (name.Status == ENameStatus.Reserved)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool WasExamined()
+        {
+            return Application.WasExamined();
         }
     }
 }
