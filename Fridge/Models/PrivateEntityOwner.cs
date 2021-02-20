@@ -33,7 +33,6 @@ namespace Fridge.Models {
 
         public Country Country { get; set; }
         public ICollection<PrivateEntityOwnerHasPrivateEntityOwner> Beneficiaries { get; set; }
-
         public ICollection<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
         public ICollection<PrivateEntityHasPrivateEntityOwner> ShareHoldingEntities { get; set; }
         public ICollection<ShareHoldingForeignEntityHasPrivateEntityOwner> RepresentedForeignEntities { get; set; }

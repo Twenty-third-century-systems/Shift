@@ -7,22 +7,37 @@ using Fridge.Constants;
 
 namespace Fridge.Models {
     public class Application {
-        public Application()
+        private Application()
         {
             RaisedQueries = new HashSet<RaisedQuery>();
         }
+
+        private Application(Guid user, int service, int sortingOffice)
+        {
+            User = user;
+            Service = (EService) service;
+            DateSubmitted = DateTime.Now;
+            CityId = sortingOffice;
+        }
+
+
+        public Application(Guid user, int service, EApplicationStatus status, int sortingOffice) : this(user, service,
+            sortingOffice)
+        {
+            Status = status;
+        }
+
         public int ApplicationId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid User { get; set; }
         public EService Service { get; set; }
         public DateTime DateSubmitted { get; set; }
         public DateTime? DateExamined { get; set; }
         public EApplicationStatus Status { get; set; }
         public int CityId { get; set; }
         public int? TaskId { get; set; }
-        public ICollection<RaisedQuery> RaisedQueries { get; set; }
         public bool SoftDeleted { get; private set; }
 
-
+        public ICollection<RaisedQuery> RaisedQueries { get; set; }
         public NameSearch NameSearch { get; set; }
         public ExaminationTask ExaminationTask { get; set; }
         public City SortingOffice { get; set; }
@@ -37,7 +52,7 @@ namespace Fridge.Models {
 
         public bool WasSubmittedBy(Guid userId)
         {
-            return this.UserId.CompareTo(userId) == 0;
+            return this.User.CompareTo(userId) == 0;
         }
 
         public string FormattedDateOfSubmission()
@@ -77,7 +92,7 @@ namespace Fridge.Models {
 
         public bool ByUser(Guid userId)
         {
-            return UserId.CompareTo(UserId).Equals(0);
+            return User.CompareTo(User).Equals(0);
         }
 
         public bool IsANameSearchApplication()

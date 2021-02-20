@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cabinet.Dtos.Response {
+﻿namespace Cabinet.Dtos.External.Response {
     public class SubmittedNameSearchResponseDto {
         public int Id { get; set; }
         public int NameSearch { get; set; }

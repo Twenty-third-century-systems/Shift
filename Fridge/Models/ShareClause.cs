@@ -7,7 +7,7 @@ namespace Fridge.Models {
             Subscribers = new HashSet<PrivateEntityOwnerHasShareClause>();
         }
         public int ShareClauseId { get; set; }
-        public string Tittle { get; set; }
+        public string Title { get; set; }
         public double NominalValue { get; set; }
         public int MemorandumId { get; set; }
 

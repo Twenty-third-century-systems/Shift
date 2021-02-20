@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Cabinet.Dtos.Response;
+using Cabinet.Dtos.External.Response;
 using Fridge.Models;
 
 namespace BarTender.Profiles {
@@ -8,18 +8,18 @@ namespace BarTender.Profiles {
         {
             // Application => SubmittedApplicationRequestDto
             CreateMap<Application, SubmittedApplicationResponseDto>()
-                .ForMember(dest=>dest.Status,op=>
-                    op.MapFrom(src=>src.Status.ToString()));
-            
-            
+                .ForMember(dest => dest.Status, op =>
+                    op.MapFrom(src => src.Status.ToString()));
+
+
             // NameSearch => NameSearchResponseDto
             CreateMap<NameSearch, NameSearchResponseDto>();
-            
-            
+
+
             //PrivateEntity => PrivateEntityResponceDto
             CreateMap<PrivateEntity, PrivateEntityResponseDto>();
-            
-            
+
+
             // City => SelectionValueResponseDto
             CreateMap<City, SelectionValueResponseDto>()
                 .ForMember(dest => dest.Id,
@@ -28,7 +28,23 @@ namespace BarTender.Profiles {
                 .ForMember(dest => dest.Value,
                     op =>
                         op.MapFrom(src => src.Name));
-            
+
+            //Transaction => TransactionResponseDto
+            CreateMap<Transaction, TransactionResponseDto>();
+
+
+            // EntityName => RegisteredNameResponseDto
+            CreateMap<EntityName, RegisteredNameResponseDto>()
+                .ForMember(dest => dest.Id, op =>
+                    op.MapFrom(src => src.EntityNameId))
+                .ForMember(dest => dest.NameSearchReference, op =>
+                    op.MapFrom(src => src.NameSearch.Reference))
+                .ForMember(dest => dest.Name, op =>
+                    op.MapFrom(src => src.Value))
+                .ForMember(dest => dest.DateSubmitted, op =>
+                    op.MapFrom(src => src.NameSearch.Application.DateSubmitted))
+                .ForMember(dest => dest.ExpiryDate, op =>
+                    op.MapFrom(src => src.NameSearch.ExpiryDate));
         }
     }
 }

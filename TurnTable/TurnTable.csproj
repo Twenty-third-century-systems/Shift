@@ -13,4 +13,8 @@
       <ProjectReference Include="..\Fridge\Fridge.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Paynow" Version="1.0.3" />
+    </ItemGroup>
+
 </Project>

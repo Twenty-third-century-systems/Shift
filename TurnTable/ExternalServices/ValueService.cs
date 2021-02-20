@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Cabinet.Dtos.Response;
+using Cabinet.Dtos.External.Response;
+using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace TurnTable.ExternalServices {
-    public class ValuesService : IValuesService {
+    public class ValueService : IValueService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;
+        private IPaymentService _paymentService;
 
-        public ValuesService(MainDatabaseContext context, IMapper mapper)
+        public ValueService(MainDatabaseContext context, IMapper mapper, IPaymentService paymentService)
         {
+            _paymentService = paymentService;
             _mapper = mapper;
             _context = context;
         }
@@ -22,18 +25,22 @@ namespace TurnTable.ExternalServices {
         /// <summary>
         /// Gets Values to display on User Dashboard
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="user"></param>
         /// <returns>
         /// ExternalUserDashboardRequestDto
         /// </returns>
-        public async Task<ExternalUserDashboardRequestDto> GetUserDashBoardValuesAsync(Guid userId)
+        public async Task<ExternalUserDashboardRequestDto> GetUserDashBoardValuesAsync(Guid user)
         {
             ExternalUserDashboardRequestDto dto = new ExternalUserDashboardRequestDto();
+
+            // User account balance
+            dto.AccountBalance = await _paymentService.GetBalanceAsync(user);
             // All applications by user
             var applicationsByUser = await _mapper
                 .ProjectTo<SubmittedApplicationResponseDto>(
                     _context.Applications
-                        .Where(a => a.IsInACountableState() && a.ByUser(userId))).ToListAsync();
+                        .Where(a => !a.Status.Equals(EApplicationStatus.Incomplete) && a.User.Equals(user)))
+                .ToListAsync();
 
             if (applicationsByUser.Count > 0)
             {
@@ -43,21 +50,22 @@ namespace TurnTable.ExternalServices {
                 //Account Use HttpService
 
                 // Recent Activity
-                dto.RecentActivity = applicationsByUser.Take(10);                
-                
+                dto.RecentActivity = applicationsByUser.Take(10);
+
                 // Approved applications
                 var approvedNameSearches = await _mapper
                     .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
                         .Include(a => a.NameSearch)
                         .ThenInclude(n => n.Names)
-                        .Where(a => a.IsANameSearchApplication())).ToListAsync();
+                        .Where(a => a.Service.Equals(EService.NameSearch))).ToListAsync();
 
                 var approvedEntities = await _mapper
                     .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
                         .Include(a => a.PrivateEntity)
-                        .Where(a => a.PrivateEntity.WasExaminedAndApproved())).ToListAsync();
-                
-                
+                        .Where(a => !a.DateExamined.Equals(null) && !string.IsNullOrEmpty(a.PrivateEntity.Reference)))
+                    .ToListAsync();
+
+
                 dto.ApprovedApplications = approvedNameSearches.Concat(approvedEntities);
                 dto.ApprovedApplications = dto.ApprovedApplications.OrderBy(a => a.DateSubmitted);
 
@@ -68,7 +76,7 @@ namespace TurnTable.ExternalServices {
             return dto;
         }
 
-        public async Task<List<SelectionValueResponseDto>> GetSortingOffices()
+        public async Task<List<SelectionValueResponseDto>> GetSortingOfficesAsync()
         {
             return await _mapper
                 .ProjectTo<SelectionValueResponseDto>(_context.Cities.Where(c => c.CanSort))

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
+using BarTender.Background;
 using BarTender.Models;
 using BarTender.Repositories;
 using Cooler.DataModels;
@@ -29,26 +30,14 @@ namespace BarTender {
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
-            });
-
-            services.Configure<List<ServicesForNameSearchSelection>>(Configuration.GetSection("Services"));
-
-            services.Configure<List<ReasonForSearchForNameSearchSelection>>(Configuration.GetSection("Reason for search"));
-            
-            services.Configure<List<DesignationsForNameSearchSelection>>(Configuration.GetSection("Designation"));
-            
-            services.AddAutoMapper(typeof(Startup));
-
-            services.AddTransient<INameSearchRepository, NameSearchRepository>();
-
-            services.AddTransient<IValuesService, ValuesService>();
-
-            services.AddTransient<IValuesService, ValuesService>();
+            });            
 
             services.AddControllers(o => o.Filters.Add(new AuthorizeFilter()));
 
@@ -111,9 +100,30 @@ namespace BarTender {
             });
 
             services.AddAutoMapper(typeof(Program));
+            
+            // Custom services
+            
+            services.Configure<List<ServicesForNameSearchSelection>>(Configuration.GetSection("Services"));
+
+            services.Configure<List<ReasonForSearchForNameSearchSelection>>(Configuration.GetSection("Reason for search"));
+            
+            services.Configure<List<DesignationsForNameSearchSelection>>(Configuration.GetSection("Designation"));
+            
+            services.AddTransient<INameSearchRepository, NameSearchRepository>();
+
+            services.AddTransient<IValueService, ValueService>();
+
+            services.AddTransient<INameSearchService, NameSearchService>();
+
+            services.AddTransient<IPaymentService, PaymentService>();
+
+            services.AddSingleton<INameSearchMutualExclusionService, NameSearchMutualExclusionService>();
+
+            services.AddScoped<IPayNowService, PayNowService>();
+
+            services.AddHostedService<CheckPaymentStatusService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

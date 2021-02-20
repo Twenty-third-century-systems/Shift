@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Cabinet.Dtos.Request {
+namespace Cabinet.Dtos.External.Request {
     public class NewNameSearchRequestDto {
         public int ServiceId { get; set; }
         public string Justification { get; set; }

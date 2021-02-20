@@ -1,17 +1,40 @@
 ﻿using AutoMapper;
-using Cabinet.Dtos;
-using Cabinet.Dtos.Request;
+using Cabinet.Dtos.External.Request;
 using Fridge.Models;
 
 namespace BarTender.Profiles {
-    public class ResourceToDomainProfile:Profile {
+    public class ResourceToDomainProfile : Profile {
         public ResourceToDomainProfile()
         {
-            // NewNameSearchRequestDto to NameSearch
+            // NewNameSearchRequestDto => NameSearch
             CreateMap<NewNameSearchRequestDto, NameSearch>();
-            
-            //SuggestedEntityNameRequestDto to EntityName
+
+            //SuggestedEntityNameRequestDto => EntityName
             CreateMap<SuggestedEntityNameRequestDto, EntityName>();
+            
+            // NewPrivateEntityAddressRequestDto => Address
+            CreateMap<NewPrivateEntityAddressRequestDto, Address>();
+            
+            // NewPrivateEntityOfficeRequestDto => Office
+            CreateMap<NewPrivateEntityOfficeRequestDto, Office>();
+            
+            // NewMemorandumRequestDto => MemorandumOfAssociation
+            CreateMap<NewMemorandumRequestDto, MemorandumOfAssociation>();
+            
+            // NewShareClauseRequestDto => ShareClause
+            CreateMap<NewShareClauseRequestDto, ShareClause>();
+            
+            // NewMemorandumOfAssociationObjectRequestDto => MemorandumOfAssociationObject
+            CreateMap<NewMemorandumOfAssociationObjectRequestDto, MemorandumOfAssociationObject>();
+            
+            // NewAmendedArticleRequestDto => AmendedArticle
+            CreateMap<NewAmendedArticleRequestDto, AmendedArticle>();
+            
+            // NewArticleOfAssociationRequestDto => ArticlesOfAssociation
+            CreateMap<NewArticleOfAssociationRequestDto, ArticlesOfAssociation>();
+            
+            // NewShareHolderRequestDto => PrivateEntityOwner
+            CreateMap<NewShareHolderRequestDto, PrivateEntityOwner>();
         }
     }
 }

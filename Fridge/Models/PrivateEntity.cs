@@ -11,6 +11,11 @@ namespace Fridge.Models {
             Members = new HashSet<PrivateEntityHasPrivateEntityOwner>();
         }
 
+        public PrivateEntity(Application nameSearchApplication)
+        {
+            NameSearchApplicationApplication = nameSearchApplication;
+        }
+
         public int PrivateEntityId { get; set; }
         public int ApplicationId { get; set; }
         public int NameSearchApplicationId { get; set; }
@@ -21,7 +26,7 @@ namespace Fridge.Models {
 
         public Application CurrentApplication { get; set; }
         public Application LastApplication { get; set; }
-        public Application NameSearchApplication { get; set; }
+        public Application NameSearchApplicationApplication { get; set; }
         public ICollection<PrivateEntityHasPrivateEntityOwner> Members { get; set; }
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
 
@@ -45,8 +50,12 @@ namespace Fridge.Models {
     }
 
     public class ArticlesOfAssociation {
+        public ArticlesOfAssociation()
+        {
+            AmendedArticles = new HashSet<AmendedArticle>();
+        }
+        
         public EArticlesOfAssociation? TableOfArticles { get; set; }
-        public bool? Other { get; set; }
         public ICollection<AmendedArticle> AmendedArticles { get; set; }
     }
 

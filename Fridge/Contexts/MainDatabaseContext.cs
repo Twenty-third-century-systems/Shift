@@ -16,7 +16,7 @@ namespace Fridge.Contexts {
         {
         }
 
-        //Uncomment this to app that moves country data
+        // Uncomment this to app that moves country data
         
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         // {
@@ -39,6 +39,8 @@ namespace Fridge.Contexts {
         public DbSet<ShareHoldingForeignEntityHasPrivateEntityOwner> ForeignEntityShareholders { get; set; }
         public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
         public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<PriceItem> PriceItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,7 +56,7 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.ApplicationId).HasColumnName("id");
 
-                entity.Property(e => e.UserId)
+                entity.Property(e => e.User)
                     .IsRequired()
                     .HasColumnName("user");
 
@@ -168,12 +170,12 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.NameSearchId).HasColumnName("name_search");
 
+                entity.Property(e => e.Value).HasColumnName("value");
+                
                 entity.Property(e => e.Status)
                     .HasColumnName("status")
                     .HasConversion(c => c.ToString(), c => Enum.Parse<ENameStatus>(c));
-
-                entity.Property(e => e.Value).HasColumnName("value");
-
+                
                 entity.HasOne(d => d.NameSearch)
                     .WithMany(p => p.Names)
                     .HasForeignKey(d => d.NameSearchId);
@@ -223,8 +225,6 @@ namespace Fridge.Contexts {
                         .HasColumnName("table")
                         .HasConversion(c => c.ToString(), c => Enum.Parse<EArticlesOfAssociation>(c));
 
-                    a.Property(e => e.Other).HasColumnName("custom_table");
-
                     a.OwnsMany(e => e.AmendedArticles, am =>
                     {
                         am.Property(e => e.AmendedArticleId).HasColumnName("id");
@@ -243,7 +243,7 @@ namespace Fridge.Contexts {
                     .HasForeignKey<PrivateEntity>(d => d.LastApplicationId)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.NameSearchApplication)
+                entity.HasOne(d => d.NameSearchApplicationApplication)
                     .WithOne(p => p.PrivateEntityNameSearchApplication)
                     .HasForeignKey<PrivateEntity>(d => d.NameSearchApplicationId);
             });
@@ -428,7 +428,7 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.ShareClauseId).HasColumnName("id");
 
-                entity.Property(e => e.Tittle).HasColumnName("title");
+                entity.Property(e => e.Title).HasColumnName("title");
 
                 entity.Property(e => e.NominalValue).HasColumnName("value");
 
@@ -533,6 +533,43 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.PrivateEntityOwnerId);
             });
 
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.ToTable("payments");
+                
+                entity.Property(e => e.TransactionId).HasColumnName("Reference");
+
+                entity.Property(e => e.User).HasColumnName("user");
+
+                entity.Property(e => e.Date).HasColumnName("date");
+
+                entity.Property(e => e.WalletProvider).HasColumnName("wallet_provider");
+
+                entity.Property(e => e.PollUrl).HasColumnName("url");
+
+                entity.Property(e => e.Email).HasColumnName("email");
+                
+                entity.Property(e => e.PhoneNumber).HasColumnName("phone");
+
+                entity.Property(e => e.PayNowReference).HasColumnName("paynow_ref");
+
+                entity.Property(e => e.Description).HasColumnName("description");
+
+                entity.Property(e => e.CreditAmount).HasColumnName("cr");
+                
+                entity.Property(e => e.DebitAmount).HasColumnName("dr");
+            });
+
+            modelBuilder.Entity<PriceItem>(entity =>
+            {
+                entity.ToTable("prices");
+
+                entity.Property(e => e.PriceItemId).HasColumnName("id");
+
+                entity.Property(e => e.Service).HasColumnName("for");
+
+                entity.Property(e => e.Price).HasColumnName("amount");
+            });
             base.OnModelCreating(modelBuilder);
         }
     }

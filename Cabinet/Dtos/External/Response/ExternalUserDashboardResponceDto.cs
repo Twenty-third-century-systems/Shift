@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Cabinet.Dtos.Response {
+namespace Cabinet.Dtos.External.Response {
     public class ExternalUserDashboardRequestDto {
         public ExternalUserDashboardRequestDto()
         {

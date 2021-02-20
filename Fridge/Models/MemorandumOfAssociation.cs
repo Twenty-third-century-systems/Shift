@@ -7,7 +7,7 @@ namespace Fridge.Models {
         {
             MemorandumObjects = new HashSet<MemorandumOfAssociationObject>();
             ShareClauses = new HashSet<ShareClause>();
-        }
+        }        
 
         public int MemorandumOfAssociationId { get; set; }
         public int PrivateEntityId { get; set; }
