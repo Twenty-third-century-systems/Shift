@@ -51,18 +51,18 @@ namespace TurnTable.ExternalServices {
             NewNameSearchRequestDto dto)
         {
             // Initialize a new Application
-            var application = new Application(user, dto.ServiceId, EApplicationStatus.Submited, dto.SortingOffice);
+            var application = new Application(user, EService.NameSearch, EApplicationStatus.Submited, dto.SortingOffice);
 
             // Initialize a NameSearch fro mapper
             var nameSearch = _mapper.Map<NewNameSearchRequestDto, NameSearch>(dto);
 
             // Create NameSearch Reference
             nameSearch.Reference = NewNameSearchReference(dto.SortingOffice);
-
+            
             // Associate NameSearch with Application
             application.NameSearch = nameSearch;
             var transaction = await _context.Database.BeginTransactionAsync();
-            _nameSearchMutualExclusionService.Lock();
+            // _nameSearchMutualExclusionService.Lock();
             try
             {
                 // BillAsync for service and commit
@@ -80,7 +80,7 @@ namespace TurnTable.ExternalServices {
             }
             finally
             {
-                _nameSearchMutualExclusionService.UnLock();
+                // _nameSearchMutualExclusionService.UnLock();
             }
 
 
@@ -92,6 +92,27 @@ namespace TurnTable.ExternalServices {
                 NameSearch = nameSearch.NameSearchId,
                 Reference = nameSearch.Reference
             };
+        }
+
+        public async Task<int> TestApproveNameSearch(Guid user, int applicationId)
+        {
+            var application = await _context.Applications.Include(a => a.NameSearch).ThenInclude(n => n.Names).SingleAsync(a =>
+                a.User.Equals(user) && a.ApplicationId.Equals(applicationId));
+
+            bool reserved = false;
+            foreach (var name in application.NameSearch.Names)
+            {
+                if (!reserved)
+                {
+                    name.Status = ENameStatus.Reserved;
+                    reserved = true;
+                }
+                else name.Status = ENameStatus.Rejected;
+            }
+            application.DateExamined = DateTime.Now;
+            application.NameSearch.ExpiryDate = DateTime.Now.AddDays(30);
+            
+            return await _context.SaveChangesAsync();
         }
 
         /// <summary>

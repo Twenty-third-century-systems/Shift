@@ -36,6 +36,7 @@ namespace BarTender.Controllers {
         private IOptions<List<DesignationsForNameSearchSelection>> _designationValues;
         private IValueService _valueService;
         private INameSearchService _nameSearchService;
+        private Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
 
         public NameSearchController(INameSearchRepository nameSearchRepository, PoleDB poleDb, ShwaDB shwaDb,
             EachDB eachDb, IOptions<List<ServicesForNameSearchSelection>> serviceValues,
@@ -68,7 +69,7 @@ namespace BarTender.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpGet("{name}/availability")]
+        [HttpHead("{name}/availability")]
         public IActionResult GetNameAvailability(string name)
         {
             // var namesInDataBase = (
@@ -211,7 +212,19 @@ namespace BarTender.Controllers {
             //     }
             // }
 
-            return Created("", await _nameSearchService.CreateNewNameSearchAsync(Guid.NewGuid(), details));
+            return Created("", await _nameSearchService.CreateNewNameSearchAsync(_user, details));
+        }
+
+        [AllowAnonymous]
+        [HttpHead("test-approve")]
+        public async Task<IActionResult> TestApprove(int applicationId)
+        {
+            if (await _nameSearchService.TestApproveNameSearch(_user, applicationId)>0)
+            {
+                return Ok();
+            }
+
+            return BadRequest("Could not update");
         }
     }
 }

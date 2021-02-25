@@ -7,34 +7,42 @@ namespace BarTender.Profiles {
         public ResourceToDomainProfile()
         {
             // NewNameSearchRequestDto => NameSearch
-            CreateMap<NewNameSearchRequestDto, NameSearch>();
+            CreateMap<NewNameSearchRequestDto, NameSearch>()
+                .ForMember(
+                    dest => dest.Service,
+                    op => op.MapFrom(src => src.ServiceId));
 
             //SuggestedEntityNameRequestDto => EntityName
             CreateMap<SuggestedEntityNameRequestDto, EntityName>();
-            
+
             // NewPrivateEntityAddressRequestDto => Address
             CreateMap<NewPrivateEntityAddressRequestDto, Address>();
-            
+
             // NewPrivateEntityOfficeRequestDto => Office
             CreateMap<NewPrivateEntityOfficeRequestDto, Office>();
-            
+
             // NewMemorandumRequestDto => MemorandumOfAssociation
             CreateMap<NewMemorandumRequestDto, MemorandumOfAssociation>();
-            
+
             // NewShareClauseRequestDto => ShareClause
             CreateMap<NewShareClauseRequestDto, ShareClause>();
-            
+
             // NewMemorandumOfAssociationObjectRequestDto => MemorandumOfAssociationObject
             CreateMap<NewMemorandumOfAssociationObjectRequestDto, MemorandumOfAssociationObject>();
-            
+
             // NewAmendedArticleRequestDto => AmendedArticle
             CreateMap<NewAmendedArticleRequestDto, AmendedArticle>();
-            
+
             // NewArticleOfAssociationRequestDto => ArticlesOfAssociation
             CreateMap<NewArticleOfAssociationRequestDto, ArticlesOfAssociation>();
-            
+
             // NewShareHolderRequestDto => PrivateEntityOwner
             CreateMap<NewShareHolderRequestDto, PrivateEntityOwner>();
+
+            // NewShareHoldingEntityRequestDto => ShareholdingForeignEntity
+            CreateMap<NewShareHoldingEntityRequestDto, ShareholdingForeignEntity>()
+                .ForMember(dest => dest.ForeignEntityName, op =>
+                    op.MapFrom(src => src.Name));
         }
     }
 }

@@ -28,6 +28,8 @@ namespace Fridge.Models {
         public Application LastApplication { get; set; }
         public Application NameSearchApplicationApplication { get; set; }
         public ICollection<PrivateEntityHasPrivateEntityOwner> Members { get; set; }
+        public ICollection<PrivateEntityHasPrivateEntity> MemberEntities { get; set; }
+        public ICollection<PrivateEntityHasPrivateEntity> OwnedEntities { get; set; }
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
 
         public bool WasExaminedAndApproved()

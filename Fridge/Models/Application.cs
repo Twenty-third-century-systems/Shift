@@ -12,16 +12,16 @@ namespace Fridge.Models {
             RaisedQueries = new HashSet<RaisedQuery>();
         }
 
-        private Application(Guid user, int service, int sortingOffice)
+        private Application(Guid user, EService service, int sortingOffice)
         {
             User = user;
-            Service = (EService) service;
+            Service = service;
             DateSubmitted = DateTime.Now;
             CityId = sortingOffice;
         }
 
 
-        public Application(Guid user, int service, EApplicationStatus status, int sortingOffice) : this(user, service,
+        public Application(Guid user, EService service, EApplicationStatus status, int sortingOffice) : this(user, service,
             sortingOffice)
         {
             Status = status;

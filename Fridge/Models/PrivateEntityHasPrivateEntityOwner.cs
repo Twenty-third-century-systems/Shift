@@ -1,5 +1,9 @@
 ﻿namespace Fridge.Models {
     public class PrivateEntityHasPrivateEntityOwner {
+        public PrivateEntityHasPrivateEntityOwner()
+        {
+            
+        }
         public PrivateEntityHasPrivateEntityOwner(PrivateEntity privateEntity, PrivateEntityOwner shareHolder)
         {
             Entity = privateEntity;

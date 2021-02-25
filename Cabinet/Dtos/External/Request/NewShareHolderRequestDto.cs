@@ -23,11 +23,16 @@ namespace Cabinet.Dtos.External.Request {
         public DateTime? DateOfTakeUp { get; set; }
 
         public List<NewShareHolderRequestDto> Nominees { get; set; }
-        public List<ShareholderSubscriptionDto> Subscriptions { get; set; }
+        public List<ShareholderSubscriptionDto> Subs { get; set; }
 
         public bool HasNominees()
         {
             return Nominees.Count > 0;
+        }
+
+        public bool HasSubscription()
+        {
+            return Subs.Count > 0;
         }
     }
 }

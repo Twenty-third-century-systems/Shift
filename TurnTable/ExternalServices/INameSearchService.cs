@@ -9,5 +9,6 @@ namespace TurnTable.ExternalServices {
         public bool NameIsAvailable(string suggestedName);
 
         public Task<SubmittedNameSearchResponseDto> CreateNewNameSearchAsync(Guid user, NewNameSearchRequestDto dto);
+        Task<int> TestApproveNameSearch(Guid user, int applicationId);
     }
 }

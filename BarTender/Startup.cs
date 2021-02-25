@@ -37,9 +37,16 @@ namespace BarTender {
             services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
-            });            
+            });
 
-            services.AddControllers(o => o.Filters.Add(new AuthorizeFilter()));
+            services.AddControllers(o =>
+                {
+                    o.Filters.Add(new AuthorizeFilter());
+
+                    o.ReturnHttpNotAcceptable = true;
+                })
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
@@ -100,15 +107,16 @@ namespace BarTender {
             });
 
             services.AddAutoMapper(typeof(Program));
-            
+
             // Custom services
-            
+
             services.Configure<List<ServicesForNameSearchSelection>>(Configuration.GetSection("Services"));
 
-            services.Configure<List<ReasonForSearchForNameSearchSelection>>(Configuration.GetSection("Reason for search"));
-            
+            services.Configure<List<ReasonForSearchForNameSearchSelection>>(
+                Configuration.GetSection("Reason for search"));
+
             services.Configure<List<DesignationsForNameSearchSelection>>(Configuration.GetSection("Designation"));
-            
+
             services.AddTransient<INameSearchRepository, NameSearchRepository>();
 
             services.AddTransient<IValueService, ValueService>();
@@ -118,6 +126,8 @@ namespace BarTender {
             services.AddTransient<IPaymentService, PaymentService>();
 
             services.AddSingleton<INameSearchMutualExclusionService, NameSearchMutualExclusionService>();
+
+            services.AddTransient<IPrivateEntityService, PrivateEntityService>();
 
             services.AddScoped<IPayNowService, PayNowService>();
 

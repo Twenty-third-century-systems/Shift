@@ -1,5 +1,9 @@
 ﻿namespace Fridge.Models {
     public class PrivateEntityOwnerHasShareClause {
+        public PrivateEntityOwnerHasShareClause()
+        {
+            
+        }
         public PrivateEntityOwnerHasShareClause(PrivateEntityOwner shareHolder, ShareClause shareClause, int amount)
         {
             Subscriber = shareHolder;

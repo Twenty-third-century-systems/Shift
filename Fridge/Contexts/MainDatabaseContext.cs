@@ -17,7 +17,7 @@ namespace Fridge.Contexts {
         }
 
         // Uncomment this to app that moves country data
-        
+
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         // {
         //     optionsBuilder.UseSqlServer("Server=localhost;Database=bigDB;Trusted_Connection=True;Enlist=False;");
@@ -31,11 +31,13 @@ namespace Fridge.Contexts {
         public DbSet<ExaminationTask> ExaminationTasks { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
+        public DbSet<PrivateEntityHasPrivateEntity> ShareHoldingEntities { get; set; }
         public DbSet<PrivateEntityHasPrivateEntityOwner> EntityOwners { get; set; }
         public DbSet<PrivateEntityOwner> Subscribers { get; set; }
         public DbSet<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
         public DbSet<PrivateEntityOwnerHasShareClause> Subscriptions { get; set; }
         public DbSet<ShareClause> ShareClasses { get; set; }
+        public DbSet<ShareHoldingForeignEntityHasShareClause> ShareHoldingForeignEntities { get; set; }
         public DbSet<ShareHoldingForeignEntityHasPrivateEntityOwner> ForeignEntityShareholders { get; set; }
         public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
         public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
@@ -84,7 +86,7 @@ namespace Fridge.Contexts {
                 entity.OwnsMany(e => e.RaisedQueries, r =>
                 {
                     r.ToTable("query");
-                    
+
                     r.Property(e => e.Step).HasColumnName("application_step");
 
                     r.Property(e => e.Comment).HasColumnName("comment");
@@ -163,7 +165,7 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<EntityName>(entity =>
             {
                 entity.ToTable("name");
-                
+
                 entity.HasIndex(e => e.NameSearchId);
 
                 entity.Property(e => e.EntityNameId).HasColumnName("id");
@@ -171,11 +173,11 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.NameSearchId).HasColumnName("name_search");
 
                 entity.Property(e => e.Value).HasColumnName("value");
-                
+
                 entity.Property(e => e.Status)
                     .HasColumnName("status")
                     .HasConversion(c => c.ToString(), c => Enum.Parse<ENameStatus>(c));
-                
+
                 entity.HasOne(d => d.NameSearch)
                     .WithMany(p => p.Names)
                     .HasForeignKey(d => d.NameSearchId);
@@ -203,6 +205,8 @@ namespace Fridge.Contexts {
 
                 entity.OwnsOne(e => e.Office, o =>
                 {
+                    o.ToTable("office");
+
                     o.Property(e => e.MobileNumber).HasColumnName("mobile");
 
                     o.Property(e => e.TelephoneNumber).HasColumnName("telephone");
@@ -217,21 +221,25 @@ namespace Fridge.Contexts {
 
                         a.Property(e => e.PostalAddress).HasColumnName("postal_address");
                     }).ToTable("address");
-                }).ToTable("office");
+                });
 
                 entity.OwnsOne(e => e.ArticlesOfAssociation, a =>
                 {
+                    a.ToTable("article_of_association");
+                    
                     a.Property(e => e.TableOfArticles)
                         .HasColumnName("table")
                         .HasConversion(c => c.ToString(), c => Enum.Parse<EArticlesOfAssociation>(c));
 
                     a.OwnsMany(e => e.AmendedArticles, am =>
                     {
+                        am.ToTable("amended_article");
+                        
                         am.Property(e => e.AmendedArticleId).HasColumnName("id");
 
                         am.Property(e => e.Value).HasColumnName("value");
-                    }).ToTable("amended_article");
-                }).ToTable("article_of_association");
+                    });
+                });
 
                 entity.HasOne(d => d.CurrentApplication)
                     .WithOne(p => p.PrivateEntity)
@@ -344,13 +352,13 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<MemorandumOfAssociation>(entity =>
             {
                 entity.ToTable("memo");
-                
+
                 entity.HasIndex(e => e.PrivateEntityId);
 
                 entity.Property(e => e.MemorandumOfAssociationId).HasColumnName("id");
-                
+
                 entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
-                
+
                 entity.Property(e => e.LiabilityClause).HasColumnName("liability_clause");
 
                 entity.HasOne(d => d.PrivateEntity)
@@ -361,13 +369,13 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<MemorandumOfAssociationObject>(entity =>
             {
                 entity.ToTable("memo_objects");
-                
+
                 entity.HasIndex(e => e.MemorandumId);
 
                 entity.Property(e => e.MemorandumOfAssociationObjectId).HasColumnName("id");
-                
+
                 entity.Property(e => e.MemorandumId).HasColumnName("memo");
-                
+
                 entity.Property(e => e.Value).HasColumnName("value");
 
                 entity.HasOne(d => d.Memorandum)
@@ -378,7 +386,7 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<PrivateEntityOwner>(entity =>
             {
                 entity.ToTable("subscriber_nominee");
-                
+
                 entity.HasIndex(e => e.CountryCode);
 
                 entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("id");
@@ -423,7 +431,7 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<ShareClause>(entity =>
             {
                 entity.ToTable("share_clause");
-                
+
                 entity.HasIndex(e => e.MemorandumId);
 
                 entity.Property(e => e.ShareClauseId).HasColumnName("id");
@@ -439,10 +447,31 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.MemorandumId);
             });
 
+            modelBuilder.Entity<PrivateEntityHasPrivateEntity>(entity =>
+            {
+                entity.ToTable("private_entity_has_private_entity");
+
+                entity.HasKey(e => new {Entity = e.EntityId, ShareHoldingEntity = e.ShareHoldingEntityId});
+
+                entity.Property(e => e.EntityId).HasColumnName("owned");
+
+                entity.Property(e => e.ShareHoldingEntityId).HasColumnName("owns");
+
+                entity.HasOne(d => d.Entity)
+                    .WithMany(p => p.OwnedEntities)
+                    .HasForeignKey(d => d.EntityId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.ShareHoldingEntity)
+                    .WithMany(p => p.MemberEntities)
+                    .HasForeignKey(d => d.ShareHoldingEntityId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
             modelBuilder.Entity<PrivateEntityHasPrivateEntityOwner>(entity =>
             {
                 entity.ToTable("private_entity_has_private_entity_owner");
-                
+
                 entity.HasKey(e => new {e.PrivateEntityId, e.PrivateEntityOwnerId});
 
                 entity.HasIndex(e => e.PrivateEntityId);
@@ -459,13 +488,13 @@ namespace Fridge.Contexts {
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.ShareHoldingEntities)
-                    .HasForeignKey(d => d.PrivateEntityId);
+                    .HasForeignKey(d => d.PrivateEntityOwnerId);
             });
 
             modelBuilder.Entity<PrivateEntityOwnerHasPrivateEntityOwner>(entity =>
             {
                 entity.ToTable("private_entity_owner_has_private_entity_owner");
-                
+
                 entity.HasKey(e => new {e.BeneficiaryId, e.NomineeId});
 
                 entity.HasIndex(e => e.BeneficiaryId);
@@ -486,11 +515,11 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.NomineeId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
-            
+
             modelBuilder.Entity<PrivateEntityOwnerHasShareClause>(entity =>
             {
                 entity.ToTable("private_entity_owner_has_share_clause");
-                
+
                 entity.HasKey(e => new {e.PrivateEntityOwnerId, e.ShareClauseId});
 
                 entity.HasIndex(e => e.PrivateEntityOwnerId);
@@ -504,16 +533,39 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.Subscriber)
                     .WithMany(p => p.Subscriptions)
                     .HasForeignKey(d => d.PrivateEntityOwnerId);
-                
+
                 entity.HasOne(d => d.ShareClauseClass)
                     .WithMany(p => p.Subscribers)
                     .HasForeignKey(d => d.ShareClauseId);
             });
-            
+
+            modelBuilder.Entity<ShareHoldingForeignEntityHasShareClause>(entity =>
+            {
+                entity.ToTable("share_holding_foreign_enity_has_share_clause");
+
+                entity.HasKey(e => new {PrivateEntityOwnerId = e.ShareHoldingForeignEntityId, e.ShareClauseId});
+
+                entity.HasIndex(e => e.ShareHoldingForeignEntityId);
+
+                entity.HasIndex(e => e.ShareClauseId);
+
+                entity.Property(e => e.ShareHoldingForeignEntityId).HasColumnName("subscriber");
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("subcriptions");
+
+                entity.HasOne(d => d.Subscriber)
+                    .WithMany(p => p.Subscriptions)
+                    .HasForeignKey(d => d.ShareHoldingForeignEntityId);
+
+                entity.HasOne(d => d.ShareClauseClass)
+                    .WithMany(p => p.ForeignEntityShareHolders)
+                    .HasForeignKey(d => d.ShareClauseId);
+            });
+
             modelBuilder.Entity<ShareHoldingForeignEntityHasPrivateEntityOwner>(entity =>
             {
                 entity.ToTable("share_holding_foreign_entity_has_private_entity_owner");
-                
+
                 entity.HasKey(e => new {e.ForeignEntityId, e.PrivateEntityOwnerId});
 
                 entity.HasIndex(e => e.ForeignEntityId);
@@ -527,7 +579,7 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.ForeignEntity)
                     .WithMany(p => p.Representatives)
                     .HasForeignKey(d => d.ForeignEntityId);
-                
+
                 entity.HasOne(d => d.Nominee)
                     .WithMany(p => p.RepresentedForeignEntities)
                     .HasForeignKey(d => d.PrivateEntityOwnerId);
@@ -536,7 +588,7 @@ namespace Fridge.Contexts {
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.ToTable("payments");
-                
+
                 entity.Property(e => e.TransactionId).HasColumnName("Reference");
 
                 entity.Property(e => e.User).HasColumnName("user");
@@ -548,7 +600,7 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.PollUrl).HasColumnName("url");
 
                 entity.Property(e => e.Email).HasColumnName("email");
-                
+
                 entity.Property(e => e.PhoneNumber).HasColumnName("phone");
 
                 entity.Property(e => e.PayNowReference).HasColumnName("paynow_ref");
@@ -556,7 +608,7 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.CreditAmount).HasColumnName("cr");
-                
+
                 entity.Property(e => e.DebitAmount).HasColumnName("dr");
             });
 
@@ -570,6 +622,7 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.Price).HasColumnName("amount");
             });
+
             base.OnModelCreating(modelBuilder);
         }
     }
