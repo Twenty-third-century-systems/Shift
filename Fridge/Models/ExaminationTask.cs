@@ -13,7 +13,7 @@ namespace Fridge.Models
         }
 
         public int ExaminationTaskId { get; set; }
-        public Guid ExaminerId { get; set; }
+        public Guid Examiner { get; set; }
         public DateTime DateAssigned { get; set; }
         public Guid AssignedBy { get; set; }
         public DateTime ExpectedDateOfCompletion { get; set; }

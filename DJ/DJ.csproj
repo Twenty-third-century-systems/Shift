@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Cooler\Cooler.csproj" />
+      <ProjectReference Include="..\TurnTable\TurnTable.csproj" />
     </ItemGroup>
 
 

@@ -270,7 +270,7 @@ namespace Fridge.Contexts {
                     .HasPrecision(6)
                     .HasColumnName("date_assigned");
 
-                entity.Property(e => e.ExaminerId)
+                entity.Property(e => e.Examiner)
                     .IsRequired()
                     .HasColumnName("assigned_to");
 

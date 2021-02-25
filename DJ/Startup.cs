@@ -1,14 +1,18 @@
 using System;
+using AutoMapper;
 using Cooler.DataModels;
+using Fridge.Contexts;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TurnTable.InternalServices;
 
 namespace DJ {
     public class Startup {
@@ -22,8 +26,13 @@ namespace DJ {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddDbContext<MainDatabaseContext>(o =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
+            });
             
+            services.AddControllers();
+
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
@@ -34,7 +43,7 @@ namespace DJ {
                         ValidateAudience = false
                     };
                 });
-            
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ApiScope", policy =>
@@ -43,7 +52,7 @@ namespace DJ {
                     policy.RequireClaim("scope", "scope1");
                 });
             });
-            
+
             services.AddSwaggerGen(x =>
                 x.SwaggerDoc("v1", new OpenApiInfo
                 {
@@ -63,26 +72,30 @@ namespace DJ {
                         Url = new Uri("https://example.com/license"),
                     }
                 }));
-                
-                            
-            
+
+
             services.AddLinqToDbContext<EachDB>((provider, options) =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("EachDatabase"))
                     .UseDefaultLogging(provider);
             });
-            
+
             services.AddLinqToDbContext<PoleDB>((provider, options) =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("PoleDatabase"))
                     .UseDefaultLogging(provider);
             });
-            
+
             services.AddLinqToDbContext<ShwaDB>((provider, options) =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
                     .UseDefaultLogging(provider);
             });
+
+            services.AddAutoMapper(typeof(Program));
+            
+            // Custom services
+            services.AddTransient<IApplicationService, ApplicationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,17 +104,14 @@ namespace DJ {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }                       
+            }
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
 
             app.UseHttpsRedirection();
 
@@ -109,10 +119,7 @@ namespace DJ {
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }
