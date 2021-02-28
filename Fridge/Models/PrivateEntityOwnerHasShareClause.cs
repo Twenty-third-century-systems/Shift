@@ -4,7 +4,7 @@
         {
             
         }
-        public PrivateEntityOwnerHasShareClause(PrivateEntityOwner shareHolder, ShareClause shareClause, int amount)
+        public PrivateEntityOwnerHasShareClause(Person shareHolder, ShareClause shareClause, int amount)
         {
             Subscriber = shareHolder;
             ShareClauseClass = shareClause;
@@ -15,7 +15,7 @@
         public int ShareClauseId { get; set; }
         public int Amount { get; set; }
 
-        public PrivateEntityOwner Subscriber { get; set; }
+        public Person Subscriber { get; set; }
         public ShareClause ShareClauseClass { get; set; }
     }
 }

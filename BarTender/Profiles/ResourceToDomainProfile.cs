@@ -37,7 +37,7 @@ namespace BarTender.Profiles {
             CreateMap<NewArticleOfAssociationRequestDto, ArticlesOfAssociation>();
 
             // NewShareHolderRequestDto => PrivateEntityOwner
-            CreateMap<NewShareHolderRequestDto, PrivateEntityOwner>();
+            CreateMap<NewShareHolderRequestDto, Person>();
 
             // NewShareHoldingEntityRequestDto => ShareholdingForeignEntity
             CreateMap<NewShareHoldingEntityRequestDto, ShareholdingForeignEntity>()

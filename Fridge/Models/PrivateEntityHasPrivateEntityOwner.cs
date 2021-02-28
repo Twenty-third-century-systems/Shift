@@ -4,7 +4,7 @@
         {
             
         }
-        public PrivateEntityHasPrivateEntityOwner(PrivateEntity privateEntity, PrivateEntityOwner shareHolder)
+        public PrivateEntityHasPrivateEntityOwner(PrivateEntity privateEntity, Person shareHolder)
         {
             Entity = privateEntity;
             Member = shareHolder;
@@ -14,6 +14,6 @@
         public int PrivateEntityOwnerId { get; set; }
 
         public PrivateEntity Entity { get; set; }
-        public PrivateEntityOwner Member { get; set; }
+        public Person Member { get; set; }
     }
 }

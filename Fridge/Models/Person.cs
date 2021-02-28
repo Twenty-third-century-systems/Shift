@@ -4,8 +4,8 @@ using Fridge.Constants;
 
 // director member
 namespace Fridge.Models {
-    public class PrivateEntityOwner {
-        public PrivateEntityOwner()
+    public class Person {
+        public Person()
         {
             Beneficiaries = new HashSet<PrivateEntityOwnerHasPrivateEntityOwner>();
             Nominees = new HashSet<PrivateEntityOwnerHasPrivateEntityOwner>();

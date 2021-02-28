@@ -4,16 +4,16 @@
         {
             
         }
-        public ShareHoldingForeignEntityHasPrivateEntityOwner(ShareholdingForeignEntity shareholdingForeignEntity, PrivateEntityOwner mapPrivateEntityOwner)
+        public ShareHoldingForeignEntityHasPrivateEntityOwner(ShareholdingForeignEntity shareholdingForeignEntity, Person mapPerson)
         {
             ForeignEntity = shareholdingForeignEntity;
-            Nominee = mapPrivateEntityOwner;
+            Nominee = mapPerson;
         }
 
         public int ForeignEntityId { get; set; }
         public int PrivateEntityOwnerId { get; set; }
 
         public ShareholdingForeignEntity ForeignEntity { get; set; }
-        public PrivateEntityOwner Nominee { get; set; }        
+        public Person Nominee { get; set; }        
     }
 }

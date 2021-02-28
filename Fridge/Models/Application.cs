@@ -122,6 +122,16 @@ namespace Fridge.Models {
     }
 
     public class RaisedQuery {
+        public RaisedQuery()
+        {
+            
+        }
+        public RaisedQuery(int step, string comment)
+        {
+            Step = (EApplicationSteps) step;
+            Comment = comment;
+        }
+
         public EApplicationSteps Step { get; set; }
         public string Comment { get; set; }
     }

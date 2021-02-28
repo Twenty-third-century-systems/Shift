@@ -4,7 +4,7 @@
         {
             
         }
-        public PrivateEntityOwnerHasPrivateEntityOwner(PrivateEntityOwner beneficiary, PrivateEntityOwner nominee)
+        public PrivateEntityOwnerHasPrivateEntityOwner(Person beneficiary, Person nominee)
         {
             Beneficiary=beneficiary;
             Nominee = nominee;
@@ -13,7 +13,7 @@
         public int BeneficiaryId { get; set; }
         public int NomineeId { get; set; }
 
-        public PrivateEntityOwner Beneficiary { get; set; }
-        public PrivateEntityOwner Nominee { get; set; }
+        public Person Beneficiary { get; set; }
+        public Person Nominee { get; set; }
     }
 }

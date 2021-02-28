@@ -266,10 +266,10 @@ namespace TurnTable.ExternalServices {
                 .Reference(p => p.MemorandumOfAssociation).LoadAsync();
         }
 
-        private PrivateEntityOwner MapPrivateEntityOwner(NewShareHolderRequestDto dto,
+        private Person MapPrivateEntityOwner(NewShareHolderRequestDto dto,
             ICollection<ShareClause> shareClauses)
         {
-            var privateEntityOwner = _mapper.Map<NewShareHolderRequestDto, PrivateEntityOwner>(dto);
+            var privateEntityOwner = _mapper.Map<NewShareHolderRequestDto, Person>(dto);
             foreach (var subscription in dto.Subs)
             {
                 var shareClause = shareClauses.Single(s => s.Title.Equals(subscription.Title));

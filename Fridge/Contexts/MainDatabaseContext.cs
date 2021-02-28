@@ -33,7 +33,7 @@ namespace Fridge.Contexts {
         public DbSet<Country> Countries { get; set; }
         public DbSet<PrivateEntityHasPrivateEntity> ShareHoldingEntities { get; set; }
         public DbSet<PrivateEntityHasPrivateEntityOwner> EntityOwners { get; set; }
-        public DbSet<PrivateEntityOwner> Subscribers { get; set; }
+        public DbSet<Person> Subscribers { get; set; }
         public DbSet<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
         public DbSet<PrivateEntityOwnerHasShareClause> Subscriptions { get; set; }
         public DbSet<ShareClause> ShareClasses { get; set; }
@@ -383,7 +383,7 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.MemorandumId);
             });
 
-            modelBuilder.Entity<PrivateEntityOwner>(entity =>
+            modelBuilder.Entity<Person>(entity =>
             {
                 entity.ToTable("subscriber_nominee");
 

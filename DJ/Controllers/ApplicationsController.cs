@@ -22,11 +22,11 @@ namespace DJ.Controllers {
     public class ApplicationsController : Controller {
         private EachDB _eachDb;
         private PoleDB _poleDb;
-        private IApplicationService _applicationService;
+        private ITaskService _taskService;
 
-        public ApplicationsController(EachDB eachDb, PoleDB poleDb, IApplicationService applicationService)
+        public ApplicationsController(EachDB eachDb, PoleDB poleDb, ITaskService taskService)
         {
-            _applicationService = applicationService;
+            _taskService = taskService;
             _eachDb = eachDb;
             _poleDb = poleDb;
         }
@@ -100,7 +100,7 @@ namespace DJ.Controllers {
             //
             // return Ok(allApplications);
 
-            return Ok(await _applicationService.GetAllUnAllocatedApplicationsAsync(sortingOffice));
+            return Ok(await _taskService.GetAllUnAllocatedApplicationsAsync(sortingOffice));
         }
 
         [HttpPost("allocate")]
@@ -170,7 +170,7 @@ namespace DJ.Controllers {
             //     }
             // }
 
-            return Created("",await _applicationService.AllocateTasksAsync(dto));
+            return Created("",await _taskService.AllocateTasksAsync(dto));
             return BadRequest("Something went wrong");
         }
     }

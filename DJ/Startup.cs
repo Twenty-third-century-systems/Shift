@@ -31,7 +31,9 @@ namespace DJ {
                 o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
             });
             
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
@@ -95,7 +97,9 @@ namespace DJ {
             services.AddAutoMapper(typeof(Program));
             
             // Custom services
-            services.AddTransient<IApplicationService, ApplicationService>();
+            services.AddTransient<ITaskService, TaskService>();
+            services.AddTransient<INameSearchExaminationService, NameSearchExaminationService>();
+            services.AddTransient<IPrivateEntityExaminationService, PrivateEntityExaminationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

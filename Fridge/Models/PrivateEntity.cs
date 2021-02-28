@@ -31,11 +31,6 @@ namespace Fridge.Models {
         public ICollection<PrivateEntityHasPrivateEntity> MemberEntities { get; set; }
         public ICollection<PrivateEntityHasPrivateEntity> OwnedEntities { get; set; }
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
-
-        public bool WasExaminedAndApproved()
-        {
-            return CurrentApplication.DateExamined != null && !string.IsNullOrEmpty(Reference);
-        }
     }
 
     public class Office {
