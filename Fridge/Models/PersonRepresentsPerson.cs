@@ -1,13 +1,13 @@
 ﻿namespace Fridge.Models {
-    public class PrivateEntityOwnerHasPrivateEntityOwner {
-        public PrivateEntityOwnerHasPrivateEntityOwner()
+    public class PersonRepresentsPerson {
+        public PersonRepresentsPerson()
         {
             
         }
-        public PrivateEntityOwnerHasPrivateEntityOwner(Person beneficiary, Person nominee)
+        public PersonRepresentsPerson(Person nominee, Person beneficiary)
         {
-            Beneficiary=beneficiary;
             Nominee = nominee;
+            Beneficiary = beneficiary;
         }
 
         public int BeneficiaryId { get; set; }

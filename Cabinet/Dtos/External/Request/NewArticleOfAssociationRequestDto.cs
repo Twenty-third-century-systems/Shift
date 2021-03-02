@@ -7,6 +7,7 @@ namespace Cabinet.Dtos.External.Request {
             AmendedArticles = new List<NewAmendedArticleRequestDto>();
         }
         public int ApplicationId { get; set; }
+        // Send null and List of Amended articles for OTHER
         public int? TableOfArticles { get; set; }
         public List<NewAmendedArticleRequestDto> AmendedArticles { get; set; }
 

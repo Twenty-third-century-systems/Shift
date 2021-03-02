@@ -37,8 +37,7 @@ namespace DJ.Profiles {
                 .ForMember(
                     dest => dest.Name,
                     op => op.MapFrom(src =>
-                        src.NameSearchApplicationApplication.NameSearch.Names
-                            .SingleOrDefault(n => n.Status.Equals(ENameStatus.Used)).Value));
+                        src.Name.Value));
 
             // Office => TaskPrivateEntityOfficeResponseDto
             CreateMap<Office, TaskPrivateEntityOfficeResponseDto>()
@@ -82,13 +81,9 @@ namespace DJ.Profiles {
                     op => op.MapFrom(src => $"{src.Surname} {src.Names}"));
 
             // PrivateEntityOwnerHasShareClause => TaskPrivateEntityShareholderSubscriptionResponseDto
-            CreateMap<PrivateEntityOwnerHasShareClause, TaskPrivateEntityShareholderSubscriptionResponseDto>()
-                .ForMember(
-                    dest => dest.Title,
-                    op => op.MapFrom(src => $"{src.ShareClauseClass.Title} @ ${src.ShareClauseClass.NominalValue}"));
-
+           
             // ShareholdingForeignEntity, TaskPrivateEntityForeignEntityShareHoldersDto
-            CreateMap<ShareholdingForeignEntity, TaskPrivateEntityForeignEntityShareHoldersDto>();
+            CreateMap<ForeignEntity, TaskPrivateEntityForeignEntityShareHoldersDto>();
         }
     }
 }

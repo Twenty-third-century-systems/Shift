@@ -12,6 +12,7 @@ namespace Fridge.Models {
         public string Justification { get; set; }
         public EDesignation Designation { get; set; }
         public EReasonForSearch ReasonForSearch { get; set; }
+        public string MainObject { get; set; }
         public string Reference { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public ICollection<EntityName> Names { get; set; }

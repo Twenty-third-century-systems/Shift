@@ -49,8 +49,9 @@ namespace TurnTable.InternalServices {
 
         private async Task AllocateMultipleApplicationsAsync(NewTaskAllocationRequestDto dto)
         {
+            var dtoService = (EService) dto.Service;
             var applications = await _context.Applications.Where(a =>
-                    a.Service == (EService) dto.Service &&
+                    a.Service == dtoService &&
                     a.CityId.Equals(dto.SortingOffice) &&
                     a.TaskId == null)
                 .Take(dto.NumberOfApplications)
@@ -78,7 +79,8 @@ namespace TurnTable.InternalServices {
         public async Task<List<AllocatedTaskResponseDto>> GetAllocatedTasksAsync(Guid examiner)
         {
             return await _mapper.ProjectTo<AllocatedTaskResponseDto>(_context.ExaminationTasks
-                    .Include(e => e.Applications).Where(e => e.Examiner.Equals(examiner)))
+                    .Include(e => e.Applications)
+                    .Where(e => e.Examiner.Equals(examiner) && e.Status == ETaskStatus.Incomplete))
                 .ToListAsync();
         }
 
@@ -95,6 +97,7 @@ namespace TurnTable.InternalServices {
         {
             var applications = await _context.Applications
                 .Include(a => a.PrivateEntity)
+                .ThenInclude(p => p.Name)
                 .Where(a => a.TaskId.Equals(taskId)).ToListAsync();
 
             AllocatedPrivateEntityTaskApplicationResponseDto privateEntityApplication = null;
@@ -102,76 +105,88 @@ namespace TurnTable.InternalServices {
             {
                 privateEntityApplication =
                     _mapper.Map<AllocatedPrivateEntityTaskApplicationResponseDto>(application);
-            
+
                 await _context.Entry(application.PrivateEntity).Reference(p => p.MemorandumOfAssociation)
                     .Query()
                     .Include(m => m.ShareClauses)
                     .Include(m => m.MemorandumObjects)
                     .LoadAsync();
-            
+
                 privateEntityApplication.PrivateEntity.MemorandumOfAssociation =
                     _mapper.Map<TaskPrivateEntityMemorandumResponseDto>(application.PrivateEntity
                         .MemorandumOfAssociation);
-            
-                await _context.Entry(application.PrivateEntity).Collection(p => p.Members).Query()
-                    .Include(m => m.Member)
-                    .ThenInclude(m => m.Subscriptions)
-                    .ThenInclude(s => s.ShareClauseClass)
-                    .LoadAsync();
-            
-                foreach (var member in application.PrivateEntity.Members)
-                {
-                    await _context.Entry(member.Member).Collection(m => m.Nominees).LoadAsync();
-                    await _context.Entry(member.Member).Collection(m => m.ShareHoldingEntities).Query()
-                        .Include(s => s.Entity).LoadAsync();
-                    await _context.Entry(member.Member).Collection(m => m.RepresentedForeignEntities).Query()
-                        .Include(s => s.ForeignEntity).ThenInclude(f => f.Country).LoadAsync();
-            
-                    if (member.Member.ShareHoldingEntities.Count > 0)
-                    {
-                        foreach (var shareHoldingEntity in member.Member.ShareHoldingEntities)
-                        {
-                            var nameApplication = await _context.Applications.Include(a => a.NameSearch)
-                                .ThenInclude(n => n.Names)
-                                .SingleAsync(a =>
-                                    a.ApplicationId.Equals(shareHoldingEntity.Entity.NameSearchApplicationId));
-            
-                            var entityShareHolder = new TaskPrivateEntityLocalEntityShareHoldersRequestDto
-                            {
-                                Name = nameApplication.NameSearch.Names.Single(n => n.Status.Equals(ENameStatus.Used))
-                                    .Value,
-                                Reference = shareHoldingEntity.Entity.Reference
-                            };
-                            entityShareHolder.Nominees.Add(
-                                _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                            privateEntityApplication.PrivateEntity.LocalEntityShareHolders.Add(entityShareHolder);
-                        }
-                    }
-                    else if (member.Member.RepresentedForeignEntities.Count > 0)
-                    {
-                        foreach (var foreignEntity in member.Member.RepresentedForeignEntities)
-                        {
-                            await _context.Entry(foreignEntity.ForeignEntity).Collection(f => f.Subscriptions)
-                                .LoadAsync();
-                            var foreignEntityDto =
-                                _mapper.Map<TaskPrivateEntityForeignEntityShareHoldersDto>(foreignEntity.ForeignEntity);
-                            foreignEntityDto.Nominees.Add(
-                                _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                            privateEntityApplication.PrivateEntity.ForeignEntityShareHolders.Add(foreignEntityDto);
-                        }
-                    }
-                    else
-                    {
-                        privateEntityApplication.PrivateEntity.Members.Add(
-                            _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                    }
-                }
+
+                // await _context.Entry(application.PrivateEntity).Collection(p => p.Members).Query()
+                //     .Include(m => m.Member)
+                //     .ThenInclude(m => m.Subscriptions)
+                //     .ThenInclude(s => s.ShareClauseClass)
+                //     .LoadAsync();
+                //
+                // foreach (var member in application.PrivateEntity.Members)
+                // {
+                //     await _context.Entry(member.Member).Collection(m => m.Nominees).LoadAsync();
+                //     await _context.Entry(member.Member).Collection(m => m.ShareHoldingEntities).Query()
+                //         .Include(s => s.Entity).LoadAsync();
+                //     await _context.Entry(member.Member).Collection(m => m.RepresentedForeignEntities).Query()
+                //         .Include(s => s.ForeignEntity).ThenInclude(f => f.Country).LoadAsync();
+                //
+                //     if (member.Member.ShareHoldingEntities.Count > 0)
+                //     {
+                //         foreach (var shareHoldingEntity in member.Member.ShareHoldingEntities)
+                //         {
+                //             var nameApplication = await _context.Applications.Include(a => a.NameSearch)
+                //                 .ThenInclude(n => n.Names)
+                //                 .SingleAsync(a =>
+                //                     a.ApplicationId.Equals(shareHoldingEntity.Entity.NameSearchApplicationId));
+                //
+                //             var entityShareHolder = new TaskPrivateEntityLocalEntityShareHoldersRequestDto
+                //             {
+                //                 Name = nameApplication.NameSearch.Names.Single(n => n.Status.Equals(ENameStatus.Used))
+                //                     .Value,
+                //                 Reference = shareHoldingEntity.Entity.Reference
+                //             };
+                //             entityShareHolder.Nominees.Add(
+                //                 _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
+                //             privateEntityApplication.PrivateEntity.LocalEntityShareHolders.Add(entityShareHolder);
+                //         }
+                //     }
+                //     else if (member.Member.RepresentedForeignEntities.Count > 0)
+                //     {
+                //         foreach (var foreignEntity in member.Member.RepresentedForeignEntities)
+                //         {
+                //             await _context.Entry(foreignEntity.ForeignEntity).Collection(f => f.Subscriptions)
+                //                 .LoadAsync();
+                //             var foreignEntityDto =
+                //                 _mapper.Map<TaskPrivateEntityForeignEntityShareHoldersDto>(foreignEntity.ForeignEntity);
+                //             foreignEntityDto.Nominees.Add(
+                //                 _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
+                //             privateEntityApplication.PrivateEntity.ForeignEntityShareHolders.Add(foreignEntityDto);
+                //         }
+                //     }
+                //     else
+                //     {
+                //         privateEntityApplication.PrivateEntity.Members.Add(
+                //             _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
+                //     }
+                // }
             }
-            
+
             return privateEntityApplication;
 
             // return await _context.PrivateEntities.Include(p => p.CurrentApplication)
             //     .SingleAsync(p => p.CurrentApplication.TaskId.Equals(taskId));
+        }
+
+        public async Task<int> FinishTaskAsync(int taskId)
+        {
+            var examinationTask = await _context.ExaminationTasks.Include(e => e.Applications)
+                .SingleAsync(e => e.ExaminationTaskId.Equals(taskId));
+            examinationTask.Status = ETaskStatus.Completed;
+            var applications = examinationTask.Applications.Where(a => a.Status != EApplicationStatus.Examined)
+                .ToList();
+            if (applications.Count.Equals(0))
+                return await _context.SaveChangesAsync();
+            else throw new Exception("Some applications in this task haven't been examined.");
         }
     }
 }

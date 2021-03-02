@@ -33,8 +33,9 @@ namespace TurnTable.ExternalServices {
             return registeredNameResponseDtos;
         }
 
-        public async Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId)
+        public async Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId, string industrySector)
         {
+            // TODO: create a dto including the IndustrySector
             // Getting the reserved name
             var name = await _context.Names
                 .Include(n => n.NameSearch)
@@ -48,11 +49,20 @@ namespace TurnTable.ExternalServices {
                     name.NameSearch.Application.SortingOffice.CityId);
 
             // Constructing a new Private entity and associating with the application
-            var privateEntity = new PrivateEntity(name.NameSearch.Application);
+            var privateEntity = new PrivateEntity(name, industrySector);
             application.PrivateEntity = privateEntity;
 
+            bool resubmission = false;
             // Mark name as used
-            name.Status = ENameStatus.Used;
+            if (name.Status == ENameStatus.Used)
+            {
+                resubmission = true;
+            }
+            else
+            {
+                name.Status = ENameStatus.Used;
+            }
+
 
             // Mark application for insertion
             await _context.AddAsync(application);
@@ -72,7 +82,7 @@ namespace TurnTable.ExternalServices {
         {
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
 
-            application.PrivateEntity.Office = _mapper.Map<NewPrivateEntityOfficeRequestDto, Office>(dto);
+            application.PrivateEntity.Office = _mapper.Map<Office>(dto);
             await _context.SaveChangesAsync();
             return new ApplicationResponseDto
             {
@@ -172,19 +182,17 @@ namespace TurnTable.ExternalServices {
             var shareClauses = application.PrivateEntity.MemorandumOfAssociation.ShareClauses;
 
             // Map shareholding pple
-            foreach (var person in dto.People)
+            foreach (var personDto in dto.People)
             {
-                var privateEntityOwner =
-                    MapPrivateEntityOwner(person, shareClauses);
-                if (person.HasNominees())
-                    foreach (var nominee in person.Nominees)
+                var person = MapPerson(personDto, shareClauses);
+                if (personDto.HasBeneficiaries())
+                    foreach (var benefactor in personDto.PeopleRepresented)
                     {
-                        privateEntityOwner.Nominees.Add(new PrivateEntityOwnerHasPrivateEntityOwner(privateEntityOwner,
-                            MapPrivateEntityOwner(nominee, shareClauses)));
+                        person.PersonRepresentsPersonss.Add(new PersonRepresentsPerson(person,
+                            MapPerson(benefactor, shareClauses)));
                     }
 
-                application.PrivateEntity.Members.Add(
-                    new PrivateEntityHasPrivateEntityOwner(application.PrivateEntity, privateEntityOwner));
+                AddPrivateEntityMember(application, person);
             }
 
             // Map shareholding Entities
@@ -194,43 +202,48 @@ namespace TurnTable.ExternalServices {
                 {
                     if (entity.CountryCode.Equals("ZWE"))
                     {
-                        // TODO: add name to search Query add the adding of share clause
-                        var registeredEntity =
-                            await _context.PrivateEntities
-                                .SingleAsync(p => p.Reference.Equals(entity.CompanyReference));
+                        var registeredEntity = await _context.PrivateEntities
+                            .Include(p => p.Name)
+                            .ThenInclude(a => a.NameSearch)
+                            .ThenInclude(n => n.Names)
+                            .SingleOrDefaultAsync(p =>
+                                p.Name.NameSearch.Names
+                                    .Single(n => n.Status.Equals(ENameStatus.Used)).Value == entity.Name &&
+                                p.Reference.Equals(entity.CompanyReference));
+
                         if (!registeredEntity.Equals(null))
                         {
-                            registeredEntity.OwnedEntities.Add(
-                                new PrivateEntityHasPrivateEntity(application.PrivateEntity, registeredEntity));
+                            foreach (var nominee in entity.Nominees)
+                            {
+                                var person = MapPerson(nominee, shareClauses);
+                                AddPrivateEntityMember(application, person);
+
+                                registeredEntity.PersonRepresentsPrivateEntity.Add(
+                                    new PersonRepresentsPrivateEntity(registeredEntity, person));
+                            }
                         }
                         else throw new Exception("One of the local shareholding entities is not registered.");
                     }
                     else
                     {
-                        var shareholdingForeignEntity =
-                            _mapper.Map<NewShareHoldingEntityRequestDto, ShareholdingForeignEntity>(entity);
+                        var shareholdingForeignEntity = _mapper.Map<ForeignEntity>(entity);
 
                         foreach (var subscription in entity.Subs)
                         {
-                            var shareClause = shareClauses.Single(s => s.Title.Equals(subscription.Title));
-                            shareholdingForeignEntity.Subscriptions.Add(
-                                new ShareHoldingForeignEntityHasShareClause(shareholdingForeignEntity, shareClause,
-                                    subscription.Amount));
+                            shareholdingForeignEntity.ForeignEntitySubscriptions.Add(
+                                new ForeignEntitySubscription(shareholdingForeignEntity,
+                                    shareClauses.Single(s => s.Title.Equals(subscription.Title)), subscription.Amount));
                         }
 
                         foreach (var nominee in entity.Nominees)
                         {
-                            shareholdingForeignEntity.Representatives.Add(
-                                new ShareHoldingForeignEntityHasPrivateEntityOwner(shareholdingForeignEntity,
-                                    MapPrivateEntityOwner(nominee, shareClauses)));
+                            var person = MapPerson(nominee, shareClauses);
+                            shareholdingForeignEntity.PersonRepresentsForeignEntities.Add(
+                                new PersonRepresentsForeignEntity(shareholdingForeignEntity, person));
+                            AddPrivateEntityMember(application, person);
                         }
-                        await _context.AddAsync(shareholdingForeignEntity);
 
-                        foreach (var representative in shareholdingForeignEntity.Representatives)
-                        {
-                            representative.Nominee.ShareHoldingEntities.Add(new PrivateEntityHasPrivateEntityOwner(application.PrivateEntity,representative.Nominee));
-                        }
-                        await _context.SaveChangesAsync();
+                        // await _context.SaveChangesAsync();
                     }
                 }
                 else throw new Exception("One of the shareholding entities is not represented.");
@@ -241,7 +254,13 @@ namespace TurnTable.ExternalServices {
             {
                 Id = application.ApplicationId,
                 Service = application.Service.ToString()
-            };            
+            };
+        }
+
+        private static void AddPrivateEntityMember(Application application, Person person)
+        {
+            application.PrivateEntity.PersonHoldsSharesInPrivateEntities.Add(
+                new PersonHoldsSharesInPrivateEntity(application.PrivateEntity, person));
         }
 
         public async Task<int> SubmitApplicationAsync(Guid user, int applicationId)
@@ -249,6 +268,30 @@ namespace TurnTable.ExternalServices {
             var application = await GetPrivateEntityApplicationAsync(user, applicationId);
             application.Status = EApplicationStatus.Submited;
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<ApplicationResponseDto> ResubmitApplicationAsync(Guid user, int applicationId)
+        {
+            var previousApplication = await _context.Applications
+                .Include(a => a.PrivateEntity)
+                .AsNoTracking()
+                .SingleAsync(a => a.ApplicationId.Equals(applicationId));
+            if (previousApplication.Status == EApplicationStatus.Examined &&
+                previousApplication.RaisedQueries.Count > 0)
+            {
+                
+                var newApplication = await CreateApplicationAsync(user, previousApplication.PrivateEntity.NameId,
+                    previousApplication.PrivateEntity.IndustrySector);
+                var createdApplication = await _context.Applications.FindAsync(newApplication.Id);
+                createdApplication.PrivateEntity.LastApplicationId = previousApplication.ApplicationId;
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    return newApplication;
+                }
+            }
+            else throw new Exception("This application does not qualify for resubmission.");
+
+            return null;
         }
 
         public async Task<Application> GetPrivateEntityApplicationAsync(Guid user, int applicationId)
@@ -266,18 +309,18 @@ namespace TurnTable.ExternalServices {
                 .Reference(p => p.MemorandumOfAssociation).LoadAsync();
         }
 
-        private Person MapPrivateEntityOwner(NewShareHolderRequestDto dto,
+        private Person MapPerson(NewShareHolderRequestDto dto,
             ICollection<ShareClause> shareClauses)
         {
-            var privateEntityOwner = _mapper.Map<NewShareHolderRequestDto, Person>(dto);
+            var person = _mapper.Map<Person>(dto);
             foreach (var subscription in dto.Subs)
             {
-                var shareClause = shareClauses.Single(s => s.Title.Equals(subscription.Title));
-                privateEntityOwner.Subscriptions.Add(
-                    new PrivateEntityOwnerHasShareClause(privateEntityOwner, shareClause, subscription.Amount));
+                person.PersonSubscriptions.Add(
+                    new PersonSubscription(person, shareClauses.Single(s => s.Title.Equals(subscription.Title)),
+                        subscription.Amount));
             }
 
-            return privateEntityOwner;
+            return person;
         }
     }
 }

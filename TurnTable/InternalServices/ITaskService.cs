@@ -13,5 +13,6 @@ namespace TurnTable.InternalServices {
 
         Task<List<AllocatedNameSearchTaskApplicationResponseDto>> GetNameSearchTaskApplicationsAsync(int taskId);
         Task<AllocatedPrivateEntityTaskApplicationResponseDto> GetPrivateEntityTaskApplicationAsync(int taskId);
+        Task<int> FinishTaskAsync(int taskId);
     }
 }

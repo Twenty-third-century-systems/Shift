@@ -21,12 +21,13 @@ namespace TurnTable.InternalServices {
             var name = await _context.Names.FindAsync(nameId);
             name.Status = (ENameStatus) status;
 
-            if (status.Equals(ENameStatus.Reserved))
+            if (status.Equals((int) ENameStatus.Reserved))
             {
                 await _context.Entry(name).Reference(n => n.NameSearch).LoadAsync();
                 await _context.Entry(name.NameSearch).Collection(n => n.Names).LoadAsync();
 
-                var unconsideredNames = name.NameSearch.Names.Where(n => !n.EntityNameId.Equals(name.EntityNameId))
+                var unconsideredNames = name.NameSearch.Names.Where(n =>
+                        !n.EntityNameId.Equals(name.EntityNameId) && n.Status.Equals(ENameStatus.Pending))
                     .ToList();
                 foreach (var unconsideredName in unconsideredNames)
                 {
@@ -58,7 +59,7 @@ namespace TurnTable.InternalServices {
             // TODO: send email and text msg here based on SaveChanges return result, message should contain if successful or has query
         }
 
-        
+
         // All the following to project straight to dto
         public async Task<List<EntityName>> GetNamesThatStartWithAsync(string searchQuery)
         {

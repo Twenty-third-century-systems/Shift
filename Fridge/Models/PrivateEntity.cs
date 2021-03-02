@@ -8,29 +8,40 @@ namespace Fridge.Models {
     public partial class PrivateEntity {
         public PrivateEntity()
         {
-            Members = new HashSet<PrivateEntityHasPrivateEntityOwner>();
+            PersonHoldsSharesInPrivateEntities = new HashSet<PersonHoldsSharesInPrivateEntity>();
+            PersonRepresentsPrivateEntity = new HashSet<PersonRepresentsPrivateEntity>();
+            PrivateEntitySubscriptions = new HashSet<PrivateEntitySubscription>();
         }
 
-        public PrivateEntity(Application nameSearchApplication)
+        public PrivateEntity(EntityName name, string industrySector) : this()
         {
-            NameSearchApplicationApplication = nameSearchApplication;
+            IndustrySector = industrySector;
+            Name = name;
         }
 
         public int PrivateEntityId { get; set; }
         public int ApplicationId { get; set; }
-        public int NameSearchApplicationId { get; set; }
+        public int NameId { get; set; }
         public int? LastApplicationId { get; set; }
+        public string IndustrySector { get; set; }
         public string Reference { get; set; }
         public Office Office { get; set; }
         public ArticlesOfAssociation ArticlesOfAssociation { get; set; }
 
         public Application CurrentApplication { get; set; }
         public Application LastApplication { get; set; }
-        public Application NameSearchApplicationApplication { get; set; }
-        public ICollection<PrivateEntityHasPrivateEntityOwner> Members { get; set; }
-        public ICollection<PrivateEntityHasPrivateEntity> MemberEntities { get; set; }
-        public ICollection<PrivateEntityHasPrivateEntity> OwnedEntities { get; set; }
+        public EntityName Name { get; set; }
+
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
+
+        // members
+        public ICollection<PersonHoldsSharesInPrivateEntity> PersonHoldsSharesInPrivateEntities { get; set; }
+
+        // Representative nominees in other private entities
+        public ICollection<PersonRepresentsPrivateEntity> PersonRepresentsPrivateEntity { get; set; }
+
+        // Subscriptions in other entities
+        public ICollection<PrivateEntitySubscription> PrivateEntitySubscriptions { get; set; }
     }
 
     public class Office {
@@ -38,6 +49,7 @@ namespace Fridge.Models {
         public string MobileNumber { get; set; }
         public string TelephoneNumber { get; set; }
         public string EmailAddress { get; set; }
+        public DateTime EffectiveFrom { get; set; }
     }
 
     public class Address {
@@ -51,7 +63,7 @@ namespace Fridge.Models {
         {
             AmendedArticles = new HashSet<AmendedArticle>();
         }
-        
+
         public EArticlesOfAssociation? TableOfArticles { get; set; }
         public ICollection<AmendedArticle> AmendedArticles { get; set; }
     }
@@ -60,5 +72,4 @@ namespace Fridge.Models {
         public int AmendedArticleId { get; set; }
         public string Value { get; set; }
     }
-
 }

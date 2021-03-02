@@ -40,7 +40,7 @@ namespace BarTender.Profiles {
             CreateMap<NewShareHolderRequestDto, Person>();
 
             // NewShareHoldingEntityRequestDto => ShareholdingForeignEntity
-            CreateMap<NewShareHoldingEntityRequestDto, ShareholdingForeignEntity>()
+            CreateMap<NewShareHoldingEntityRequestDto, ForeignEntity>()
                 .ForMember(dest => dest.ForeignEntityName, op =>
                     op.MapFrom(src => src.Name));
         }

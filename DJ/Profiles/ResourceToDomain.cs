@@ -8,6 +8,9 @@ namespace DJ.Profiles {
         {
             // NewTaskAllocationRequestDto => ExaminationTask
             CreateMap<NewTaskAllocationRequestDto, ExaminationTask>();
+            
+            // RaisedQueryRequestDto => RaisedQuery
+            CreateMap<RaisedQueryRequestDto, RaisedQuery>();
         }
     }
 }

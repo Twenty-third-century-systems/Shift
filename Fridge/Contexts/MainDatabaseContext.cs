@@ -18,31 +18,33 @@ namespace Fridge.Contexts {
 
         // Uncomment this to app that moves country data
 
-        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        // {
-        //     optionsBuilder.UseSqlServer("Server=localhost;Database=bigDB;Trusted_Connection=True;Enlist=False;");
-        // }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=localhost;Database=bigDB;Trusted_Connection=True;Enlist=False;");
+        }
 
         public DbSet<Application> Applications { get; set; }
-        public DbSet<ShareholdingForeignEntity> ForeignEntities { get; set; }
+        public DbSet<ForeignEntity> ForeignEntities { get; set; }
         public DbSet<NameSearch> NameSearches { get; set; }
         public DbSet<EntityName> Names { get; set; }
         public DbSet<PrivateEntity> PrivateEntities { get; set; }
         public DbSet<ExaminationTask> ExaminationTasks { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<PrivateEntityHasPrivateEntity> ShareHoldingEntities { get; set; }
-        public DbSet<PrivateEntityHasPrivateEntityOwner> EntityOwners { get; set; }
         public DbSet<Person> Subscribers { get; set; }
-        public DbSet<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
-        public DbSet<PrivateEntityOwnerHasShareClause> Subscriptions { get; set; }
         public DbSet<ShareClause> ShareClasses { get; set; }
-        public DbSet<ShareHoldingForeignEntityHasShareClause> ShareHoldingForeignEntities { get; set; }
-        public DbSet<ShareHoldingForeignEntityHasPrivateEntityOwner> ForeignEntityShareholders { get; set; }
         public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
         public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<PriceItem> PriceItems { get; set; }
+        public DbSet<Person> PrivateEntitySubscribers { get; set; }
+        public DbSet<PersonHoldsSharesInPrivateEntity> PeopleHoldingSharesInPrivateEntities { get; set; }
+        public DbSet<PersonRepresentsPerson> PeopleRepresentingPeople { get; set; }
+        public DbSet<PersonRepresentsForeignEntity> PeopleRepresentingForeignEntities { get; set; }
+        public DbSet<PersonRepresentsPrivateEntity> PeopleRepresentingPrivateEntities { get; set; }
+        public DbSet<PersonSubscription> PeopleSubscriptionsInPrivateEntities { get; set; }
+        public DbSet<ForeignEntitySubscription> ForeignEntitySubscriptionsInPrivateEntities { get; set; }
+        public DbSet<PrivateEntitySubscription> PrivateEntitySubscriptionsInPrivateEntities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -102,11 +104,11 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.CityId);
             });
 
-            modelBuilder.Entity<ShareholdingForeignEntity>(entity =>
+            modelBuilder.Entity<ForeignEntity>(entity =>
             {
                 entity.ToTable("foreign_entity");
 
-                entity.Property(e => e.ShareholdingForeignEntityId).HasColumnName("id");
+                entity.Property(e => e.ForeignEntityId).HasColumnName("id");
 
                 entity.Property(e => e.CompanyReference)
                     .IsRequired()
@@ -152,6 +154,8 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.ReasonForSearch)
                     .HasColumnName("reason_for_search")
                     .HasConversion(c => c.ToString(), c => Enum.Parse<EReasonForSearch>(c));
+
+                entity.Property(e => e.MainObject).HasColumnName("main_object");
 
                 entity.Property(e => e.Reference).HasColumnName("ref");
 
@@ -199,6 +203,8 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.LastApplicationId).HasColumnName("last_application");
 
+                entity.Property(e => e.IndustrySector).HasColumnName("sector");
+
                 entity.Property(e => e.Reference)
                     .HasMaxLength(45)
                     .HasColumnName("reference");
@@ -213,6 +219,8 @@ namespace Fridge.Contexts {
 
                     o.Property(e => e.EmailAddress).HasColumnName("email");
 
+                    o.Property(e => e.EffectiveFrom).HasColumnName("from").HasDefaultValue(DateTime.Now);
+
                     o.OwnsOne(o => o.Address, a =>
                     {
                         a.Property(e => e.CityTown).HasColumnName("city");
@@ -226,7 +234,7 @@ namespace Fridge.Contexts {
                 entity.OwnsOne(e => e.ArticlesOfAssociation, a =>
                 {
                     a.ToTable("article_of_association");
-                    
+
                     a.Property(e => e.TableOfArticles)
                         .HasColumnName("table")
                         .HasConversion(c => c.ToString(), c => Enum.Parse<EArticlesOfAssociation>(c));
@@ -234,7 +242,7 @@ namespace Fridge.Contexts {
                     a.OwnsMany(e => e.AmendedArticles, am =>
                     {
                         am.ToTable("amended_article");
-                        
+
                         am.Property(e => e.AmendedArticleId).HasColumnName("id");
 
                         am.Property(e => e.Value).HasColumnName("value");
@@ -244,16 +252,16 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.CurrentApplication)
                     .WithOne(p => p.PrivateEntity)
                     .HasForeignKey<PrivateEntity>(d => d.ApplicationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(d => d.LastApplication)
                     .WithOne(p => p.PrivateEntityLastApplication)
                     .HasForeignKey<PrivateEntity>(d => d.LastApplicationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                    .OnDelete(DeleteBehavior.NoAction);
 
-                entity.HasOne(d => d.NameSearchApplicationApplication)
-                    .WithOne(p => p.PrivateEntityNameSearchApplication)
-                    .HasForeignKey<PrivateEntity>(d => d.NameSearchApplicationId);
+                entity.HasOne(d => d.Name)
+                    .WithMany(p => p.PrivateEntities)
+                    .HasForeignKey(d => d.NameId);
             });
 
             modelBuilder.Entity<ExaminationTask>(entity =>
@@ -267,7 +275,6 @@ namespace Fridge.Contexts {
                     .HasColumnName("assigned_by");
 
                 entity.Property(e => e.DateAssigned)
-                    .HasPrecision(6)
                     .HasColumnName("date_assigned");
 
                 entity.Property(e => e.Examiner)
@@ -275,8 +282,12 @@ namespace Fridge.Contexts {
                     .HasColumnName("assigned_to");
 
                 entity.Property(e => e.ExpectedDateOfCompletion)
-                    .HasPrecision(6)
                     .HasColumnName("expected_date_of_completion");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasDefaultValue(ETaskStatus.Incomplete)
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<ETaskStatus>(c));
             });
 
             modelBuilder.Entity<City>(entity =>
@@ -313,7 +324,7 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.Cities)
                     .HasForeignKey(d => d.CountryCode)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Country>(entity =>
@@ -385,11 +396,11 @@ namespace Fridge.Contexts {
 
             modelBuilder.Entity<Person>(entity =>
             {
-                entity.ToTable("subscriber_nominee");
+                entity.ToTable("subscriber");
 
                 entity.HasIndex(e => e.CountryCode);
 
-                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("id");
+                entity.Property(e => e.PersonId).HasColumnName("id");
 
                 entity.Property(e => e.CountryCode).HasColumnName("country");
 
@@ -421,7 +432,7 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.DateOfTakeUp).HasColumnName("take_up_date");
 
-                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("id");
+                entity.Property(e => e.PersonId).HasColumnName("id");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.PrivateOwners)
@@ -442,147 +453,11 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.MemorandumId).HasColumnName("memo");
 
+                entity.Property(e => e.TotalNumberOfShares).HasColumnName("total");
+
                 entity.HasOne(d => d.MemorandumOfAssociation)
                     .WithMany(p => p.ShareClauses)
                     .HasForeignKey(d => d.MemorandumId);
-            });
-
-            modelBuilder.Entity<PrivateEntityHasPrivateEntity>(entity =>
-            {
-                entity.ToTable("private_entity_has_private_entity");
-
-                entity.HasKey(e => new {Entity = e.EntityId, ShareHoldingEntity = e.ShareHoldingEntityId});
-
-                entity.Property(e => e.EntityId).HasColumnName("owned");
-
-                entity.Property(e => e.ShareHoldingEntityId).HasColumnName("owns");
-
-                entity.HasOne(d => d.Entity)
-                    .WithMany(p => p.OwnedEntities)
-                    .HasForeignKey(d => d.EntityId)
-                    .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(d => d.ShareHoldingEntity)
-                    .WithMany(p => p.MemberEntities)
-                    .HasForeignKey(d => d.ShareHoldingEntityId)
-                    .OnDelete(DeleteBehavior.NoAction);
-            });
-
-            modelBuilder.Entity<PrivateEntityHasPrivateEntityOwner>(entity =>
-            {
-                entity.ToTable("private_entity_has_private_entity_owner");
-
-                entity.HasKey(e => new {e.PrivateEntityId, e.PrivateEntityOwnerId});
-
-                entity.HasIndex(e => e.PrivateEntityId);
-
-                entity.HasIndex(e => e.PrivateEntityOwnerId);
-
-                entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
-
-                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("subscriber");
-
-                entity.HasOne(d => d.Entity)
-                    .WithMany(p => p.Members)
-                    .HasForeignKey(d => d.PrivateEntityId);
-
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.ShareHoldingEntities)
-                    .HasForeignKey(d => d.PrivateEntityOwnerId);
-            });
-
-            modelBuilder.Entity<PrivateEntityOwnerHasPrivateEntityOwner>(entity =>
-            {
-                entity.ToTable("private_entity_owner_has_private_entity_owner");
-
-                entity.HasKey(e => new {e.BeneficiaryId, e.NomineeId});
-
-                entity.HasIndex(e => e.BeneficiaryId);
-
-                entity.HasIndex(e => e.NomineeId);
-
-                entity.Property(e => e.BeneficiaryId).HasColumnName("beneficiary");
-
-                entity.Property(e => e.NomineeId).HasColumnName("nominee");
-
-                entity.HasOne(d => d.Beneficiary)
-                    .WithMany(p => p.Nominees)
-                    .HasForeignKey(d => d.BeneficiaryId)
-                    .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(d => d.Nominee)
-                    .WithMany(p => p.Beneficiaries)
-                    .HasForeignKey(d => d.NomineeId)
-                    .OnDelete(DeleteBehavior.NoAction);
-            });
-
-            modelBuilder.Entity<PrivateEntityOwnerHasShareClause>(entity =>
-            {
-                entity.ToTable("private_entity_owner_has_share_clause");
-
-                entity.HasKey(e => new {e.PrivateEntityOwnerId, e.ShareClauseId});
-
-                entity.HasIndex(e => e.PrivateEntityOwnerId);
-
-                entity.HasIndex(e => e.ShareClauseId);
-
-                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("subscriber");
-
-                entity.Property(e => e.ShareClauseId).HasColumnName("subcriptions");
-
-                entity.HasOne(d => d.Subscriber)
-                    .WithMany(p => p.Subscriptions)
-                    .HasForeignKey(d => d.PrivateEntityOwnerId);
-
-                entity.HasOne(d => d.ShareClauseClass)
-                    .WithMany(p => p.Subscribers)
-                    .HasForeignKey(d => d.ShareClauseId);
-            });
-
-            modelBuilder.Entity<ShareHoldingForeignEntityHasShareClause>(entity =>
-            {
-                entity.ToTable("share_holding_foreign_enity_has_share_clause");
-
-                entity.HasKey(e => new {PrivateEntityOwnerId = e.ShareHoldingForeignEntityId, e.ShareClauseId});
-
-                entity.HasIndex(e => e.ShareHoldingForeignEntityId);
-
-                entity.HasIndex(e => e.ShareClauseId);
-
-                entity.Property(e => e.ShareHoldingForeignEntityId).HasColumnName("subscriber");
-
-                entity.Property(e => e.ShareClauseId).HasColumnName("subcriptions");
-
-                entity.HasOne(d => d.Subscriber)
-                    .WithMany(p => p.Subscriptions)
-                    .HasForeignKey(d => d.ShareHoldingForeignEntityId);
-
-                entity.HasOne(d => d.ShareClauseClass)
-                    .WithMany(p => p.ForeignEntityShareHolders)
-                    .HasForeignKey(d => d.ShareClauseId);
-            });
-
-            modelBuilder.Entity<ShareHoldingForeignEntityHasPrivateEntityOwner>(entity =>
-            {
-                entity.ToTable("share_holding_foreign_entity_has_private_entity_owner");
-
-                entity.HasKey(e => new {e.ForeignEntityId, e.PrivateEntityOwnerId});
-
-                entity.HasIndex(e => e.ForeignEntityId);
-
-                entity.HasIndex(e => e.PrivateEntityOwnerId);
-
-                entity.Property(e => e.ForeignEntityId).HasColumnName("foreign_entity");
-
-                entity.Property(e => e.PrivateEntityOwnerId).HasColumnName("represantative");
-
-                entity.HasOne(d => d.ForeignEntity)
-                    .WithMany(p => p.Representatives)
-                    .HasForeignKey(d => d.ForeignEntityId);
-
-                entity.HasOne(d => d.Nominee)
-                    .WithMany(p => p.RepresentedForeignEntities)
-                    .HasForeignKey(d => d.PrivateEntityOwnerId);
             });
 
             modelBuilder.Entity<Transaction>(entity =>
@@ -621,6 +496,159 @@ namespace Fridge.Contexts {
                 entity.Property(e => e.Service).HasColumnName("for");
 
                 entity.Property(e => e.Price).HasColumnName("amount");
+            });
+
+            modelBuilder.Entity<PersonSubscription>(entity =>
+            {
+                entity.ToTable("subscribing_person_subscription");
+
+                entity.HasKey(e => new {e.PersonId, e.ShareClauseId});
+
+                entity.Property(e => e.PersonId).HasColumnName("person");
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("share_clause");
+
+                entity.Property(e => e.AmountOfSharesSubscribed).HasColumnName("shares_subscribed");
+
+                entity.HasOne(d => d.ShareClause)
+                    .WithMany(p => p.PersonSubscriptions)
+                    .HasForeignKey(d => d.ShareClauseId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.ShareHolder)
+                    .WithMany(p => p.PersonSubscriptions)
+                    .HasForeignKey(d => d.PersonId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<PersonHoldsSharesInPrivateEntity>(entity =>
+            {
+                entity.ToTable("subscribing_person");
+
+                entity.HasKey(e => new {PersonId = e.ShareHolderId, e.PrivateEntityId});
+
+                entity.Property(e => e.ShareHolderId).HasColumnName("subscriber");
+
+                entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
+
+                entity.HasOne(d => d.ShareHolder)
+                    .WithMany(p => p.PersonHoldsSharesInPrivateEntities)
+                    .HasForeignKey(d => d.ShareHolderId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.PrivateEntitySubscribed)
+                    .WithMany(p => p.PersonHoldsSharesInPrivateEntities)
+                    .HasForeignKey(d => d.PrivateEntityId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<PersonRepresentsForeignEntity>(entity =>
+            {
+                entity.ToTable("foreign_entity_representatives");
+
+                entity.HasKey(e => new {e.NomineeId, e.BeneficiaryId});
+
+                entity.Property(e => e.NomineeId).HasColumnName("nominee");
+
+                entity.Property(e => e.BeneficiaryId).HasColumnName("beneficiary");
+
+                entity.HasOne(d => d.Nominee)
+                    .WithMany(p => p.PersonRepresentsForeignEntities)
+                    .HasForeignKey(d => d.NomineeId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.Beneficiary)
+                    .WithMany(p => p.PersonRepresentsForeignEntities)
+                    .HasForeignKey(d => d.BeneficiaryId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<PersonRepresentsPerson>(entity =>
+            {
+                entity.ToTable("people_representatives");
+
+                entity.HasKey(e => new {e.NomineeId, e.BeneficiaryId});
+
+                entity.Property(e => e.NomineeId).HasColumnName("nominee");
+
+                entity.Property(e => e.BeneficiaryId).HasColumnName("beneficiary");
+
+                entity.HasOne(d => d.Nominee)
+                    .WithMany(p => p.PersonRepresentsPersons)
+                    .HasForeignKey(d => d.NomineeId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.Beneficiary)
+                    .WithMany(p => p.PersonRepresentsPersonss)
+                    .HasForeignKey(d => d.BeneficiaryId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<PersonRepresentsPrivateEntity>(entity =>
+            {
+                entity.ToTable("private_entity_representatives");
+
+                entity.HasKey(e => new {e.NomineeId, e.BeneficiaryId});
+
+                entity.Property(e => e.NomineeId).HasColumnName("nominee");
+
+                entity.Property(e => e.BeneficiaryId).HasColumnName("beneficiary");
+
+                entity.HasOne(d => d.Nominee)
+                    .WithMany(p => p.PersonRepresentsPrivateEntities)
+                    .HasForeignKey(d => d.NomineeId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.Beneficiary)
+                    .WithMany(p => p.PersonRepresentsPrivateEntity)
+                    .HasForeignKey(d => d.BeneficiaryId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<ForeignEntitySubscription>(entity =>
+            {
+                entity.ToTable("foreign_entity_subscription");
+
+                entity.HasKey(e => new {e.ForeignEntityId, e.ShareClauseId});
+
+                entity.Property(e => e.ForeignEntityId).HasColumnName("foreign_entity");
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("share_clause");
+
+                entity.Property(e => e.AmountOfSharesSubscribed).HasColumnName("shares_subscribed");
+
+                entity.HasOne(d => d.ShareClause)
+                    .WithMany(p => p.ForeignEntitySubscriptions)
+                    .HasForeignKey(d => d.ShareClauseId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.ForeignEntity)
+                    .WithMany(p => p.ForeignEntitySubscriptions)
+                    .HasForeignKey(d => d.ForeignEntityId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<PrivateEntitySubscription>(entity =>
+            {
+                entity.ToTable("private_entity_subscription");
+
+                entity.HasKey(e => new {e.PrivateEntityId, e.ShareClauseId});
+
+                entity.Property(e => e.PrivateEntityId).HasColumnName("private_entity");
+
+                entity.Property(e => e.ShareClauseId).HasColumnName("share_clause");
+
+                entity.Property(e => e.Amount).HasColumnName("shares_subscribed");
+
+                entity.HasOne(d => d.ShareClause)
+                    .WithMany(p => p.PrivateEntitySubscriptions)
+                    .HasForeignKey(d => d.ShareClauseId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(d => d.PrivateEntity)
+                    .WithMany(p => p.PrivateEntitySubscriptions)
+                    .HasForeignKey(d => d.PrivateEntityId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             base.OnModelCreating(modelBuilder);

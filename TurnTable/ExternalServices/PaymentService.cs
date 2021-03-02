@@ -58,7 +58,7 @@ namespace TurnTable.ExternalServices {
             var debitTransactions =
                 transactions.Where(t => !t.DebitAmount.Equals(null)).ToList();
 
-            return _mapper.Map<IEnumerable<Transaction>, IEnumerable<TransactionResponseDto>>(
+            return _mapper.Map<List<TransactionResponseDto>>(
                 creditTransactions.Concat(debitTransactions));
         }
 

@@ -5,7 +5,7 @@ namespace Cabinet.Dtos.External.Request {
     public class NewShareHolderRequestDto {
         public NewShareHolderRequestDto()
         {
-            Nominees = new List<NewShareHolderRequestDto>();
+            PeopleRepresented = new List<NewShareHolderRequestDto>();
         }
 
         public string CountryCode { get; set; }
@@ -22,12 +22,14 @@ namespace Cabinet.Dtos.External.Request {
         public string Occupation { get; set; }
         public DateTime? DateOfTakeUp { get; set; }
 
-        public List<NewShareHolderRequestDto> Nominees { get; set; }
+        public List<NewShareHolderRequestDto> PeopleRepresented { get; set; }
         public List<ShareholderSubscriptionDto> Subs { get; set; }
 
-        public bool HasNominees()
+        // public List<NewShareHoldingEntityRequestDto> RepresentedEntities { get; set; }
+
+        public bool HasBeneficiaries()
         {
-            return Nominees.Count > 0;
+            return PeopleRepresented.Count > 0;
         }
 
         public bool HasSubscription()

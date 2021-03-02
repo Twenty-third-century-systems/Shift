@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fridge.Constants;
 
 #nullable disable
 
@@ -17,6 +18,7 @@ namespace Fridge.Models
         public DateTime DateAssigned { get; set; }
         public Guid AssignedBy { get; set; }
         public DateTime ExpectedDateOfCompletion { get; set; }
+        public ETaskStatus Status { get; set; }
 
         public ICollection<Application> Applications { get; set; }
     }

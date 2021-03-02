@@ -259,7 +259,7 @@ namespace BarTender.Controllers {
 
         [AllowAnonymous]
         [HttpGet("name")]
-        public async Task<IActionResult> NameChosenForApplication(int nameId)
+        public async Task<IActionResult> NameChosenForApplication(int nameId, string industrySector)
         {
             // User user;
             // using (var client = new HttpClient())
@@ -389,7 +389,7 @@ namespace BarTender.Controllers {
             //     }
             // }
 
-            return Ok(await _privateEntityService.CreateApplicationAsync(_user, nameId));
+            return Ok(await _privateEntityService.CreateApplicationAsync(_user, nameId, industrySector));
         }
 
         [AllowAnonymous]
@@ -948,6 +948,16 @@ namespace BarTender.Controllers {
             if (await _privateEntityService.SubmitApplicationAsync(_user, applicationId) > 0)
                 return NoContent();
             return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resubmit/{applicationId}")]
+        public async Task<IActionResult> ResubmitApplication(int applicationId)
+        {
+            var resubmitApplicationAsync = await _privateEntityService.ResubmitApplicationAsync(_user, applicationId);
+            if (resubmitApplicationAsync != null)
+                return Ok(resubmitApplicationAsync);
+            else return BadRequest("Could not save application");
         }
     }
 }

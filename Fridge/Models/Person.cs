@@ -7,14 +7,15 @@ namespace Fridge.Models {
     public class Person {
         public Person()
         {
-            Beneficiaries = new HashSet<PrivateEntityOwnerHasPrivateEntityOwner>();
-            Nominees = new HashSet<PrivateEntityOwnerHasPrivateEntityOwner>();
-            ShareHoldingEntities = new HashSet<PrivateEntityHasPrivateEntityOwner>();
-            RepresentedForeignEntities = new HashSet<ShareHoldingForeignEntityHasPrivateEntityOwner>();
-            Subscriptions = new HashSet<PrivateEntityOwnerHasShareClause>();
+            PersonSubscriptions = new HashSet<PersonSubscription>();
+            PersonHoldsSharesInPrivateEntities = new HashSet<PersonHoldsSharesInPrivateEntity>();
+            PersonRepresentsForeignEntities = new HashSet<PersonRepresentsForeignEntity>();
+            PersonRepresentsPersons = new HashSet<PersonRepresentsPerson>();
+            PersonRepresentsPersonss = new HashSet<PersonRepresentsPerson>();
+            PersonRepresentsPrivateEntities = new HashSet<PersonRepresentsPrivateEntity>();
         }
 
-        public int PrivateEntityOwnerId { get; set; }
+        public int PersonId { get; set; }
         public string CountryCode { get; set; }
         public string Surname { get; set; }
         public string Names { get; set; }
@@ -29,13 +30,26 @@ namespace Fridge.Models {
         public bool IsDirector { get; set; }
         public string Occupation { get; set; }
         public DateTime? DateOfTakeUp { get; set; }
-        
+
 
         public Country Country { get; set; }
-        public ICollection<PrivateEntityOwnerHasPrivateEntityOwner> Beneficiaries { get; set; }
-        public ICollection<PrivateEntityOwnerHasPrivateEntityOwner> Nominees { get; set; }
-        public ICollection<PrivateEntityHasPrivateEntityOwner> ShareHoldingEntities { get; set; }
-        public ICollection<ShareHoldingForeignEntityHasPrivateEntityOwner> RepresentedForeignEntities { get; set; }
-        public ICollection<PrivateEntityOwnerHasShareClause> Subscriptions { get; set; }
+
+        //subscriptions
+        public ICollection<PersonSubscription> PersonSubscriptions { get; set; }
+
+        // entities subscribed
+        public ICollection<PersonHoldsSharesInPrivateEntity> PersonHoldsSharesInPrivateEntities { get; set; }
+
+        // Beneficiary foreign entities
+        public ICollection<PersonRepresentsForeignEntity> PersonRepresentsForeignEntities { get; set; }
+
+        // Beneficiary people
+        public ICollection<PersonRepresentsPerson> PersonRepresentsPersons { get; set; }
+
+        //people  Nominees
+        public ICollection<PersonRepresentsPerson> PersonRepresentsPersonss { get; set; }
+
+        // Beneficiary Private Entities
+        public ICollection<PersonRepresentsPrivateEntity> PersonRepresentsPrivateEntities { get; set; }
     }
 }

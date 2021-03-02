@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,180 +34,181 @@ namespace DJ.Controllers {
 
         [AllowAnonymous]
         [HttpGet("{examinerId}")]
-        public IActionResult GetTasks(string examinerId)
+        public async Task<IActionResult> GetTasks(Guid examinerId)
         {
-            var tasks = (
-                from t in _eachDb.Tasks
-                where t.ExaminerId == examinerId
-                select t
-            ).ToList();
-
-            if (tasks.Count > 0)
-            {
-                TasksToExaminerDto tasksToExaminer = new TasksToExaminerDto();
-
-                foreach (var task in tasks)
-                {
-                    var applications = (
-                        from s in _eachDb.Applications
-                        where s.TaskId == task.Id
-                              && s.DateExamined == null
-                        select s
-                    ).ToList();
-
-                    if (applications.Count > 0)
-                    {
-                        var service = (
-                            from t in _poleDb.Services
-                            where t.Id == applications[0].ServiceId
-                            select t.Description
-                        ).FirstOrDefault();
-
-                        if (!string.IsNullOrEmpty(service))
-                        {
-                            if (service.Equals("name search"))
-                            {
-                                tasksToExaminer.NameSearchTasks.Add(new TaskSummary
-                                {
-                                    Id = task.Id,
-                                    ApplicationCount = applications.Count,
-                                    Service = service.ToUpper(),
-                                    ExpectedDateOfCompletion = task.ExpectedDateOfCompletion
-                                });
-                            }
-                            else if (service.Equals("private limited company"))
-                            {
-                                tasksToExaminer.PvtEntityTasks.Add(new TaskSummary
-                                {
-                                    Id = task.Id,
-                                    ApplicationCount = applications.Count,
-                                    Service = service.ToUpper(),
-                                    ExpectedDateOfCompletion = task.ExpectedDateOfCompletion
-                                });
-                            }
-                            else
-                            {
-                                return NotFound("No allocated tasks at the moment");
-                            }
-                        }
-                        else
-                        {
-                            return NotFound("No allocated tasks at the moment");
-                        }
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-
-                return Ok(tasksToExaminer);
-            }
-            else
-            {
-                return NotFound("No allocated tasks at the moment");
-            }
+            // var tasks = (
+            //     from t in _eachDb.Tasks
+            //     where t.ExaminerId == examinerId
+            //     select t
+            // ).ToList();
+            //
+            // if (tasks.Count > 0)
+            // {
+            //     TasksToExaminerDto tasksToExaminer = new TasksToExaminerDto();
+            //
+            //     foreach (var task in tasks)
+            //     {
+            //         var applications = (
+            //             from s in _eachDb.Applications
+            //             where s.TaskId == task.Id
+            //                   && s.DateExamined == null
+            //             select s
+            //         ).ToList();
+            //
+            //         if (applications.Count > 0)
+            //         {
+            //             var service = (
+            //                 from t in _poleDb.Services
+            //                 where t.Id == applications[0].ServiceId
+            //                 select t.Description
+            //             ).FirstOrDefault();
+            //
+            //             if (!string.IsNullOrEmpty(service))
+            //             {
+            //                 if (service.Equals("name search"))
+            //                 {
+            //                     tasksToExaminer.NameSearchTasks.Add(new TaskSummary
+            //                     {
+            //                         Id = task.Id,
+            //                         ApplicationCount = applications.Count,
+            //                         Service = service.ToUpper(),
+            //                         ExpectedDateOfCompletion = task.ExpectedDateOfCompletion
+            //                     });
+            //                 }
+            //                 else if (service.Equals("private limited company"))
+            //                 {
+            //                     tasksToExaminer.PvtEntityTasks.Add(new TaskSummary
+            //                     {
+            //                         Id = task.Id,
+            //                         ApplicationCount = applications.Count,
+            //                         Service = service.ToUpper(),
+            //                         ExpectedDateOfCompletion = task.ExpectedDateOfCompletion
+            //                     });
+            //                 }
+            //                 else
+            //                 {
+            //                     return NotFound("No allocated tasks at the moment");
+            //                 }
+            //             }
+            //             else
+            //             {
+            //                 return NotFound("No allocated tasks at the moment");
+            //             }
+            //         }
+            //         else
+            //         {
+            //             continue;
+            //         }
+            //     }
+            //
+            //     return Ok(tasksToExaminer);
+            // }
+            // else
+            // {
+            //     return NotFound("No allocated tasks at the moment");
+            // }
+            return Ok(await _taskService.GetAllocatedTasksAsync(examinerId));
         }
 
         [HttpGet("{taskId}/ns")]
-        public IActionResult GetNameSearchTask(int taskId)
+        public async Task<IActionResult> GetNameSearchTask(int taskId)
         {
-            List<NameSearchTaskDto> nameSearchTasks = new List<NameSearchTaskDto>();
+            // List<NameSearchTaskDto> nameSearchTasks = new List<NameSearchTaskDto>();
+            //
+            // var applications = (
+            //     from application in _eachDb.Applications
+            //     where application.TaskId == taskId
+            //     select application
+            // ).ToList();
+            //
+            // if (applications.Count > 0)
+            // {
+            //     foreach (var application in applications)
+            //     {
+            //         var nameSearch = (
+            //             from n in _eachDb.NameSearches
+            //             where n.ApplicationId == application.Id
+            //             select n
+            //         ).FirstOrDefault();
+            //
+            //         if (nameSearch != null)
+            //         {
+            //             var names = (
+            //                 from name in _eachDb.Names
+            //                 where name.NameSearchId == nameSearch.Id
+            //                 select name
+            //             ).ToList();
+            //
+            //             var service = (
+            //                 from serv in _poleDb.Services
+            //                 where serv.Id == application.ServiceId
+            //                 select serv.Description
+            //             ).FirstOrDefault();
+            //
+            //             if (names.Count > 0)
+            //             {
+            //                 var nameSearchTaskDto = new NameSearchTaskDto
+            //                 {
+            //                     Application = new Models.Application
+            //                     {
+            //                         Id = application.Id,
+            //                         Service = service,
+            //                         User = application.UserId,
+            //                         SubmissionDate = application.DateSubmitted,
+            //                         Examined = application.DateExamined == null ? false : true
+            //                     },
+            //                     NameSearch = new NameSearch
+            //                     {
+            //                         Id = nameSearch.Id,
+            //                         ReasonForSearch = (
+            //                             from r in _poleDb.ReasonForSearches
+            //                             where r.Id == nameSearch.ReasonForSearch
+            //                             select r.Description
+            //                         ).FirstOrDefault(),
+            //                         TypeOfEntity = (
+            //                             from s in _poleDb.Services
+            //                             where s.Id == nameSearch.Service
+            //                             select s.Description
+            //                         ).FirstOrDefault(),
+            //                         Designation = (
+            //                             from designation in _poleDb.Designations
+            //                             where designation.Id == nameSearch.DesignationId
+            //                             select designation.Description
+            //                         ).FirstOrDefault(),
+            //                         Justification = nameSearch.Justification
+            //                     }
+            //                 };
+            //
+            //                 foreach (var name in names)
+            //                 {
+            //                     nameSearchTaskDto.NameSearch.Names.Add(new Name
+            //                     {
+            //                         Id = name.Id,
+            //                         Value = name.Value,
+            //                         Status = (
+            //                             from s in _poleDb.Status
+            //                             where s.Id == name.Status
+            //                             select s.Description
+            //                         ).FirstOrDefault(),
+            //                         NameSearchId = name.NameSearchId
+            //                     });
+            //                 }
+            //
+            //                 nameSearchTasks.Add(nameSearchTaskDto);
+            //             }
+            //         }
+            //         else
+            //         {
+            //             return BadRequest("Task has incorrect data");
+            //         }
+            //     }
+            // }
+            // else
+            // {
+            //     return BadRequest("Task is Empty");
+            // }
 
-            var applications = (
-                from application in _eachDb.Applications
-                where application.TaskId == taskId
-                select application
-            ).ToList();
-
-            if (applications.Count > 0)
-            {
-                foreach (var application in applications)
-                {
-                    var nameSearch = (
-                        from n in _eachDb.NameSearches
-                        where n.ApplicationId == application.Id
-                        select n
-                    ).FirstOrDefault();
-
-                    if (nameSearch != null)
-                    {
-                        var names = (
-                            from name in _eachDb.Names
-                            where name.NameSearchId == nameSearch.Id
-                            select name
-                        ).ToList();
-
-                        var service = (
-                            from serv in _poleDb.Services
-                            where serv.Id == application.ServiceId
-                            select serv.Description
-                        ).FirstOrDefault();
-
-                        if (names.Count > 0)
-                        {
-                            var nameSearchTaskDto = new NameSearchTaskDto
-                            {
-                                Application = new Models.Application
-                                {
-                                    Id = application.Id,
-                                    Service = service,
-                                    User = application.UserId,
-                                    SubmissionDate = application.DateSubmitted,
-                                    Examined = application.DateExamined == null ? false : true
-                                },
-                                NameSearch = new NameSearch
-                                {
-                                    Id = nameSearch.Id,
-                                    ReasonForSearch = (
-                                        from r in _poleDb.ReasonForSearches
-                                        where r.Id == nameSearch.ReasonForSearch
-                                        select r.Description
-                                    ).FirstOrDefault(),
-                                    TypeOfEntity = (
-                                        from s in _poleDb.Services
-                                        where s.Id == nameSearch.Service
-                                        select s.Description
-                                    ).FirstOrDefault(),
-                                    Designation = (
-                                        from designation in _poleDb.Designations
-                                        where designation.Id == nameSearch.DesignationId
-                                        select designation.Description
-                                    ).FirstOrDefault(),
-                                    Justification = nameSearch.Justification
-                                }
-                            };
-
-                            foreach (var name in names)
-                            {
-                                nameSearchTaskDto.NameSearch.Names.Add(new Name
-                                {
-                                    Id = name.Id,
-                                    Value = name.Value,
-                                    Status = (
-                                        from s in _poleDb.Status
-                                        where s.Id == name.Status
-                                        select s.Description
-                                    ).FirstOrDefault(),
-                                    NameSearchId = name.NameSearchId
-                                });
-                            }
-
-                            nameSearchTasks.Add(nameSearchTaskDto);
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest("Task has incorrect data");
-                    }
-                }
-            }
-            else
-            {
-                return BadRequest("Task is Empty");
-            }
-
-            return Ok(nameSearchTasks);
+            return Ok(await _taskService.GetNameSearchTaskApplicationsAsync(taskId));
         }
 
         [AllowAnonymous]
@@ -470,6 +472,15 @@ namespace DJ.Controllers {
             return Ok(await _taskService.GetPrivateEntityTaskApplicationAsync(taskId));
 
             return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpHead("{taskId}/f")]
+        public async Task<IActionResult> FinishTask(int taskId)
+        {
+            if (await _taskService.FinishTaskAsync(taskId) > 0)
+                return NoContent();
+            return BadRequest("Could not finish task");
         }
     }
 }

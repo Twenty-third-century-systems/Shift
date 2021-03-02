@@ -36,6 +36,7 @@ namespace TurnTable.ExternalServices {
             var entityNames = _context.Names.Include(n => n.NameSearch)
                 .Where(n =>
                     n.Value.Equals(suggestedName) && n.Status.Equals(ENameStatus.Reserved) ||
+                    n.Status.Equals(ENameStatus.Blacklisted) ||
                     n.Status.Equals(ENameStatus.Used)).ToList();
             entityNames = entityNames.Where(n => DateTime.Now - n.NameSearch.ExpiryDate <= TimeSpan.FromDays(0))
                 .ToList();
