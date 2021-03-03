@@ -2,6 +2,10 @@
 
 namespace Cabinet.Dtos.External.Request {
     public class NewNameSearchRequestDto {
+        public NewNameSearchRequestDto()
+        {
+            Names = new List<SuggestedEntityNameRequestDto>();
+        }
         public int ServiceId { get; set; }
         public string Justification { get; set; }
         public int DesignationId { get; set; }

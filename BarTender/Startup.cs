@@ -117,7 +117,7 @@ namespace BarTender {
 
             services.Configure<List<DesignationsForNameSearchSelection>>(Configuration.GetSection("Designation"));
 
-            services.AddTransient<INameSearchRepository, NameSearchRepository>();
+            // services.AddTransient<INameSearchRepository, NameSearchRepository>();
 
             services.AddTransient<IValueService, ValueService>();
 

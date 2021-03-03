@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Dab.Models;
+using Val = Cabinet.Dtos.External.Response.Val;
 
 namespace BarTender.Dtos {
     public class NameSearchDefaultsDto {

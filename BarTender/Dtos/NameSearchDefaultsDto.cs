@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BarTender.Models;
+using Val = Cabinet.Dtos.External.Response.Val;
 
 namespace BarTender.Dtos {
     public class NameSearchDefaultsDto {

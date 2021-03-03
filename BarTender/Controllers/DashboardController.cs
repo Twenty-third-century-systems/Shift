@@ -30,27 +30,27 @@ namespace BarTender.Controllers {
             _eachDb = eachDb;
         }
 
-        [AllowAnonymous]
-        [HttpGet("external/dashboard")]
+        // [AllowAnonymous]
+        [HttpGet("")]
         public async Task<IActionResult> GetExternalUserDash()
         {
-            // User user;
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = await client.GetAsync("https://localhost:5001/connect/userinfo");
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         var userDetailsFromAuth = await response.Content.ReadAsStringAsync();
-            //         user = JsonConvert.DeserializeObject<User>(userDetailsFromAuth);
-            //     }
-            //     else
-            //     {
-            //         // TODO: to substitute with NOT ALLOWED
-            //         return BadRequest("Not allowed");
-            //     }
-            // }
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo");
+                if (response.IsSuccessStatusCode)
+                {
+                    var userDetailsFromAuth = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(userDetailsFromAuth);
+                }
+                else
+                {
+                    // TODO: to substitute with NOT ALLOWED
+                    return BadRequest("Not allowed");
+                }
+            }
 
             // ExternalUserDashboardDto externalUserDashboard = new ExternalUserDashboardDto();
             //
@@ -193,7 +193,7 @@ namespace BarTender.Controllers {
             //     }
             // }
             
-            return Ok(await _valueService.GetUserDashBoardValuesAsync(Guid.NewGuid()));
+            return Ok(await _valueService.GetUserDashBoardValuesAsync(user.Sub));
         }
     }
 }

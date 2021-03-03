@@ -1,6 +1,8 @@
-﻿namespace BarTender.Models {
+﻿using System;
+
+namespace BarTender.Models {
     public class User {
-        public string Sub { get; set; }
+        public Guid Sub { get; set; }
         public string Name { get; set; }
     }
 }

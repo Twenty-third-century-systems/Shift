@@ -7,12 +7,14 @@
     
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
       <PackageReference Include="IdentityModel" Version="4.3.0" />
       <PackageReference Include="IronPdf" Version="5.2.0.1" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.7" />
+      <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.12" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
@@ -40,6 +42,12 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+    </ItemGroup>
+
+    
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cabinet\Cabinet.csproj" />
     </ItemGroup>
 
 </Project>

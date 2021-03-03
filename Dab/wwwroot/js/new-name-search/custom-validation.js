@@ -11,21 +11,24 @@ $(document).ready(function () {
 
     $('#name-search-form').validate({
         rules: {
-            reason: {
+            reasonForSearchId: {
                 required: true,
             },
-            type: {
+            serviceId: {
                 required: true,
             },
-            designation: {
+            designationId: {
                 required: true,
             },
-            office: {
+            sortingOffice: {
                 required: true,
             },
             justification: {
                 required: true,
-                noSpace: true,
+                maxlength: 200
+            },
+            mainObject: {
+                required: true,
                 maxlength: 200
             },
             name1: {
@@ -77,21 +80,24 @@ $(document).ready(function () {
             },
         },
         messages: {
-            reason: {
+            reasonForSearchId: {
                 required: 'This information is required',
             },
-            type: {
+            serviceId: {
                 required: 'This information is required'
             },
-            designation: {
+            designationId: {
                 required: 'This information is required'
             },
-            office: {
+            sortingOffice: {
                 required: 'This information is required'
             },
             justification: {
                 required: 'This information is required',
                 noSpace: 'Spaces are not allowed'
+            },
+            mainObject: {
+                required: 'This information is required',
             },
             name1: {
                 required: 'This information is required',
@@ -120,7 +126,8 @@ $(document).ready(function () {
                     url: '/name-search/submission',
                     data: $(form).serialize(),
                     success: function (data) {
-                        toastr.success('Your application has been submitted');
+                        console.log(data);
+                        toastr.success('Your application has been submitted\n Reference: ' + data.Reference);
                         $('#name-search-form').trigger('reset');
                     },
                     error: function (err) {
@@ -129,11 +136,12 @@ $(document).ready(function () {
                     },
                 });
             } else {
-                $('#reason').text($("[name='reason'] option:selected").text());
-                $('#type').text($("[name='type'] option:selected").text());
-                $('#designation').text($("[name='designation'] option:selected").text());
-                $('#sorting').text($("[name='office'] option:selected").text());
+                $('#reason').text($("[name='reasonForSearchId'] option:selected").text());
+                $('#type').text($("[name='serviceId'] option:selected").text());
+                $('#designation').text($("[name='designationId'] option:selected").text());
+                $('#sorting').text($("[name='sortingOffice'] option:selected").text());
                 $('#justification').text($("[name='justification']").val());
+                $('#mainObject').text($("[name='mainObject']").val());
                 $('#name1').text($("[name='name1']").val());
                 $('#name2').text($("[name='name2']").val());
                 $('#name3').text($("[name='name3']").val());

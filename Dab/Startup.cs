@@ -2,17 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Dab.Clients;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 
 namespace Dab {
     public class Startup {
@@ -53,9 +57,27 @@ namespace Dab {
                     options.SaveTokens = true;
                     options.UsePkce = true;
                 });
+
+            services.AddHttpContextAccessor();
+            services.AddHttpClient<IApiClientService, ApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri("https://localhost:44312/api/");
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
             
-            
-            services.AddControllersWithViews(o=>o.Filters.Add(new AuthorizeFilter()));
+            services.AddAutoMapper(typeof(Program));
+
+            services.AddControllersWithViews(o => o.Filters.Add(new AuthorizeFilter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,11 +95,11 @@ namespace Dab {
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();            
+            app.UseStaticFiles();
             // app.UseNodeModules();
             app.UseRouting();
 
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
 

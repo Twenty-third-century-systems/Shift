@@ -33,9 +33,9 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Reason for search </label>
-                        <select class="form-control select2" name="reason">
+                        <select class="form-control select2" name="reasonForSearchId">
                             <option selected="selected"></option>
-                            @foreach (var value in ViewBag.Defaults.Reasons)
+                            @foreach (var value in ViewBag.Defaults.ReasonForSearch)
                             {
                                 <option value="@value.Id">@value.Value</option>
                             }
@@ -45,9 +45,9 @@
 
                     <div class="form-group">
                         <label>Type of entity </label>
-                        <select class="form-control select2" name="type">
+                        <select class="form-control select2" name="serviceId">
                             <option selected="selected"></option>
-                            @foreach (var value in ViewBag.Defaults.Types)
+                            @foreach (var value in ViewBag.Defaults.Services)
                             {
                                 <option value="@value.Id">@value.Value</option>
                             }
@@ -57,7 +57,7 @@
 
                     <div class="form-group">
                         <label>Designation </label>
-                        <select class="form-control select2" name="designation">
+                        <select class="form-control select2" name="designationId">
                             <option selected="selected"></option>
                             @foreach (var value in ViewBag.Defaults.Designations)
                             {
@@ -69,9 +69,9 @@
 
                     <div class="form-group">
                         <label>Sorting office </label>
-                        <select class="form-control select2" name="office">
+                        <select class="form-control select2" name="sortingOffice">
                             <option selected="selected"></option>
-                            @foreach (var value in ViewBag.Defaults.Sorters)
+                            @foreach (var value in ViewBag.Defaults.SortingOffices)
                             {
                                 <option value="@value.Id">@value.Value</option>
                             }
@@ -84,6 +84,11 @@
                         <label>Justification:</label>
                         <input type="text" class="form-control" name="justification">
                     </div>
+                    <!-- main object -->
+                    <div class="form-group">
+                        <label>Main object:</label>
+                        <input type="text" class="form-control" name="mainObject">
+                    </div>
                     <!-- /.form group -->
                 </div>
                 <!-- /.card-body -->
@@ -95,7 +100,12 @@
         <div class="col-lg-6">
             <div class="card card-info">
                 <div class="card-header">
-                    <h3 class="card-title">Names <small><i>without extension</i></small></h3>
+                    <h3 class="card-title">
+                        Names
+                        <small>
+                            <i>without extension</i>
+                        </small>
+                    </h3>
                 </div>
                 <div class="card-body">
                     <!-- First choice -->
@@ -141,7 +151,7 @@
             <div class="float-right">
                 <button type="submit" class="btn btn-info pull-right" id="btn-done">Done</button>
             </div>
-            
+
             <!-- /.done -->
         </div>
 
@@ -157,7 +167,7 @@
 {
     <partial name="_ValidationScriptsPartial"/>
     <partial name="_ToastRScriptsPartal"/>
-    <!-- form to json --> 
+    <!-- form to json -->
     <script type="text/javascript" src="~/lib/form-data-json-object/src/formToJson.min.js"></script>
     <!-- custom validation -->
     <script type="text/javascript" src="~/js/new-name-search/custom-validation.js"></script>

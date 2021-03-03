@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
 using BarTender.Dtos;
 using BarTender.Models;
+using Cabinet.Dtos.External.Request;
+using Dab.Clients;
 using Dab.Dtos;
 using Dab.Globals;
 using IdentityModel.Client;
@@ -17,82 +20,81 @@ using NameSearchDetails = Dab.Models.NameSearchDetails;
 namespace Dab.Controllers {
     [Route("name-search")]
     public class NameSearchController : Controller {
-        // GET
+        private readonly IApiClientService _apiClientService;
+        private readonly IMapper _mapper;
+
+        public NameSearchController(IApiClientService apiClientService, IMapper mapper)
+        {
+            _apiClientService = apiClientService;
+            _mapper = mapper;
+        }
+
         [HttpGet("new")]
         public async Task<IActionResult> NewNameSearch()
         {
-            using (var client = new HttpClient())
-            {
-                try
-                {
-                    var accessToken = await HttpContext.GetTokenAsync("access_token");
-                    client.SetBearerToken(accessToken);
-                    var apiResponse = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
-                        .ReadAsStringAsync();
-                    var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(apiResponse);
-                    var nameClaim = User.Claims
-                        .Where(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"))
-                        .FirstOrDefault();
-                    ViewBag.User = nameClaim.Value;
-                    ViewBag.Defaults = nameSearchDefaults;
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
-            }
-
+            // using (var client = new HttpClient())
+            // {
+            //     try
+            //     {
+            //         var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //         client.SetBearerToken(accessToken);
+            //         var apiResponse = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
+            //             .ReadAsStringAsync();
+            // var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(apiResponse);
+            //         var nameClaim = User.Claims
+            //             .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
+            //         ViewBag.User = nameClaim.Value;
+            //         ViewBag.Defaults = nameSearchDefaults;
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            //     }
+            // }
+            ViewBag.Defaults = await _apiClientService.GetNameSearchDefaultsAsync();
             return View();
         }
 
         // POST
         [HttpPost("submission")]
-        public async Task<IActionResult> NewSubmission(NewNameSearchDto newNameDetails)
+        public async Task<IActionResult> NewSubmission(NewNameSearchFormRequestDto dto)
         {
-            using (var client = new HttpClient())
+            var newNameSearchRequestDto = _mapper.Map<NewNameSearchRequestDto>(dto);
+
+            newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
             {
-                NameSearchDetails details = new NameSearchDetails
+                Value = dto.Name1
+            });
+            newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
+            {
+                Value = dto.Name2
+            });
+            if (string.IsNullOrEmpty(dto.Name3))
+                newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    ReasonForSearch = newNameDetails.Reason,
-                    TypeOfEntity = newNameDetails.Type,
-                    Justification = newNameDetails.Justification,
-                    Designation = newNameDetails.Designation,
-                    SortingOffice = newNameDetails.Office
-                };
+                    Value = dto.Name3
+                });
 
-                NameSearchRequestDto nameSearchRequest = new NameSearchRequestDto
+            if (string.IsNullOrEmpty(dto.Name4))
+                newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    Details = details,
-                    Names = new List<string>()
-                };
+                    Value = dto.Name4
+                });
 
-                if (!string.IsNullOrEmpty(newNameDetails.Name1))
-                    nameSearchRequest.Names.Add(newNameDetails.Name1.ToUpper());
-                if (!string.IsNullOrEmpty(newNameDetails.Name2))
-                    nameSearchRequest.Names.Add(newNameDetails.Name2.ToUpper());
-                if (!string.IsNullOrEmpty(newNameDetails.Name3))
-                    nameSearchRequest.Names.Add(newNameDetails.Name3.ToUpper());
-                if (!string.IsNullOrEmpty(newNameDetails.Name4))
-                    nameSearchRequest.Names.Add(newNameDetails.Name4.ToUpper());
-                if (!string.IsNullOrEmpty(newNameDetails.Name5))
-                    nameSearchRequest.Names.Add(newNameDetails.Name5.ToUpper());
-
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = await client
-                    .PostAsJsonAsync<NameSearchRequestDto>(ApiUrls.SubmitNameSearchUrl, nameSearchRequest);
-
-                if (response.IsSuccessStatusCode)
+            if (string.IsNullOrEmpty(dto.Name5))
+                newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    var nameSearchResponse = await response.Content.ReadAsStringAsync();
-                    NameSearchResponseDto nameSearch =
-                        JsonConvert.DeserializeObject<NameSearchResponseDto>(nameSearchResponse);
-                    return Created("/name-search/new-submission", nameSearch);
-                }
-                else
-                {
-                    return BadRequest("Insufficient funds");
-                }
+                    Value = dto.Name5
+                });
+
+            var submittedNameSearch = await _apiClientService.PostNewNameSearchAsync(newNameSearchRequestDto);
+            if (submittedNameSearch != null)
+            {
+                return Ok(submittedNameSearch);
+            }
+            else
+            {
+                return BadRequest("Insufficient funds");
             }
         }
 
@@ -101,7 +103,6 @@ namespace Dab.Controllers {
         public async Task<IActionResult> NameAvailability(Names name)
         {
             var nameToSend = "";
-
             if (!string.IsNullOrEmpty(name.name1))
                 nameToSend = name.name1;
             else if (!string.IsNullOrEmpty(name.name2))
@@ -113,16 +114,10 @@ namespace Dab.Controllers {
             else
                 nameToSend = name.name5;
 
-            using (var client = new HttpClient())
-            {
-                var responce = await client.GetAsync($"{ApiUrls.CheckNameAvailability}/{nameToSend}/availability");
-                if (responce.IsSuccessStatusCode)
-                {
-                    return Ok(true);
-                }
-
-                return Ok("\"This name is not available\"");
-            }
+            var nameAvailable = await _apiClientService.GetNameAvailabilityAsync(nameToSend);
+            if (nameAvailable)
+                return Ok(true);
+            else return Ok("\"This name is not available\"");
         }
     }
 }

@@ -25,7 +25,6 @@ using NameSearchResponseDto = BarTender.Dtos.NameSearchResponseDto;
 namespace BarTender.Controllers {
     [Route("api/name")]
     public class NameSearchController : Controller {
-        private INameSearchRepository _nameSearchRepository;
         private PoleDB _poleDb;
         private ShwaDB _shwaDb;
         private EachDB _eachDb;
@@ -38,7 +37,7 @@ namespace BarTender.Controllers {
         private INameSearchService _nameSearchService;
         private Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
 
-        public NameSearchController(INameSearchRepository nameSearchRepository, PoleDB poleDb, ShwaDB shwaDb,
+        public NameSearchController(PoleDB poleDb, ShwaDB shwaDb,
             EachDB eachDb, IOptions<List<ServicesForNameSearchSelection>> serviceValues,
             IOptions<List<ReasonForSearchForNameSearchSelection>> reasonsValues,
             IOptions<List<DesignationsForNameSearchSelection>> designationValues, IValueService valueService,
@@ -49,7 +48,6 @@ namespace BarTender.Controllers {
             _designationValues = designationValues;
             _reasonsValues = reasonsValues;
             _serviceValues = serviceValues;
-            _nameSearchRepository = nameSearchRepository;
             _poleDb = poleDb;
             _shwaDb = shwaDb;
             _eachDb = eachDb;
@@ -59,9 +57,10 @@ namespace BarTender.Controllers {
         [HttpGet("defaults")]
         public async Task<IActionResult> GetDefaults()
         {
+            var servicesForNameSearchSelections = _serviceValues.Value.Where(v => !v.id.Equals(0));
             return Ok(new
             {
-                Services = _serviceValues.Value.Where(v => !v.id.Equals(1)),
+                Services = servicesForNameSearchSelections,
                 ReasonForSearch = _reasonsValues.Value,
                 Designations = _designationValues.Value,
                 SortingOffices = await _valueService.GetSortingOfficesAsync()
@@ -95,23 +94,23 @@ namespace BarTender.Controllers {
         [HttpPost("submit")]
         public async Task<IActionResult> PostNewNameSearch([FromBody] NewNameSearchRequestDto details)
         {
-            // User user;
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = await client.GetAsync("https://localhost:5001/connect/userinfo");
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         var userDetailsFromAuth = await response.Content.ReadAsStringAsync();
-            //         user = JsonConvert.DeserializeObject<User>(userDetailsFromAuth);
-            //     }
-            //     else
-            //     {
-            //         // TODO: to substitute with NOT ALLOWED
-            //         return BadRequest("Not allowed");
-            //     }
-            // }
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo");
+                if (response.IsSuccessStatusCode)
+                {
+                    var userDetailsFromAuth = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(userDetailsFromAuth);
+                }
+                else
+                {
+                    // TODO: to substitute with NOT ALLOWED
+                    return BadRequest("Not allowed");
+                }
+            }
             //
             //
             // using (var client = new HttpClient())
@@ -212,7 +211,7 @@ namespace BarTender.Controllers {
             //     }
             // }
 
-            return Created("", await _nameSearchService.CreateNewNameSearchAsync(_user, details));
+            return Created("", await _nameSearchService.CreateNewNameSearchAsync(user.Sub, details));
         }
 
         [AllowAnonymous]

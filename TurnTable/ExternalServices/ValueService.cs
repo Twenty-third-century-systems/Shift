@@ -39,7 +39,7 @@ namespace TurnTable.ExternalServices {
             var applicationsByUser = await _mapper
                 .ProjectTo<SubmittedApplicationResponseDto>(
                     _context.Applications
-                        .Where(a => !a.Status.Equals(EApplicationStatus.Incomplete) && a.User.Equals(user)))
+                        .Where(a => !a.Status.Equals(EApplicationStatus.Incomplete) && a.User == user))
                 .ToListAsync();
 
             if (applicationsByUser.Count > 0)
