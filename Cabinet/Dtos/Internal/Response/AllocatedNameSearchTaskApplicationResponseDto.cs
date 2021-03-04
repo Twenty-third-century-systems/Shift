@@ -6,7 +6,7 @@ namespace Cabinet.Dtos.Internal.Response {
         public string Service { get; set; }
         public Guid User { get; set; }
         public DateTime DateSubmitted { get; set; }
-        public DateTime DateExamined { get; set; }
+        public bool Examined { get; set; }
 
         public TaskNameSearchResponseDto NameSearch { get; set; }
     }

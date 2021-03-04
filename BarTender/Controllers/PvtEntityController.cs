@@ -26,7 +26,7 @@ namespace BarTender.Controllers {
         private ShwaDB _shwaDb;
         private EachDB _eachDb;
         private Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
-        private IPrivateEntityService _privateEntityService;
+        private readonly IPrivateEntityService _privateEntityService;
 
 
         public PvtEntityController(PoleDB poleDb, ShwaDB shwaDb, EachDB eachDb,
@@ -184,14 +184,16 @@ namespace BarTender.Controllers {
         [HttpGet("names")]
         public async Task<IActionResult> GetApplicableNames()
         {
-            // User user;
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
-            //         .ReadAsStringAsync();
-            //     user = JsonConvert.DeserializeObject<User>(response);
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
+                    .ReadAsStringAsync();
+                user = JsonConvert.DeserializeObject<User>(response);
+            }
+
             //
             //     var applications = (
             //         from a in _eachDb.Applications
@@ -254,7 +256,7 @@ namespace BarTender.Controllers {
             //
             //     return Ok(names);
             // }
-            return Ok(await _privateEntityService.GetRegisteredNamesAsync(_user));
+            return Ok(await _privateEntityService.GetRegisteredNamesAsync(user.Sub));
         }
 
         [AllowAnonymous]

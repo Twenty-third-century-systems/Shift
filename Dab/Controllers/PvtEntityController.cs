@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BarTender.Dtos;
+using Dab.Clients;
 using Dab.Dtos;
 using Dab.Globals;
 using Dab.Models;
@@ -16,12 +17,18 @@ using Newtonsoft.Json;
 namespace Dab.Controllers {
     [Route("entity")]
     public class PvtEntityController : Controller {
-        // GET
+        private readonly IApiClientService _apiClientService;
+
+        public PvtEntityController(IApiClientService apiClientService)
+        {
+            _apiClientService = apiClientService;
+        }
+
         [HttpGet("{nameId}/new")]
         public async Task<IActionResult> NewPrivateEntity(int nameId)
         {
-            var nameClaim = User.Claims.Where(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"))
-                .FirstOrDefault();
+            var nameClaim = User.Claims
+                .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
             ViewBag.User = nameClaim.Value;
 
             using (var client = new HttpClient())
@@ -31,16 +38,19 @@ namespace Dab.Controllers {
                 var responce = client
                     .GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name")
                     .Result;
-                
+
                 // var imweResponse = client
                 //     .PostAsJsonAsync<NameApplicationAndDefaults>(
                 //         $"{ApiUrls.InitialisePvtApplication}", 
                 //         nameAndApplication
                 //         )
                 //     .Result;
-                
-                if(responce.IsSuccessStatusCode){
-                    var nameAndApplication = JsonConvert.DeserializeObject<NameApplicationAndDefaults>(await responce.Content.ReadAsStringAsync());
+
+                if (responce.IsSuccessStatusCode)
+                {
+                    var nameAndApplication =
+                        JsonConvert.DeserializeObject<NameApplicationAndDefaults>(
+                            await responce.Content.ReadAsStringAsync());
                     nameAndApplication.Id = nameId;
                     ViewBag.NameRacho = nameAndApplication.Value;
                     ViewBag.ApplicationId = nameAndApplication.ApplicationId;
@@ -53,22 +63,23 @@ namespace Dab.Controllers {
                 {
                     return BadRequest("Something went wrong in trying to use");
                 }
-                
             }
+
             return View();
         }
 
         [HttpGet("names/reg")]
         public async Task<IActionResult> RegisteredNames()
         {
-            using (var client = new HttpClient())
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = await client.GetAsync(ApiUrls.RegisteredNames).Result.Content
-                    .ReadAsStringAsync();
-                return Ok(JsonConvert.DeserializeObject<List<RegisteredNameDto>>(response));
-            }
+            return Ok(await _apiClientService.GetApplicableNamesAsync());
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var response = await client.GetAsync(ApiUrls.RegisteredNames).Result.Content
+            //         .ReadAsStringAsync();
+            //     return Ok(JsonConvert.DeserializeObject<List<RegisteredNameDto>>(response));
+            // }
         }
 
         [HttpPost("office")]
@@ -80,12 +91,15 @@ namespace Dab.Controllers {
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
                 client.SetBearerToken(accessToken);
-                var responce = client.PostAsJsonAsync<OfficeInformationDto>(ApiUrls.SubmitPvtApplicationOffice, officeInformationDto).Result;
+                var responce = client
+                    .PostAsJsonAsync<OfficeInformationDto>(ApiUrls.SubmitPvtApplicationOffice, officeInformationDto)
+                    .Result;
                 if (responce.IsSuccessStatusCode)
                 {
                     return Ok();
                 }
             }
+
             return BadRequest();
         }
 
@@ -101,10 +115,11 @@ namespace Dab.Controllers {
                         liabilityShareClausesDto).Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    var resp = await response.Content.ReadAsStringAsync();                    
+                    var resp = await response.Content.ReadAsStringAsync();
                     return Ok(JsonConvert.DeserializeObject<int>(resp));
                 }
             }
+
             return BadRequest();
         }
 
@@ -120,10 +135,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<MemorandumObjectsDto>(ApiUrls.SubmitPvtApplicationsObjects,
                         memorandumObjectsDto).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -138,10 +154,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<ArticleTableDto>(ApiUrls.SubmitPvtApplicationsArticleTable,
                         articleTableDto).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -156,10 +173,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<AmmendedArticleDto>(ApiUrls.SubmitPvtApplicationsAmendedArticle,
                         amendedArticleDto).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -174,10 +192,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<ShareHoldingPersonDto>(ApiUrls.SubmitPvtApplicationShareHoldingPeople,
                         shareHoldingPersonDto).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -192,10 +211,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<ShareHoldingEntityDto>(ApiUrls.SubmitPvtApplicationShareHoldingEntities,
                         shareHoldingEntityDto).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -210,10 +230,11 @@ namespace Dab.Controllers {
                     .PostAsJsonAsync<int>(ApiUrls.SubmitPvtApplication,
                         applicationId).Result;
                 if (response.IsSuccessStatusCode)
-                {                                        
+                {
                     return NoContent();
                 }
             }
+
             return BadRequest();
         }
 
@@ -228,11 +249,12 @@ namespace Dab.Controllers {
                     .GetAsync($"{ApiUrls.ReloadPvtApplication}/{applicationId}/reload").Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    var populatedApplication =  JsonConvert
+                    var populatedApplication = JsonConvert
                         .DeserializeObject<PopulatedApplicationDetailDto>(await response.Content.ReadAsStringAsync());
                     return Ok(populatedApplication);
                 }
             }
+
             return BadRequest("Something went wrong in reloading the application");
         }
     }

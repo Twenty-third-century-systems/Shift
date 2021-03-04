@@ -40,11 +40,11 @@ namespace BarTender.Profiles {
                 .ForMember(dest => dest.NameSearchReference, op =>
                     op.MapFrom(src => src.NameSearch.Reference))
                 .ForMember(dest => dest.Name, op =>
-                    op.MapFrom(src => src.Value))
+                    op.MapFrom(src => src.Value.ToUpper()))
                 .ForMember(dest => dest.DateSubmitted, op =>
-                    op.MapFrom(src => src.NameSearch.Application.DateSubmitted))
+                    op.MapFrom(src => src.NameSearch.Application.DateSubmitted.ToString("d")))
                 .ForMember(dest => dest.ExpiryDate, op =>
-                    op.MapFrom(src => src.NameSearch.ExpiryDate));
+                    op.MapFrom(src => src.NameSearch.ExpiryDate.Value.ToString("d")));
         }
     }
 }

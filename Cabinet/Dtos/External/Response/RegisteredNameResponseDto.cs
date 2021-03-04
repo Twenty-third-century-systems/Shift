@@ -5,7 +5,7 @@ namespace Cabinet.Dtos.External.Response {
         public string Id { get; set; }
         public string NameSearchReference { get; set; }
         public string Name { get; set; }
-        public DateTime DateSubmitted { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public string DateSubmitted { get; set; }
+        public string ExpiryDate { get; set; }
     }
 }

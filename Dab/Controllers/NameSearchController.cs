@@ -63,31 +63,33 @@ namespace Dab.Controllers {
 
             newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
             {
-                Value = dto.Name1
+                Value = dto.Name1.ToUpper()
             });
+            
             newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
             {
-                Value = dto.Name2
+                Value = dto.Name2.ToUpper()
             });
-            if (string.IsNullOrEmpty(dto.Name3))
+            
+            if (!string.IsNullOrEmpty(dto.Name3))
                 newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    Value = dto.Name3
+                    Value = dto.Name3.ToUpper()
                 });
 
-            if (string.IsNullOrEmpty(dto.Name4))
+            if (!string.IsNullOrEmpty(dto.Name4))
                 newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    Value = dto.Name4
+                    Value = dto.Name4.ToUpper()
                 });
 
-            if (string.IsNullOrEmpty(dto.Name5))
+            if (!string.IsNullOrEmpty(dto.Name5))
                 newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
-                    Value = dto.Name5
+                    Value = dto.Name5.ToUpper()
                 });
 
-            var submittedNameSearch = await _apiClientService.PostNewNameSearchAsync(newNameSearchRequestDto);
+            var submittedNameSearch = await _apiClientService.SubmitNewNameSearchAsync(newNameSearchRequestDto);
             if (submittedNameSearch != null)
             {
                 return Ok(submittedNameSearch);
@@ -114,7 +116,7 @@ namespace Dab.Controllers {
             else
                 nameToSend = name.name5;
 
-            var nameAvailable = await _apiClientService.GetNameAvailabilityAsync(nameToSend);
+            var nameAvailable = await _apiClientService.IsNameAvailableAsync(nameToSend);
             if (nameAvailable)
                 return Ok(true);
             else return Ok("\"This name is not available\"");

@@ -10,7 +10,7 @@ function SendNameForExamination() {
 
 function finishExamination() {
     connection
-        .invoke("Finish", tasksApplications[a].application.id)
+        .invoke("Finish", tasksApplications[a].nameSearch.nameSearchId)
         .catch(function (err) {
             return console.error(err.toString());
         });
@@ -35,11 +35,11 @@ $(document).ready(function () {
         });
 
     connection
-        .on("ReceiveApplicationUpdate", function (applicationId) {
-            console.log(applicationId);
+        .on("ReceiveApplicationUpdate", function (nameSearchId) {
+            console.log(nameSearchId);
             toastr.success("Application has been examined");
-            if (tasksApplications[a].application.id === applicationId) {
-                tasksApplications[a].application.examined = true;
+            if (tasksApplications[a].nameSearch.nameSearchId === nameSearchId) {
+                tasksApplications[a].examined = true;
 
                 $('#pending').empty();
                 $('#completed').empty();

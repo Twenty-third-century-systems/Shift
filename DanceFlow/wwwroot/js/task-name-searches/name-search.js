@@ -1,4 +1,4 @@
-﻿﻿let tasksApplications, OnExamination, i, a = undefined;
+﻿let tasksApplications, OnExamination, i, a = undefined;
 let ind = -1;
 
 function displayPage(refresh) {
@@ -8,12 +8,12 @@ function displayPage(refresh) {
         let applicationSelect =
             '<li class="nav-item">\n' +
             '                    <a class="nav-link" href="#">\n' +
-            '                        <i class="far fa-folder"></i> Application - <small>' + e.application.user + '</small>\n' +
+            '                        <i class="far fa-folder"></i> Application \n' +
             '                    </a>\n' +
             '                </li>';
 
         console.log(refresh);
-        if (!e.application.examined) {
+        if (!e.examined) {
             if (refresh === undefined)
                 $(applicationSelect)
                     .css('cursor', 'pointer')
@@ -21,7 +21,7 @@ function displayPage(refresh) {
                         a = index;
                         console.log(a)
                         $('#reason').val(e.nameSearch.reasonForSearch.toUpperCase());
-                        $('#type').val(e.nameSearch.typeOfEntity.toUpperCase());
+                        $('#type').val(e.nameSearch.service.toUpperCase());
                         $('#designation').val(e.nameSearch.designation.toUpperCase());
                         $('#justification').val(e.nameSearch.justification.toUpperCase());
 
@@ -45,7 +45,7 @@ function displayPage(refresh) {
             else {
                 let application = tasksApplications[a];
                 $('#reason').val(application.nameSearch.reasonForSearch.toUpperCase());
-                $('#type').val(application.nameSearch.typeOfEntity.toUpperCase());
+                $('#type').val(application.nameSearch.service.toUpperCase());
                 $('#designation').val(application.nameSearch.designation.toUpperCase());
                 $('#justification').val(application.nameSearch.justification.toUpperCase());
 
@@ -74,13 +74,13 @@ function updateStatuses(names) {
     $('#name-section').find('span').remove();
     names.forEach((e, index) => {
         container = $('#name' + (index + 1) + '-group');
-        if (e.status === "blacklisted") {
+        if (e.status === "Blacklisted") {
             $('<span class="text-dark"><small>Blacklisted</small></span>').appendTo(container);
-        } else if (e.status === "rejected") {
+        } else if (e.status === "Rejected") {
             $('<span class="text-danger"><small>Rejected</small></span>').appendTo(container);
-        } else if (e.status === "not considered") {
+        } else if (e.status === "NotConsidered") {
             $('<span class="text-warning"><small>Not considered</small></span>').appendTo(container);
-        } else if (e.status !== "pending") {
+        } else if (e.status !== "Pending") {
             $('<span class="text-success"><small>Reserved</small></span>').appendTo(container);
         }
     });
@@ -88,19 +88,19 @@ function updateStatuses(names) {
 
 function setUpModalButtons() {
     $('#btn-blacklist').click(function () {
-        nameOnExamination.status = "blacklisted";
+        nameOnExamination.status = 4;
         console.log(nameOnExamination);
         console.log(i + ": index");
         SendNameForExamination();
     });
     $('#btn-reject').click(function () {
-        nameOnExamination.status = "rejected";
+        nameOnExamination.status = 3;
         console.log(nameOnExamination);
         console.log(i + ": index");
         SendNameForExamination();
     });
     $('#btn-approve').click(function () {
-        nameOnExamination.status = "reserved";
+        nameOnExamination.status = 1;
         console.log(nameOnExamination);
         console.log(i + ": index");
         SendNameForExamination();

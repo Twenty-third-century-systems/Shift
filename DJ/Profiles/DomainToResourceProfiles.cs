@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
+using Cabinet.Dtos.Internal.Request;
 using Cabinet.Dtos.Internal.Response;
 using Fridge.Constants;
 using Fridge.Models;
@@ -21,7 +22,9 @@ namespace DJ.Profiles {
                     op => op.MapFrom(src => src.Applications.First().Service));
 
             // Application => AllocatedTaskNameSearchApplicationResponseDto
-            CreateMap<Application, AllocatedNameSearchTaskApplicationResponseDto>();
+            CreateMap<Application, AllocatedNameSearchTaskApplicationResponseDto>()
+                .ForMember(dest => dest.Examined,
+                    op => op.MapFrom(src => src.Status == EApplicationStatus.Examined));
 
             // NameSearch => TaskNameSearchResponseDto
             CreateMap<NameSearch, TaskNameSearchResponseDto>();
@@ -70,7 +73,7 @@ namespace DJ.Profiles {
                 .ForMember(
                     dest => dest.Value,
                     op => op.MapFrom(src => $"{src.Title} @ ${src.NominalValue} each"));
-            
+
             // MemorandumObject => TaskPrivateEntityMemorandumObjectResponseDto
             CreateMap<MemorandumOfAssociation, TaskPrivateEntityMemorandumObjectResponseDto>();
 
@@ -81,9 +84,19 @@ namespace DJ.Profiles {
                     op => op.MapFrom(src => $"{src.Surname} {src.Names}"));
 
             // PrivateEntityOwnerHasShareClause => TaskPrivateEntityShareholderSubscriptionResponseDto
-           
+
             // ShareholdingForeignEntity, TaskPrivateEntityForeignEntityShareHoldersDto
             CreateMap<ForeignEntity, TaskPrivateEntityForeignEntityShareHoldersDto>();
+
+            // EntityName => NameRequestDto
+            CreateMap<EntityName, NameRequestDto>()
+                .ForMember(
+                    dest => dest.Name,
+                    op => op.MapFrom(src => src.Value))
+                .ForMember(dest => dest.DateSubmitted,
+                    op => op.MapFrom(src => src.NameSearch.Application.DateSubmitted.ToString("d")))
+                .ForMember(dest => dest.TypeOfBusiness,
+                    op => op.MapFrom(src => src.NameSearch.Service));
         }
     }
 }

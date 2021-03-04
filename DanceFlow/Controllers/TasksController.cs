@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DanceFlow.Client;
 using DanceFlow.Dtos;
 using DanceFlow.Models;
 using DJ.Dtos;
@@ -9,42 +11,55 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace DanceFlow.Controllers {    
+namespace DanceFlow.Controllers {
     [Authorize(Policy = "IsExaminer")]
     [Route("tasks")]
     public class TasksController : Controller {
-        // GET
+        private readonly IApiClientService _apiClientService;
+
+        public TasksController(IApiClientService apiClientService)
+        {
+            _apiClientService = apiClientService;
+        }
+
         [HttpGet("allocated")]
         public IActionResult Tasks()
         {
             return View();
         }
-        
+
 
         [HttpGet("pending")]
         public async Task<IActionResult> Task(int task)
         {
-            using (var client = new HttpClient())
+            var user = User.Claims.FirstOrDefault(c =>
+                c.Type.Equals("sub") && c.Issuer.Equals("https://localhost:5002"));
+            if (user != null)
             {
-                var user = User
-                    .Claims
-                    .Where(c => c.Type.Equals("sub")&& c.Issuer.Equals("https://localhost:5002"))
-                    .FirstOrDefault();
-                var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{user.Value}"	).Result.Content
-                    .ReadAsStringAsync();
-                try
-                {
-                    TasksForExaminerDto tasks = JsonConvert.DeserializeObject<TasksForExaminerDto>(response);
-                    return Ok(tasks);
-                }
-                catch (JsonReaderException ex)
-                {
-                    return NoContent();
-                }
-                
+                var allocatedTasks = await _apiClientService.GetAllocatedTasksAsync(Guid.Parse(user.Value));
+                if (allocatedTasks != null)
+                    return Ok(allocatedTasks);
+                return NoContent();
             }
+
+            return NotFound();
+
+            // using (var client = new HttpClient())
+            // {
+            // var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{user.Value}").Result.Content
+            //     .ReadAsStringAsync();
+            // try
+            // {
+            //     TasksForExaminerDto tasks = JsonConvert.DeserializeObject<TasksForExaminerDto>(response);
+            //     return Ok(tasks);
+            // }
+            // catch (JsonReaderException ex)
+            // {
+            //     return NoContent();
+            // }
+            // }
         }
-        
+
 
         [HttpGet("name-search/{task}")]
         public IActionResult NameSearches(int task)
@@ -52,20 +67,22 @@ namespace DanceFlow.Controllers {
             ViewBag.TaskId = task;
             return View();
         }
-        
 
-        [HttpGet("name-search/{task}/applications")]
-        public async Task<IActionResult> NameSearchTaskApplications(int task)
+
+        [HttpGet("name-search/{taskId}/applications")]
+        public async Task<IActionResult> NameSearchTaskApplications(int taskId)
         {
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/ns").Result.Content
-                    .ReadAsStringAsync();
-                List<NameSearchTaskApplicationsDto> taskApplications = JsonConvert.DeserializeObject<List<NameSearchTaskApplicationsDto>>(response);
-                return Ok(taskApplications);
-            }
+            return Ok(await _apiClientService.GetAllocatedTaskApplicationsAsync(taskId));
+            // using (var client = new HttpClient())
+            // {
+            //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/ns").Result.Content
+            //         .ReadAsStringAsync();
+            //     List<NameSearchTaskApplicationsDto> taskApplications =
+            //         JsonConvert.DeserializeObject<List<NameSearchTaskApplicationsDto>>(response);
+            //     return Ok(taskApplications);
+            // }
         }
-        
+
 
         [HttpGet("pvt-entity/{task}")]
         public IActionResult PvtEntities(int task)
@@ -73,8 +90,8 @@ namespace DanceFlow.Controllers {
             ViewBag.TaskId = task;
             return View();
         }
-        
-        
+
+
         [HttpGet("pvt-entity/{task}/applications")]
         public async Task<IActionResult> PvtEntityTaskApplications(int task)
         {
@@ -82,43 +99,62 @@ namespace DanceFlow.Controllers {
             {
                 var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/pla").Result.Content
                     .ReadAsStringAsync();
-                List<PvtApplicationTaskDto> taskApplications = JsonConvert.DeserializeObject<List<PvtApplicationTaskDto>>(response);
+                List<PvtApplicationTaskDto> taskApplications =
+                    JsonConvert.DeserializeObject<List<PvtApplicationTaskDto>>(response);
                 return Ok(taskApplications);
             }
         }
-        
 
-        [HttpGet("examination/{name}/{id}/contain")]
-        public async Task<IActionResult> NamesThatContain(string name,int id)
+
+        [HttpGet("examination/{suggestedName}/contain")]
+        public async Task<IActionResult> NamesThatContain(string suggestedName)
         {
-            using (var client = new HttpClient())
-            {
-                var namesToExaminer = new List<NameUnderExaminationResultDto>();
-                var response =  client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/contain").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var strResp = await response.Content.ReadAsStringAsync();
-                    namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
-                }                
-                return Ok(namesToExaminer);
-            }            
+            return Ok(await _apiClientService.GetNamesThatContainAsync(suggestedName));
+            // using (var client = new HttpClient())
+            // {
+            //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            //     var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/contain").Result;
+            //     if (response.IsSuccessStatusCode)
+            //     {
+            //         var strResp = await response.Content.ReadAsStringAsync();
+            //         namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
+            //     }
+            //
+            //     return Ok(namesToExaminer);
+            // }
         }
-        
-        
-        [HttpGet("examination/{name}/{id}/starts")]
-        public async Task<IActionResult> NamesThatStartWith(string name, int id)
+
+
+        [HttpGet("examination/{suggestedName}/starts")]
+        public async Task<IActionResult> NamesThatStartWith(string suggestedName)
         {
-            using (var client = new HttpClient())
-            {
-                var namesToExaminer = new List<NameUnderExaminationResultDto>();
-                var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/starts").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var strResp = await response.Content.ReadAsStringAsync();
-                    namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
-                }  
-                return Ok(namesToExaminer);
-            }  
+            return Ok(await _apiClientService.GetNamesThatStartWithAsync(suggestedName));
+            // using (var client = new HttpClient())
+            // {
+            //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            //     var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/starts").Result;
+            //     if (response.IsSuccessStatusCode)
+            //     {
+            //         var strResp = await response.Content.ReadAsStringAsync();
+            //         namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
+            //     }
+            //
+            //     return Ok(namesToExaminer);
+            // }
+        }
+
+        [HttpGet("examination/{suggestedName}/ends")]
+        public async Task<IActionResult> NamesThatEndWith(string suggestedName)
+        {
+            return Ok(await _apiClientService.GetNamesThatEndWithAsync(suggestedName));
+        }
+
+        [HttpGet("finish/{taskId}")]
+        public async Task<IActionResult> FinishTask(int taskId)
+        {
+           if( await _apiClientService.FinishTaskAsync(taskId))
+               return RedirectToAction("Tasks");
+           return BadRequest("Could not finish task. Try again.");
         }
     }
 }

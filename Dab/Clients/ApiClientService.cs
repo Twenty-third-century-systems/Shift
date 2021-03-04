@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Cabinet.Dtos.External.Request;
@@ -36,7 +37,7 @@ namespace Dab.Clients {
             return null;
         }
 
-        public async Task<SubmittedNameSearchResponseDto> PostNewNameSearchAsync(
+        public async Task<SubmittedNameSearchResponseDto> SubmitNewNameSearchAsync(
             NewNameSearchRequestDto newNameSearchRequestDto)
         {
             var response =
@@ -49,13 +50,21 @@ namespace Dab.Clients {
             return null;
         }
 
-        public async Task<bool> GetNameAvailabilityAsync(string nameToSend)
+        public async Task<bool> IsNameAvailableAsync(string nameToSend)
         {
             var response =
                 await _client.SendAsync(new HttpRequestMessage(HttpMethod.Head, $"name/{nameToSend}/availability"));
             if (response.IsSuccessStatusCode)
                 return true;
             return false;
+        }
+
+        public async Task<List<RegisteredNameResponseDto>> GetApplicableNamesAsync()
+        {
+            var response = await _client.GetAsync("entity/names");
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<List<RegisteredNameResponseDto>>();
+            return null;
         }
     }
 }

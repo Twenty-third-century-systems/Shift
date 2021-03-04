@@ -2,17 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using DanceFlow.Client;
 using DanceFlow.Hubs;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using Polly;
 
 namespace DanceFlow {
     public class Startup {
@@ -63,7 +68,24 @@ namespace DanceFlow {
                     p.RequireRole("Registrar"));
                 options.AddPolicy("CanSign", p => 
                     p.RequireClaim("Policy", "can sign"));
-            });
+            });            
+
+            services.AddHttpContextAccessor();
+            services.AddHttpClient<IApiClientService, ApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri("https://localhost:44362/api/");
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
 
             services.AddControllersWithViews();
 

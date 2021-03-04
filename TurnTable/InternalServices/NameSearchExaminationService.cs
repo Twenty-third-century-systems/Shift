@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Cabinet.Dtos.Internal.Request;
 using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
@@ -10,10 +12,12 @@ using Microsoft.EntityFrameworkCore;
 namespace TurnTable.InternalServices {
     public class NameSearchExaminationService : INameSearchExaminationService {
         private readonly MainDatabaseContext _context;
+        private readonly IMapper _mapper;
 
-        public NameSearchExaminationService(MainDatabaseContext context)
+        public NameSearchExaminationService(MainDatabaseContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<int> ChangeNameStatusAsync(int nameId, int status)
@@ -59,21 +63,28 @@ namespace TurnTable.InternalServices {
             // TODO: send email and text msg here based on SaveChanges return result, message should contain if successful or has query
         }
 
-
-        // All the following to project straight to dto
-        public async Task<List<EntityName>> GetNamesThatStartWithAsync(string searchQuery)
+        public async Task<List<NameRequestDto>> GetNamesThatStartWithAsync(string searchQuery)
         {
-            return await _context.Names.Where(n => n.Value.StartsWith(searchQuery)).ToListAsync();
+            return await _mapper.ProjectTo<NameRequestDto>(_context.Names.Include(n => n.NameSearch)
+                    .ThenInclude(n => n.Application)
+                    .Where(n => n.Value.StartsWith(searchQuery) && n.Value != searchQuery))
+                .ToListAsync();
         }
 
-        public async Task<List<EntityName>> GetNamesThatContainAsync(string searchQuery)
+        public async Task<List<NameRequestDto>> GetNamesThatContainAsync(string searchQuery)
         {
-            return await _context.Names.Where(n => n.Value.Contains(searchQuery)).ToListAsync();
+            return await _mapper.ProjectTo<NameRequestDto>(_context.Names.Include(n => n.NameSearch)
+                    .ThenInclude(n => n.Application)
+                    .Where(n => n.Value.Contains(searchQuery) && n.Value != searchQuery))
+                .ToListAsync();
         }
 
-        public async Task<List<EntityName>> GetNamesThatEndsWithAsync(string searchQuery)
+        public async Task<List<NameRequestDto>> GetNamesThatEndsWithAsync(string searchQuery)
         {
-            return await _context.Names.Where(n => n.Value.EndsWith(searchQuery)).ToListAsync();
+            return await _mapper.ProjectTo<NameRequestDto>(_context.Names.Include(n => n.NameSearch)
+                    .ThenInclude(n => n.Application)
+                    .Where(n => n.Value.EndsWith(searchQuery) && n.Value != searchQuery))
+                .ToListAsync();
         }
     }
 }

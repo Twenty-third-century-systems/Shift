@@ -13,14 +13,14 @@ function initializeTables(nameId) {
     
     tblNamesThatContain = $('#tblContains').DataTable({
         ajax: {
-            url: '/tasks/examination/' + nameUnderExamination + '/' + nameId + '/contain/',
+            url: '/tasks/examination/' + nameUnderExamination + '/contain/',
             dataSrc: ''
         },
         columns: [
-            {
-                data: 'id',
-                visible: false
-            },
+            // {
+            //     data: 'id',
+            //     visible: false
+            // },
             {data: 'name'},
             {data: 'dateSubmitted'},
             {data: 'typeOfBusiness'},
@@ -31,14 +31,10 @@ function initializeTables(nameId) {
     tblNamesThatStartWith = undefined;
     tblNamesThatStartWith = $('#tblNamesStartWith').DataTable({
         ajax: {
-            url: '/tasks/examination/' + nameUnderExamination + '/' + nameId + '/starts',
+            url: '/tasks/examination/' + nameUnderExamination + '/starts',
             dataSrc: ''
         },
         columns: [
-            {
-                data: 'id',
-                visible: false
-            },
             {data: 'name'},
             {data: 'dateSubmitted'},
             {data: 'typeOfBusiness'},

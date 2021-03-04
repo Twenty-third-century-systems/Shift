@@ -165,110 +165,168 @@ namespace DJ.Controllers {
             return BadRequest("Could not finish examination. Try again later.");
         }
 
-        [HttpGet("{name}/{id}/contain")]
-        public IActionResult NamesThatContain(string name, int id)
+        [AllowAnonymous]
+        [HttpGet("{suggestedName}/contain")]
+        public async Task<IActionResult> NamesThatContain(string suggestedName)
         {
-            var names = (
-                from n in _eachDb.Names
-                where n.Value.Contains(name)
-                select n
-            ).ToList();
+            // var names = (
+            //     from n in _eachDb.Names
+            //     where n.Value.Contains(name)
+            //     select n
+            // ).ToList();
+            //
+            // var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            // foreach (var zita in names)
+            // {
+            //     if (zita.Value.Equals(name) && zita.Id == id)
+            //     {
+            //         continue;
+            //     }
+            //
+            //     var nameSearchApplication = (
+            //         from a in _eachDb.Applications
+            //         join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
+            //         where n.Id == zita.NameSearchId
+            //         select new
+            //         {
+            //             a.DateSubmitted,
+            //             n.Service
+            //         }
+            //     ).FirstOrDefault();
+            //
+            //     var typeOfBusiness = (
+            //         from s in _poleDb.Services
+            //         where s.Id == nameSearchApplication.Service
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     var status = (
+            //         from s in _poleDb.Status
+            //         where s.Id == zita.Status
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     namesToExaminer.Add(new NameUnderExaminationResultDto
+            //     {
+            //         Id = zita.Id,
+            //         Name = zita.Value,
+            //         DateSubmitted = nameSearchApplication.DateSubmitted,
+            //         TypeOfBusiness = typeOfBusiness.ToUpper(),
+            //         Status = status
+            //     });
+            // }
+            //
+            // return Ok(namesToExaminer);
 
-            var namesToExaminer = new List<NameUnderExaminationResultDto>();
-            foreach (var zita in names)
-            {
-                if (zita.Value.Equals(name) && zita.Id == id)
-                {
-                    continue;
-                }
-
-                var nameSearchApplication = (
-                    from a in _eachDb.Applications
-                    join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
-                    where n.Id == zita.NameSearchId
-                    select new
-                    {
-                        a.DateSubmitted,
-                        n.Service
-                    }
-                ).FirstOrDefault();
-
-                var typeOfBusiness = (
-                    from s in _poleDb.Services
-                    where s.Id == nameSearchApplication.Service
-                    select s.Description
-                ).FirstOrDefault();
-
-                var status = (
-                    from s in _poleDb.Status
-                    where s.Id == zita.Status
-                    select s.Description
-                ).FirstOrDefault();
-
-                namesToExaminer.Add(new NameUnderExaminationResultDto
-                {
-                    Id = zita.Id,
-                    Name = zita.Value,
-                    DateSubmitted = nameSearchApplication.DateSubmitted,
-                    TypeOfBusiness = typeOfBusiness.ToUpper(),
-                    Status = status
-                });
-            }
-
-            return Ok(namesToExaminer);
+            return Ok( await _nameSearchExaminationService.GetNamesThatContainAsync(suggestedName));
         }
 
-        [HttpGet("{name}/{id}/starts")]
-        public IActionResult NamesThatStartWith(string name, int id)
+        [AllowAnonymous]
+        [HttpGet("{suggestedName}/starts")]
+        public async Task<IActionResult> NamesThatStartWith(string suggestedName)
         {
-            var names = (
-                from n in _eachDb.Names
-                where n.Value.StartsWith(name)
-                select n
-            ).ToList();
+            // var names = (
+            //     from n in _eachDb.Names
+            //     where n.Value.StartsWith(name)
+            //     select n
+            // ).ToList();
+            //
+            // var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            // foreach (var zita in names)
+            // {
+            //     if (zita.Value.Equals(name) && zita.Id == id)
+            //     {
+            //         continue;
+            //     }
+            //
+            //     var nameSearchApplication = (
+            //         from a in _eachDb.Applications
+            //         join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
+            //         where n.Id == zita.NameSearchId
+            //         select new
+            //         {
+            //             a.DateSubmitted,
+            //             n.Service
+            //         }
+            //     ).FirstOrDefault();
+            //
+            //     var typeOfBusiness = (
+            //         from s in _poleDb.Services
+            //         where s.Id == nameSearchApplication.Service
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     var status = (
+            //         from s in _poleDb.Status
+            //         where s.Id == zita.Status
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     namesToExaminer.Add(new NameUnderExaminationResultDto
+            //     {
+            //         Id = zita.Id,
+            //         Name = zita.Value,
+            //         DateSubmitted = nameSearchApplication.DateSubmitted,
+            //         TypeOfBusiness = typeOfBusiness.ToUpper(),
+            //         Status = status
+            //     });
+            // }
 
-            var namesToExaminer = new List<NameUnderExaminationResultDto>();
-            foreach (var zita in names)
-            {
-                if (zita.Value.Equals(name) && zita.Id == id)
-                {
-                    continue;
-                }
+            return Ok( await _nameSearchExaminationService.GetNamesThatStartWithAsync(suggestedName));
+        }
+        
+        [AllowAnonymous]
+        [HttpGet("{suggestedName}/ends")]
+        public async Task<IActionResult> NamesThatEndsWith(string suggestedName)
+        {
+            // var names = (
+            //     from n in _eachDb.Names
+            //     where n.Value.StartsWith(name)
+            //     select n
+            // ).ToList();
+            //
+            // var namesToExaminer = new List<NameUnderExaminationResultDto>();
+            // foreach (var zita in names)
+            // {
+            //     if (zita.Value.Equals(name) && zita.Id == id)
+            //     {
+            //         continue;
+            //     }
+            //
+            //     var nameSearchApplication = (
+            //         from a in _eachDb.Applications
+            //         join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
+            //         where n.Id == zita.NameSearchId
+            //         select new
+            //         {
+            //             a.DateSubmitted,
+            //             n.Service
+            //         }
+            //     ).FirstOrDefault();
+            //
+            //     var typeOfBusiness = (
+            //         from s in _poleDb.Services
+            //         where s.Id == nameSearchApplication.Service
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     var status = (
+            //         from s in _poleDb.Status
+            //         where s.Id == zita.Status
+            //         select s.Description
+            //     ).FirstOrDefault();
+            //
+            //     namesToExaminer.Add(new NameUnderExaminationResultDto
+            //     {
+            //         Id = zita.Id,
+            //         Name = zita.Value,
+            //         DateSubmitted = nameSearchApplication.DateSubmitted,
+            //         TypeOfBusiness = typeOfBusiness.ToUpper(),
+            //         Status = status
+            //     });
+            // }
 
-                var nameSearchApplication = (
-                    from a in _eachDb.Applications
-                    join n in _eachDb.NameSearches on a.Id equals n.ApplicationId
-                    where n.Id == zita.NameSearchId
-                    select new
-                    {
-                        a.DateSubmitted,
-                        n.Service
-                    }
-                ).FirstOrDefault();
-
-                var typeOfBusiness = (
-                    from s in _poleDb.Services
-                    where s.Id == nameSearchApplication.Service
-                    select s.Description
-                ).FirstOrDefault();
-
-                var status = (
-                    from s in _poleDb.Status
-                    where s.Id == zita.Status
-                    select s.Description
-                ).FirstOrDefault();
-
-                namesToExaminer.Add(new NameUnderExaminationResultDto
-                {
-                    Id = zita.Id,
-                    Name = zita.Value,
-                    DateSubmitted = nameSearchApplication.DateSubmitted,
-                    TypeOfBusiness = typeOfBusiness.ToUpper(),
-                    Status = status
-                });
-            }
-
-            return Ok(namesToExaminer);
+            return Ok(await _nameSearchExaminationService.GetNamesThatEndsWithAsync(suggestedName));
         }
     }
 }
