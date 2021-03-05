@@ -4,7 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using DanceFlow.Client;
+using DanceFlow.Clients.NameSearch;
+using DanceFlow.Clients.Task;
 using DanceFlow.Hubs;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
@@ -41,7 +42,7 @@ namespace DanceFlow {
                 .AddCookie("ExamCookie")
                 .AddOpenIdConnect("ExamOidc", options =>
                 {
-                    options.Authority = "https://localhost:5002";
+                    options.Authority = Configuration["Authority"];
 
                     options.ClientId = "72FC2454-1401-42A0-B0DD-FBE0B7DBD482";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
@@ -71,13 +72,29 @@ namespace DanceFlow {
             });            
 
             services.AddHttpContextAccessor();
-            services.AddHttpClient<IApiClientService, ApiClientService>(
+            services.AddHttpClient<ITaskApiClientService, TaskApiClientService>(
                     async (serviceProvider, client) =>
                     {
                         var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
                         var token = await accessor.HttpContext.GetTokenAsync("access_token");
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-                        client.BaseAddress = new Uri("https://localhost:44362/api/");
+                        client.BaseAddress = new Uri(Configuration["Api"]);
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
+            
+            services.AddHttpClient<INameSearchApiService, NameSearchApiService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri(Configuration["Api"]);
                     })
                 .AddTransientHttpErrorPolicy(policy =>
                     policy.WaitAndRetryAsync(new[]

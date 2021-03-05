@@ -7,7 +7,8 @@ namespace Cabinet.Dtos.Internal.Response {
         public string Service { get; set; }
         public string Justification { get; set; }
         public string Designation { get; set; }
-        public string ReasonForSearch { get; set; }
+        public string ReasonForSearch { get; set; }        
+        public string MainObject { get; set; }
 
         public List<TaskNameSearchNameResponseDto> Names { get; set; }
     }

@@ -4,13 +4,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 using Cabinet.Dtos.Internal.Response;
-using Microsoft.AspNetCore.Builder;
 
-namespace DanceFlow.Client {
-    public class ApiClientService : IApiClientService {
+namespace DanceFlow.Clients.Task {
+    public class TaskApiClientService : ITaskApiClientService {
         private readonly HttpClient _client;
 
-        public ApiClientService(HttpClient client)
+        public TaskApiClientService(HttpClient client)
         {
             _client = client;
         }
@@ -51,49 +50,6 @@ namespace DanceFlow.Client {
             var response = await _client.GetAsync($"tasks/{taskId}/ns");
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<List<AllocatedNameSearchTaskApplicationResponseDto>>();
-            return null;
-        }
-
-        public async Task<bool> ChangeNameStatusAsync(int nameId, int status)
-        {
-            var response = await _client.PatchAsync($"ex/name/{nameId}/{status}", null);
-            if (response.IsSuccessStatusCode)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> FinishNameSearchExaminationAsync(int nameSearchId)
-        {
-            var response = await _client.PatchAsync($"/api/ex/name/f/{nameSearchId}", null);
-            if (response.IsSuccessStatusCode)
-                return true;
-            return false;
-        }
-
-        public async Task<List<NameRequestDto>> GetNamesThatContainAsync(string suggestedName)
-        {
-            var response = await _client.GetAsync($"ex/name/{suggestedName}/contain");
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<List<NameRequestDto>>();
-            return null;
-        }
-
-        public async Task<List<NameRequestDto>> GetNamesThatStartWithAsync(string suggestedName)
-        {
-            var response = await _client.GetAsync($"ex/name/{suggestedName}/starts");
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<List<NameRequestDto>>();
-            return null;
-        }
-
-        public async Task<List<NameRequestDto>> GetNamesThatEndWithAsync(string suggestedName)
-        {
-            var response = await _client.GetAsync($"ex/name/{suggestedName}/ends");
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<List<NameRequestDto>>();
             return null;
         }
 

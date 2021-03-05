@@ -36,8 +36,8 @@ namespace TurnTable.ExternalServices {
             var entityNames = _context.Names.Include(n => n.NameSearch)
                 .Where(n =>
                     n.Value.Equals(suggestedName) && (n.Status.Equals(ENameStatus.Reserved) ||
-                    n.Status.Equals(ENameStatus.Blacklisted) ||
-                    n.Status.Equals(ENameStatus.Used))).ToList();
+                                                      n.Status.Equals(ENameStatus.Blacklisted) ||
+                                                      n.Status.Equals(ENameStatus.Used))).ToList();
             entityNames = entityNames.Where(n => DateTime.Now - n.NameSearch.ExpiryDate <= TimeSpan.FromDays(0))
                 .ToList();
 
@@ -123,23 +123,17 @@ namespace TurnTable.ExternalServices {
             return await _context.SaveChangesAsync();
         }
 
-        public async Task FurtherReserveName(string reference)
+        public async Task<int> FurtherReserveUnexpiredNameAsync(string reference)
         {
             var nameSearch = await _context.NameSearches.Include(n => n.Names)
                 .SingleAsync(n => n.Reference.Equals(reference));
-            if (DateTime.Now - nameSearch.ExpiryDate > TimeSpan.FromDays(0))
+            if (DateTime.Now - nameSearch.ExpiryDate <= TimeSpan.FromDays(0))
             {
-                // TODO: check for funds here if not enough raise exception
-                var name = nameSearch.Names.SingleOrDefault(n => n.Status.Equals(ENameStatus.Reserved));
-                if (name != null && NameIsAvailable(name.Value))
-                {
-                    nameSearch.ExpiryDate = DateTime.Now.AddDays(30);
-                    await _context.SaveChangesAsync();
-                    // TODO: send email and/or sms
-                }
-                else throw new Exception("The name is no longer available.");
+                nameSearch.ExpiryDate = DateTime.Now.AddDays(30);
+                return await _context.SaveChangesAsync();
+                // TODO: send email and/or sms
             }
-            else throw new Exception("The name has not expired yet");
+            else throw new Exception("The name is no longer available for further reservation.");
         }
 
         /// <summary>

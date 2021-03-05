@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Cabinet.Dtos.External.Request;
 using Cabinet.Dtos.External.Response;
 
-namespace Dab.Clients {
-    public class ApiClientService : IApiClientService {
+namespace Dab.Clients.NameSearch {
+    public class NameSearchApiClientService : INameSearchApiClientService {
         private readonly HttpClient _client;
 
-        public ApiClientService(HttpClient client)
+        public NameSearchApiClientService(HttpClient client)
         {
             _client = client;
         }
@@ -37,7 +36,7 @@ namespace Dab.Clients {
             return null;
         }
 
-        public async Task<SubmittedNameSearchResponseDto> SubmitNewNameSearchAsync(
+        public async Task<SubmittedNameSearchResponseDto> NewNameSearchAsync(
             NewNameSearchRequestDto newNameSearchRequestDto)
         {
             var response =
@@ -65,6 +64,15 @@ namespace Dab.Clients {
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<List<RegisteredNameResponseDto>>();
             return null;
+        }
+
+        public async Task<bool> FurtherReserveUnexpiredNameAsync(string reference)
+        {
+            var response =
+                await _client.SendAsync(new HttpRequestMessage(HttpMethod.Head, $"name/further?reference={reference}"));
+            if (response.IsSuccessStatusCode)
+                return true;
+            return false;
         }
     }
 }

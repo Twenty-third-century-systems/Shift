@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "Further Reserve";
+    Layout = "_Layout";
+}
+
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluId">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">Further Reservation</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="#">Name search / <span class="text-muted">Further reservation</span></a>
+                    </li>
+                    @* <li class="breadcrumb-item active">Starter Page</li> *@
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluId -->
+</div>
+<!-- /.content-header -->
+
+
+<div class="row">
+    <div class="col-md-6">
+        <form id="reservation">
+            <!-- Justification -->
+            <div class="form-group">
+                <label>Reference:</label>
+                <input type="text" class="form-control" name="reference">
+            </div>
+            <div class="float-right">
+                <!-- submit -->
+                <button type="submit" class="btn btn-info pull-right" id="btn-done">Reserve</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ToastRScriptsPartial"/>
+    <!-- Form to JSON serializer-->
+    <script type="text/javascript" src="~/lib/serialize-form-into-JSON/dist/jquery.serializeToJSON.min.js"></script>
+    <!-- custom validations for address form -->
+    <script type="text/javascript" src="~/js/further-reservation/custom-validation.js"></script>
+}

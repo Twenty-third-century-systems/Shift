@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
-using DanceFlow.Client;
+using DanceFlow.Clients.Task;
 using DanceFlow.Dtos;
 using DanceFlow.Models;
 using IdentityModel.Client;
@@ -18,11 +18,11 @@ namespace DanceFlow.Controllers {
     [Authorize(Policy = "IsRegistrar")]
     [Route("applications")]
     public class ApplicationsController : Controller {
-        private readonly IApiClientService _apiClientService;
+        private readonly ITaskApiClientService _taskApiClientService;
 
-        public ApplicationsController(IApiClientService apiClientService)
+        public ApplicationsController(ITaskApiClientService taskApiClientService)
         {
-            _apiClientService = apiClientService;
+            _taskApiClientService = taskApiClientService;
         }
 
         [HttpGet("")]
@@ -42,7 +42,7 @@ namespace DanceFlow.Controllers {
                 ViewBag.Examiners = examiners;
             }
 
-            var unallocatedApplications = await _apiClientService.GetAllUnallocatedApplicationsAsync(Int32.Parse(office.Value));
+            var unallocatedApplications = await _taskApiClientService.GetAllUnallocatedApplicationsAsync(Int32.Parse(office.Value));
             if (unallocatedApplications != null)
             {                
                 ViewBag.NameSearchCount = unallocatedApplications.Count(a => a.Service.Equals("NameSearch"));
@@ -116,7 +116,7 @@ namespace DanceFlow.Controllers {
             if (office != null) dto.SortingOffice = Convert.ToInt32(office.Value);
             else return NotFound();
 
-            var multipleApplicationTask = await _apiClientService.PostMultipleApplicationTaskAsync(dto);
+            var multipleApplicationTask = await _taskApiClientService.PostMultipleApplicationTaskAsync(dto);
             if (multipleApplicationTask != null) return Ok(multipleApplicationTask);
             else return BadRequest("Could not allocate");
 

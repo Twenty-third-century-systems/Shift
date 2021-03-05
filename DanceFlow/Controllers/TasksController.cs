@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DanceFlow.Client;
+using DanceFlow.Clients.NameSearch;
+using DanceFlow.Clients.Task;
 using DanceFlow.Dtos;
 using DanceFlow.Models;
 using DJ.Dtos;
@@ -15,11 +16,13 @@ namespace DanceFlow.Controllers {
     [Authorize(Policy = "IsExaminer")]
     [Route("tasks")]
     public class TasksController : Controller {
-        private readonly IApiClientService _apiClientService;
+        private readonly ITaskApiClientService _taskApiClientService;
+        private readonly INameSearchApiService _nameSearchApiService;
 
-        public TasksController(IApiClientService apiClientService)
+        public TasksController(ITaskApiClientService taskApiClientService,INameSearchApiService nameSearchApiService)
         {
-            _apiClientService = apiClientService;
+            _taskApiClientService = taskApiClientService;
+            _nameSearchApiService = nameSearchApiService;
         }
 
         [HttpGet("allocated")]
@@ -36,7 +39,7 @@ namespace DanceFlow.Controllers {
                 c.Type.Equals("sub") && c.Issuer.Equals("https://localhost:5002"));
             if (user != null)
             {
-                var allocatedTasks = await _apiClientService.GetAllocatedTasksAsync(Guid.Parse(user.Value));
+                var allocatedTasks = await _taskApiClientService.GetAllocatedTasksAsync(Guid.Parse(user.Value));
                 if (allocatedTasks != null)
                     return Ok(allocatedTasks);
                 return NoContent();
@@ -72,7 +75,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("name-search/{taskId}/applications")]
         public async Task<IActionResult> NameSearchTaskApplications(int taskId)
         {
-            return Ok(await _apiClientService.GetAllocatedTaskApplicationsAsync(taskId));
+            return Ok(await _taskApiClientService.GetAllocatedTaskApplicationsAsync(taskId));
             // using (var client = new HttpClient())
             // {
             //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/ns").Result.Content
@@ -109,7 +112,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/contain")]
         public async Task<IActionResult> NamesThatContain(string suggestedName)
         {
-            return Ok(await _apiClientService.GetNamesThatContainAsync(suggestedName));
+            return Ok(await _nameSearchApiService.GetNamesThatContainAsync(suggestedName));
             // using (var client = new HttpClient())
             // {
             //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
@@ -128,7 +131,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/starts")]
         public async Task<IActionResult> NamesThatStartWith(string suggestedName)
         {
-            return Ok(await _apiClientService.GetNamesThatStartWithAsync(suggestedName));
+            return Ok(await _nameSearchApiService.GetNamesThatStartWithAsync(suggestedName));
             // using (var client = new HttpClient())
             // {
             //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
@@ -146,13 +149,13 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/ends")]
         public async Task<IActionResult> NamesThatEndWith(string suggestedName)
         {
-            return Ok(await _apiClientService.GetNamesThatEndWithAsync(suggestedName));
+            return Ok(await _nameSearchApiService.GetNamesThatEndWithAsync(suggestedName));
         }
 
         [HttpGet("finish/{taskId}")]
         public async Task<IActionResult> FinishTask(int taskId)
         {
-           if( await _apiClientService.FinishTaskAsync(taskId))
+           if( await _taskApiClientService.FinishTaskAsync(taskId))
                return RedirectToAction("Tasks");
            return BadRequest("Could not finish task. Try again.");
         }

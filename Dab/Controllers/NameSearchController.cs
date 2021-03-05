@@ -7,7 +7,7 @@ using AutoMapper;
 using BarTender.Dtos;
 using BarTender.Models;
 using Cabinet.Dtos.External.Request;
-using Dab.Clients;
+using Dab.Clients.NameSearch;
 using Dab.Dtos;
 using Dab.Globals;
 using IdentityModel.Client;
@@ -20,12 +20,12 @@ using NameSearchDetails = Dab.Models.NameSearchDetails;
 namespace Dab.Controllers {
     [Route("name-search")]
     public class NameSearchController : Controller {
-        private readonly IApiClientService _apiClientService;
+        private readonly INameSearchApiClientService _nameSearchApiClientService;
         private readonly IMapper _mapper;
 
-        public NameSearchController(IApiClientService apiClientService, IMapper mapper)
+        public NameSearchController(INameSearchApiClientService nameSearchApiClientService, IMapper mapper)
         {
-            _apiClientService = apiClientService;
+            _nameSearchApiClientService = nameSearchApiClientService;
             _mapper = mapper;
         }
 
@@ -51,7 +51,7 @@ namespace Dab.Controllers {
             //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             //     }
             // }
-            ViewBag.Defaults = await _apiClientService.GetNameSearchDefaultsAsync();
+            ViewBag.Defaults = await _nameSearchApiClientService.GetNameSearchDefaultsAsync();
             return View();
         }
 
@@ -89,7 +89,7 @@ namespace Dab.Controllers {
                     Value = dto.Name5.ToUpper()
                 });
 
-            var submittedNameSearch = await _apiClientService.SubmitNewNameSearchAsync(newNameSearchRequestDto);
+            var submittedNameSearch = await _nameSearchApiClientService.NewNameSearchAsync(newNameSearchRequestDto);
             if (submittedNameSearch != null)
             {
                 return Ok(submittedNameSearch);
@@ -100,7 +100,6 @@ namespace Dab.Controllers {
             }
         }
 
-        // GET
         [HttpGet("availability/name")]
         public async Task<IActionResult> NameAvailability(Names name)
         {
@@ -116,10 +115,24 @@ namespace Dab.Controllers {
             else
                 nameToSend = name.name5;
 
-            var nameAvailable = await _apiClientService.IsNameAvailableAsync(nameToSend);
+            var nameAvailable = await _nameSearchApiClientService.IsNameAvailableAsync(nameToSend);
             if (nameAvailable)
                 return Ok(true);
             else return Ok("\"This name is not available\"");
+        }
+
+        [HttpGet("f-reserve")]
+        public IActionResult FurtherReserveUnexpiredName()
+        {
+            return View();
+        }
+
+        [HttpPost("reserve")]
+        public async Task<IActionResult> FurtherReserve(NameSearchReservationRequestDto dto)
+        {
+            if (await _nameSearchApiClientService.FurtherReserveUnexpiredNameAsync(dto.Reference))
+                return Ok();
+            return BadRequest();
         }
     }
 }

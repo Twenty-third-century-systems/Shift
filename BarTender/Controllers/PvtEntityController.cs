@@ -178,9 +178,8 @@ namespace BarTender.Controllers {
 
             return BadRequest("Could not reload application");
         }
-
-        // GET
-        [AllowAnonymous]
+        
+        
         [HttpGet("names")]
         public async Task<IActionResult> GetApplicableNames()
         {

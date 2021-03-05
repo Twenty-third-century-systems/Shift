@@ -24,7 +24,8 @@ function displayPage(refresh) {
                         $('#type').val(e.nameSearch.service.toUpperCase());
                         $('#designation').val(e.nameSearch.designation.toUpperCase());
                         $('#justification').val(e.nameSearch.justification.toUpperCase());
-
+                        $('#object').val(e.nameSearch.mainObject.toUpperCase());
+                        
                         e.nameSearch.names.forEach((x, index) => {
                             $('#name' + (index + 1)).val(x.value.toUpperCase());
                             $('#name' + (index + 1) + '-toggle').click(function () {
@@ -48,6 +49,7 @@ function displayPage(refresh) {
                 $('#type').val(application.nameSearch.service.toUpperCase());
                 $('#designation').val(application.nameSearch.designation.toUpperCase());
                 $('#justification').val(application.nameSearch.justification.toUpperCase());
+                $('#object').val(application.nameSearch.mainObject.toUpperCase());
 
                 application.nameSearch.names.forEach((x, index) => {
                     $('#name' + (index + 1)).val(x.value.toUpperCase());

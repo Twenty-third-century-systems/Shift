@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BarTender.Dtos;
-using Dab.Clients;
+using Dab.Clients.NameSearch;
 using Dab.Dtos;
 using Dab.Globals;
 using Dab.Models;
@@ -17,11 +17,11 @@ using Newtonsoft.Json;
 namespace Dab.Controllers {
     [Route("entity")]
     public class PvtEntityController : Controller {
-        private readonly IApiClientService _apiClientService;
+        private readonly INameSearchApiClientService _nameSearchApiClientService;
 
-        public PvtEntityController(IApiClientService apiClientService)
+        public PvtEntityController(INameSearchApiClientService nameSearchApiClientService)
         {
-            _apiClientService = apiClientService;
+            _nameSearchApiClientService = nameSearchApiClientService;
         }
 
         [HttpGet("{nameId}/new")]
@@ -71,7 +71,7 @@ namespace Dab.Controllers {
         [HttpGet("names/reg")]
         public async Task<IActionResult> RegisteredNames()
         {
-            return Ok(await _apiClientService.GetApplicableNamesAsync());
+            return Ok(await _nameSearchApiClientService.GetApplicableNamesAsync());
             // using (var client = new HttpClient())
             // {
             //     var accessToken = await HttpContext.GetTokenAsync("access_token");

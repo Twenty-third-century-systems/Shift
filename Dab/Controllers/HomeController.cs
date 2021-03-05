@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Dab.Clients;
+using Dab.Clients.NameSearch;
 using Dab.Dtos;
 using Dab.Globals;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +19,12 @@ using Newtonsoft.Json;
 namespace Dab.Controllers {
     public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
-        private readonly IApiClientService _apiClientService;
+        private readonly INameSearchApiClientService _nameSearchApiClientService;
 
-        public HomeController(ILogger<HomeController> logger,IApiClientService apiClientService)
+        public HomeController(ILogger<HomeController> logger,INameSearchApiClientService nameSearchApiClientService)
         {
             _logger = logger;
-            _apiClientService = apiClientService;
+            _nameSearchApiClientService = nameSearchApiClientService;
         }
 
         public async Task<IActionResult> Index()
@@ -48,7 +48,7 @@ namespace Dab.Controllers {
             // ViewBag.User = nameClaim.Value;
             var nameClaim = User.Claims
                 .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
-            ViewBag.DashData = await _apiClientService.GetDashBoardDefaultsAsync();
+            ViewBag.DashData = await _nameSearchApiClientService.GetDashBoardDefaultsAsync();
             if (nameClaim != null) ViewBag.User = nameClaim.Value;
             return View();
         }

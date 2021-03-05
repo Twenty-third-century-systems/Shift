@@ -50,4 +50,10 @@
       <ProjectReference Include="..\Cabinet\Cabinet.csproj" />
     </ItemGroup>
 
+    
+
+    <ItemGroup>
+      <Folder Include="Clients\PrivateEntity" />
+    </ItemGroup>
+
 </Project>

@@ -11,6 +11,6 @@ namespace TurnTable.ExternalServices {
         public Task<SubmittedNameSearchResponseDto> CreateNewNameSearchAsync(Guid user, NewNameSearchRequestDto dto);
         Task<int> TestApproveNameSearch(Guid user, int applicationId);
 
-        public Task FurtherReserveName(string reference);
+        public Task<int> FurtherReserveUnexpiredNameAsync(string reference);
     }
 }

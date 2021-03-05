@@ -1,44 +1,29 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BarTender.Dtos;
 using BarTender.Models;
-using BarTender.Repositories;
 using Cabinet.Dtos.External.Request;
-using Cooler.DataModels;
 using IdentityModel.Client;
-using LinqToDB;
-using LinqToDB.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TurnTable.ExternalServices;
-using NameSearchResponseDto = BarTender.Dtos.NameSearchResponseDto;
 
 namespace BarTender.Controllers {
     [Route("api/name")]
     public class NameSearchController : Controller {
-        private PoleDB _poleDb;
-        private ShwaDB _shwaDb;
-        private EachDB _eachDb;
-        private readonly IOptions<List<Val>> _values;
-        private readonly IConfiguration _configuration;
-        private IOptions<List<ServicesForNameSearchSelection>> _serviceValues;
-        private IOptions<List<ReasonForSearchForNameSearchSelection>> _reasonsValues;
-        private IOptions<List<DesignationsForNameSearchSelection>> _designationValues;
-        private IValueService _valueService;
-        private INameSearchService _nameSearchService;
-        private Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
+        private readonly IOptions<List<ServicesForNameSearchSelection>> _serviceValues;
+        private readonly IOptions<List<ReasonForSearchForNameSearchSelection>> _reasonsValues;
+        private readonly IOptions<List<DesignationsForNameSearchSelection>> _designationValues;
+        private readonly IValueService _valueService;
+        private readonly INameSearchService _nameSearchService;
+        private readonly Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
 
-        public NameSearchController(PoleDB poleDb, ShwaDB shwaDb,
-            EachDB eachDb, IOptions<List<ServicesForNameSearchSelection>> serviceValues,
+        public NameSearchController(IOptions<List<ServicesForNameSearchSelection>> serviceValues,
             IOptions<List<ReasonForSearchForNameSearchSelection>> reasonsValues,
             IOptions<List<DesignationsForNameSearchSelection>> designationValues, IValueService valueService,
             INameSearchService nameSearchService)
@@ -48,9 +33,6 @@ namespace BarTender.Controllers {
             _designationValues = designationValues;
             _reasonsValues = reasonsValues;
             _serviceValues = serviceValues;
-            _poleDb = poleDb;
-            _shwaDb = shwaDb;
-            _eachDb = eachDb;
         }
 
         [AllowAnonymous]
@@ -218,12 +200,29 @@ namespace BarTender.Controllers {
         [HttpHead("test-approve")]
         public async Task<IActionResult> TestApprove(int applicationId)
         {
-            if (await _nameSearchService.TestApproveNameSearch(_user, applicationId)>0)
-            {
-                return Ok();
-            }
+            // if (await _nameSearchService.TestApproveNameSearch(_user, applicationId)>0)
+            // {
+            //     return Ok();
+            // }
 
             return BadRequest("Could not update");
+        }
+
+
+        [HttpHead("further")]
+        public async Task<IActionResult> FurtherReserveUnexpiredName(string reference)
+        {
+            try
+            {
+                if (await _nameSearchService.FurtherReserveUnexpiredNameAsync(reference) > 0)
+                    return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return NotFound();
         }
     }
 }

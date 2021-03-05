@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Dab.Clients;
+using Dab.Clients.NameSearch;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -40,7 +40,7 @@ namespace Dab {
                 .AddCookie("EOnlineCookie")
                 .AddOpenIdConnect("EOnlineOidc", options =>
                 {
-                    options.Authority = "https://localhost:5001";
+                    options.Authority = Configuration["Authority"];
 
                     options.ClientId = "028BED7E-F9CA-4484-8ED7-7DE3A82F40BC";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
@@ -59,13 +59,13 @@ namespace Dab {
                 });
 
             services.AddHttpContextAccessor();
-            services.AddHttpClient<IApiClientService, ApiClientService>(
+            services.AddHttpClient<INameSearchApiClientService, NameSearchApiClientService>(
                     async (serviceProvider, client) =>
                     {
                         var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
                         var token = await accessor.HttpContext.GetTokenAsync("access_token");
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-                        client.BaseAddress = new Uri("https://localhost:44312/api/");
+                        client.BaseAddress = new Uri(Configuration["Api"]);
                     })
                 .AddTransientHttpErrorPolicy(policy =>
                     policy.WaitAndRetryAsync(new[]

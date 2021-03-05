@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using DanceFlow.Client;
+using DanceFlow.Clients.NameSearch;
+using DanceFlow.Clients.Task;
 using DanceFlow.Dtos;
 using DanceFlow.Models;
 using Microsoft.AspNetCore.Http;
@@ -13,16 +14,18 @@ using Task = System.Threading.Tasks.Task;
 
 namespace DanceFlow.Hubs {
     public class NameExaminationHub : Hub {
-        private readonly IApiClientService _apiClientService;
+        private readonly ITaskApiClientService _taskApiClientService;
+        private readonly INameSearchApiService _nameSearchApiService;
 
-        public NameExaminationHub(IApiClientService apiClientService)
+        public NameExaminationHub(ITaskApiClientService taskApiClientService,INameSearchApiService nameSearchApiService)
         {
-            _apiClientService = apiClientService;
+            _taskApiClientService = taskApiClientService;
+            _nameSearchApiService = nameSearchApiService;
         }
 
         public async Task UpdateName(NameExaminedFromExaminerDto name)
         {
-            if (await _apiClientService.ChangeNameStatusAsync(name.EntityNameId, name.Status))
+            if (await _nameSearchApiService.ChangeNameStatusAsync(name.EntityNameId, name.Status))
                 await Clients.Caller.SendAsync("ReceiveExaminationUpdate", name);
             
             
@@ -38,7 +41,7 @@ namespace DanceFlow.Hubs {
 
         public async Task Finish(int nameSearchId)
         {
-            if(await _apiClientService.FinishNameSearchExaminationAsync(nameSearchId))
+            if(await _nameSearchApiService.FinishNameSearchExaminationAsync(nameSearchId))
                 await Clients.Caller.SendAsync("ReceiveApplicationUpdate", nameSearchId);
             // using (var client = new HttpClient())
             // {
