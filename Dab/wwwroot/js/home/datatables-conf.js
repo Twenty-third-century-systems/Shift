@@ -20,7 +20,7 @@ $(document).ready(function () {
 
     $('#tblRegNames tbody').on('click', 'tr', function () {
         var data = registeredNamesTable.row(this).data();
-        window.location.href = '/entity/' + data.id + '/new'
+        window.location.href = '/entity/' + data.id + '/new/' + data.name
         // alert('You clicked on ' + data.name + '\'s row');
     });
 })

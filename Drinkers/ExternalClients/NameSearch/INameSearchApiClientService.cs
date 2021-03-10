@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Cabinet.Dtos.External.Request;
 using Cabinet.Dtos.External.Response;
 
-namespace Dab.Clients.NameSearch {
+namespace Drinkers.ExternalClients.NameSearch {
     public interface INameSearchApiClientService {
         Task<ExternalUserDashboardRequestDto> GetDashBoardDefaultsAsync();
         Task<NameSearchDefaultsRequestDto> GetNameSearchDefaultsAsync();

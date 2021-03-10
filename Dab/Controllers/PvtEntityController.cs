@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
 using BarTender.Dtos;
-using Dab.Clients.NameSearch;
+using Cabinet.Dtos.External.Request;
+using Dab.Clients.PrivateEntity;
 using Dab.Dtos;
 using Dab.Globals;
-using Dab.Models;
+using Drinkers.ExternalClients.NameSearch;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -18,52 +17,66 @@ namespace Dab.Controllers {
     [Route("entity")]
     public class PvtEntityController : Controller {
         private readonly INameSearchApiClientService _nameSearchApiClientService;
+        private readonly IPrivateEntityApiClientService _privateEntityApiClientService;
+        private readonly IMapper _mapper;
 
-        public PvtEntityController(INameSearchApiClientService nameSearchApiClientService)
+        public PvtEntityController(INameSearchApiClientService nameSearchApiClientService,
+            IPrivateEntityApiClientService privateEntityApiClientService, IMapper mapper)
         {
             _nameSearchApiClientService = nameSearchApiClientService;
+            _privateEntityApiClientService = privateEntityApiClientService;
+            _mapper = mapper;
         }
 
-        [HttpGet("{nameId}/new")]
-        public async Task<IActionResult> NewPrivateEntity(int nameId)
+        [HttpGet("{nameId}/new/{name}")]
+        public async Task<IActionResult> NewPrivateEntity(int nameId, string name)
         {
             var nameClaim = User.Claims
                 .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
             ViewBag.User = nameClaim.Value;
 
-            using (var client = new HttpClient())
+            var application = await _privateEntityApiClientService.NewPrivateEntityAsync(nameId);
+            if (application != null)
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var responce = client
-                    .GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name")
-                    .Result;
-
-                // var imweResponse = client
-                //     .PostAsJsonAsync<NameApplicationAndDefaults>(
-                //         $"{ApiUrls.InitialisePvtApplication}", 
-                //         nameAndApplication
-                //         )
-                //     .Result;
-
-                if (responce.IsSuccessStatusCode)
-                {
-                    var nameAndApplication =
-                        JsonConvert.DeserializeObject<NameApplicationAndDefaults>(
-                            await responce.Content.ReadAsStringAsync());
-                    nameAndApplication.Id = nameId;
-                    ViewBag.NameRacho = nameAndApplication.Value;
-                    ViewBag.ApplicationId = nameAndApplication.ApplicationId;
-                    ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
-                    ViewBag.Cities = nameAndApplication.Cities;
-                    ViewBag.Countries = nameAndApplication.Countries;
-                    ViewBag.Gender = nameAndApplication.Genders;
-                }
-                else
-                {
-                    return BadRequest("Something went wrong in trying to use");
-                }
+                ViewBag.Application = application;
+                ViewBag.EntityName = $"{name} (pvt) ltd";
             }
+
+            else return NotFound();
+
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var responce = client
+            //         .GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name")
+            //         .Result;
+
+            // var imweResponse = client
+            //     .PostAsJsonAsync<NameApplicationAndDefaults>(
+            //         $"{ApiUrls.InitialisePvtApplication}", 
+            //         nameAndApplication
+            //         )
+            //     .Result;
+
+            //     if (responce.IsSuccessStatusCode)
+            //     {
+            //         var nameAndApplication =
+            //             JsonConvert.DeserializeObject<NameApplicationAndDefaults>(
+            //                 await responce.Content.ReadAsStringAsync());
+            //         nameAndApplication.Id = nameId;
+            //         ViewBag.NameRacho = nameAndApplication.Value;
+            //         ViewBag.ApplicationId = nameAndApplication.ApplicationId;
+            //         ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
+            //         ViewBag.Cities = nameAndApplication.Cities;
+            //         ViewBag.Countries = nameAndApplication.Countries;
+            //         ViewBag.Gender = nameAndApplication.Genders;
+            //     }
+            //     else
+            //     {
+            //         return BadRequest("Something went wrong in trying to use");
+            //     }
+            // }
 
             return View();
         }
@@ -83,25 +96,51 @@ namespace Dab.Controllers {
         }
 
         [HttpPost("office")]
-        public async Task<IActionResult> Office(OfficeInformationDto officeInformationDto)
+        public async Task<IActionResult> Office(PrivateOfficeInformationRequestDto dto)
         {
-            officeInformationDto.Office.PhysicalAddress = officeInformationDto.Office.PhysicalAddress.ToUpper();
-            officeInformationDto.Office.PostalAddress = officeInformationDto.Office.PostalAddress.ToUpper();
-            using (var client = new HttpClient())
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var responce = client
-                    .PostAsJsonAsync<OfficeInformationDto>(ApiUrls.SubmitPvtApplicationOffice, officeInformationDto)
-                    .Result;
-                if (responce.IsSuccessStatusCode)
-                {
-                    return Ok();
-                }
-            }
+            var officeDto = _mapper.Map<NewPrivateEntityOfficeRequestDto>(dto.AddressInformation);
+            officeDto.Address = _mapper.Map<NewPrivateEntityAddressRequestDto>(dto.AddressInformation);
+            officeDto.ApplicationId = dto.ApplicationId;
+            var application = await _privateEntityApiClientService.NewPrivateEntityOffice(officeDto);
+            if (application != null)
+                return Ok();
+            // dto.Office.PhysicalAddress = dto.Office.PhysicalAddress.ToUpper();
+            // dto.Office.PostalAddress = dto.Office.PostalAddress.ToUpper();
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var responce = client
+            //         .PostAsJsonAsync<OfficeInformationDto>(ApiUrls.SubmitPvtApplicationOffice, dto)
+            //         .Result;
+            //     if (responce.IsSuccessStatusCode)
+            //     {
+            //         return Ok();
+            //     }
+            // }
 
             return BadRequest();
         }
+        
+        //===========================================================================================================
+
+        [HttpPost("directors")]
+        public async Task<IActionResult> Directors()
+        {
+            if (await _privateEntityApiClientService.NewDirectors(new NewDirectorsRequestDto()) != null)
+                return Ok();
+            return BadRequest("Something went wrong in saving Directors");
+        }
+
+        [HttpPost("secretary")]        
+        public async Task<IActionResult> Secretary(NewSecretaryRequestDto dto)
+        {
+            if (await _privateEntityApiClientService.NewSecretary(dto) != null)
+                return Ok();
+            return BadRequest("Something went wrong in saving Directors");
+        }
+        
+        //===========================================================================================================
 
         [HttpPost("clause")]
         public async Task<IActionResult> ShareAndLiabilityClauses(LiabilityShareClausesDto liabilityShareClausesDto)

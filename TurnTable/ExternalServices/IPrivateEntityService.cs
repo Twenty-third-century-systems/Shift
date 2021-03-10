@@ -9,11 +9,11 @@ using Fridge.Models;
 namespace TurnTable.ExternalServices {
     public interface IPrivateEntityService {
         Task<List<RegisteredNameResponseDto>> GetRegisteredNamesAsync(Guid user);
-        Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId, string industrySector);
+        Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId);
 
         Task<ApplicationResponseDto> InsertOfficeAsync(Guid user, NewPrivateEntityOfficeRequestDto dto);
 
-        Task<ApplicationResponseDto> InsertMemorandumOfAssociationAsync(Guid user, NewMemorandumRequestDto dto);
+        Task<ApplicationResponseDto> InsertLiabilityClauseAsync(Guid user, NewLiabilityClauseRequestDto dto);
 
         Task<ApplicationResponseDto> InsertMemorandumObjectsAsync(Guid user,
             NewMemorandumOfAssociationObjectsRequestDto dto);
@@ -23,7 +23,10 @@ namespace TurnTable.ExternalServices {
         Task<ApplicationResponseDto> InsertShareClauseAsync(Guid user, NewShareClausesRequestDto dto);
 
         Task<ApplicationResponseDto> InsertMembersAsync(Guid user, NewShareHoldersRequestDto dto);
-        Task<int> SubmitApplicationAsync(Guid user, int applicationId);
+        Task<int> FinishApplicationAsync(Guid user, int applicationId);
         Task<ApplicationResponseDto> ResubmitApplicationAsync(Guid user, int applicationId);
+        Task<ApplicationResponseDto> InsertAmendedArticles(Guid user, NewAmendedArticlesRequestDto dto);
+        Task<ApplicationResponseDto> InsertDirectors(Guid user, NewDirectorsRequestDto dto);
+        Task<ApplicationResponseDto> InsertSecretary(Guid user, NewSecretaryRequestDto dto);
     }
 }

@@ -4,7 +4,7 @@
         {
         }
 
-        public PersonRepresentsForeignEntity(ForeignEntity beneficiary, Person nominee)
+        public PersonRepresentsForeignEntity(ForeignEntity beneficiary, ShareHolder nominee)
         {
             Beneficiary = beneficiary;
             Nominee = nominee;
@@ -14,6 +14,6 @@
         public int NomineeId { get; set; }
 
         public ForeignEntity Beneficiary { get; set; }
-        public Person Nominee { get; set; }
+        public ShareHolder Nominee { get; set; }
     }
 }

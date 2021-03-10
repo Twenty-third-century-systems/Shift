@@ -4,7 +4,7 @@
         {
             
         }
-        public PersonRepresentsPrivateEntity(PrivateEntity beneficiary, Person nominee)
+        public PersonRepresentsPrivateEntity(PrivateEntity beneficiary, ShareHolder nominee)
         {
             Beneficiary = beneficiary;
             Nominee = nominee;
@@ -14,6 +14,6 @@
         public int BeneficiaryId { get; set; }
 
         public  PrivateEntity Beneficiary { get; set; }
-        public  Person Nominee { get; set; }
+        public  ShareHolder Nominee { get; set; }
     }
 }

@@ -78,7 +78,7 @@ namespace DJ.Profiles {
             CreateMap<MemorandumOfAssociation, TaskPrivateEntityMemorandumObjectResponseDto>();
 
             // PrivateEntityOwner => TaskPrivateEntityShareHolderResponseDto
-            CreateMap<Person, TaskPrivateEntityShareHolderResponseDto>()
+            CreateMap<ShareHolder, TaskPrivateEntityShareHolderResponseDto>()
                 .ForMember(
                     dest => dest.FullName,
                     op => op.MapFrom(src => $"{src.Surname} {src.Names}"));

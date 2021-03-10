@@ -22,7 +22,7 @@ namespace BarTender.Profiles {
             CreateMap<NewPrivateEntityOfficeRequestDto, Office>();
 
             // NewMemorandumRequestDto => MemorandumOfAssociation
-            CreateMap<NewMemorandumRequestDto, MemorandumOfAssociation>();
+            CreateMap<NewLiabilityClauseRequestDto, MemorandumOfAssociation>();
 
             // NewShareClauseRequestDto => ShareClause
             CreateMap<NewShareClauseRequestDto, ShareClause>();
@@ -37,12 +37,20 @@ namespace BarTender.Profiles {
             CreateMap<NewArticleOfAssociationRequestDto, ArticlesOfAssociation>();
 
             // NewShareHolderRequestDto => PrivateEntityOwner
-            CreateMap<NewShareHolderRequestDto, Person>();
+            CreateMap<NewShareHolderRequestDto, ShareHolder>();
 
             // NewShareHoldingEntityRequestDto => ShareholdingForeignEntity
             CreateMap<NewShareHoldingEntityRequestDto, ForeignEntity>()
                 .ForMember(dest => dest.ForeignEntityName, op =>
                     op.MapFrom(src => src.Name));
+            
+            // NewDirectorSecretaryRequestDto => Director
+            CreateMap<NewDirectorSecretaryRequestDto, Director>();
+            
+            // NewDirectorSecretaryRequestDto => Secretary
+            CreateMap<NewDirectorSecretaryRequestDto, Secretary>();
+            
+            
         }
     }
 }

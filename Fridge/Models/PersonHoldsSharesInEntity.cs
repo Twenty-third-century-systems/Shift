@@ -4,7 +4,7 @@
         {
             
         }
-        public PersonHoldsSharesInPrivateEntity(PrivateEntity privateEntity, Person shareHolder)
+        public PersonHoldsSharesInPrivateEntity(PrivateEntity privateEntity, ShareHolder shareHolder)
         {
             PrivateEntitySubscribed = privateEntity;
             ShareHolder = shareHolder;
@@ -14,6 +14,6 @@
         public int PrivateEntityId { get; set; }
 
         public PrivateEntity PrivateEntitySubscribed { get; set; }
-        public Person ShareHolder { get; set; }
+        public ShareHolder ShareHolder { get; set; }
     }
 }

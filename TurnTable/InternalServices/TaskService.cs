@@ -27,7 +27,7 @@ namespace TurnTable.InternalServices {
                     _context.Applications.Where(a =>
                         a.TaskId == null &&
                         a.CityId.Equals(sortingOffice) &&
-                        a.Status.Equals(EApplicationStatus.Submited)))
+                        a.Status.Equals(EApplicationStatus.Submitted)))
                 .ToListAsync();
         }
 

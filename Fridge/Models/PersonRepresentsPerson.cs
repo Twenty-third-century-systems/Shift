@@ -4,7 +4,7 @@
         {
             
         }
-        public PersonRepresentsPerson(Person nominee, Person beneficiary)
+        public PersonRepresentsPerson(ShareHolder nominee, ShareHolder beneficiary)
         {
             Nominee = nominee;
             Beneficiary = beneficiary;
@@ -13,7 +13,7 @@
         public int BeneficiaryId { get; set; }
         public int NomineeId { get; set; }
 
-        public Person Beneficiary { get; set; }
-        public Person Nominee { get; set; }
+        public ShareHolder Beneficiary { get; set; }
+        public ShareHolder Nominee { get; set; }
     }
 }

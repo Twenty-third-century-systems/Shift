@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 
-namespace DanceFlow.Clients.NameSearch {
+namespace Drinkers.InternalClients.NameSearch {
     public interface INameSearchApiService {
         Task<bool> ChangeNameStatusAsync(int nameId, int status);
         Task<bool> FinishNameSearchExaminationAsync(int nameSearchId);

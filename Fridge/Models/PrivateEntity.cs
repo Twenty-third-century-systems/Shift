@@ -8,14 +8,14 @@ namespace Fridge.Models {
     public partial class PrivateEntity {
         public PrivateEntity()
         {
+            Directors = new HashSet<Director>();
             PersonHoldsSharesInPrivateEntities = new HashSet<PersonHoldsSharesInPrivateEntity>();
             PersonRepresentsPrivateEntity = new HashSet<PersonRepresentsPrivateEntity>();
             PrivateEntitySubscriptions = new HashSet<PrivateEntitySubscription>();
         }
 
-        public PrivateEntity(EntityName name, string industrySector) : this()
+        public PrivateEntity(EntityName name) : this()
         {
-            IndustrySector = industrySector;
             Name = name;
         }
 
@@ -26,20 +26,21 @@ namespace Fridge.Models {
         public string IndustrySector { get; set; }
         public string Reference { get; set; }
         public Office Office { get; set; }
+        public int? SecretaryId { get; set; }
+        
         public ArticlesOfAssociation ArticlesOfAssociation { get; set; }
-
         public Application CurrentApplication { get; set; }
         public Application LastApplication { get; set; }
         public EntityName Name { get; set; }
-
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
 
+        public Secretary Secretary { get; set; }
+        // Directors
+        public ICollection<Director> Directors { get; set; }
         // members
         public ICollection<PersonHoldsSharesInPrivateEntity> PersonHoldsSharesInPrivateEntities { get; set; }
-
         // Representative nominees in other private entities
         public ICollection<PersonRepresentsPrivateEntity> PersonRepresentsPrivateEntity { get; set; }
-
         // Subscriptions in other entities
         public ICollection<PrivateEntitySubscription> PrivateEntitySubscriptions { get; set; }
     }

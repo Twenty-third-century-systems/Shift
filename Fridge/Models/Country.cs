@@ -11,7 +11,7 @@ namespace Fridge.Models
         {
             Cities = new HashSet<City>();
             ForeignEntities = new HashSet<ForeignEntity>();
-            PrivateOwners = new HashSet<Person>();
+            People = new HashSet<Person>();
         }
         
         public string Code { get; set; }
@@ -21,6 +21,6 @@ namespace Fridge.Models
 
         public ICollection<City> Cities { get; set; }
         public ICollection<ForeignEntity> ForeignEntities { get; set; }
-        public ICollection<Person> PrivateOwners { get; set; }
+        public ICollection<Person> People { get; set; }
     }
 }

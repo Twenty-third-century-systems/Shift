@@ -18,8 +18,8 @@ namespace Shisha {
             new ApiScope[]
             {
                 new ApiScope("scope1", "E-Online Client API"),
-                new ApiScope("scope2"),
-                new ApiScope("scope3"),
+                // new ApiScope("scope2"),
+                // new ApiScope("scope3"),
             };
 
         public static IEnumerable<Client> Clients =>

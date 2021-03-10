@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 using Cabinet.Dtos.Internal.Response;
 
-namespace DanceFlow.Clients.Task {
+namespace Drinkers.InternalClients.Task {
     public class TaskApiClientService : ITaskApiClientService {
         private readonly HttpClient _client;
 

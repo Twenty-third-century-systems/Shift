@@ -4,7 +4,7 @@
         {
             
         }
-        public PersonSubscription(Person shareHolder, ShareClause shareClause, int amountOfSharesSubscribed)
+        public PersonSubscription(ShareHolder shareHolder, ShareClause shareClause, int amountOfSharesSubscribed)
         {
             ShareHolder = shareHolder;
             ShareClause = shareClause;
@@ -16,6 +16,6 @@
         public int AmountOfSharesSubscribed { get; set; }
 
         public ShareClause ShareClause { get; set; }
-        public Person ShareHolder { get; set; }
+        public ShareHolder ShareHolder { get; set; }
     }
 }

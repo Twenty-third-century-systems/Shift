@@ -31,13 +31,13 @@ namespace Fridge.Contexts {
         public DbSet<ExaminationTask> ExaminationTasks { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<Person> Subscribers { get; set; }
+        public DbSet<ShareHolder> Subscribers { get; set; }
         public DbSet<ShareClause> ShareClasses { get; set; }
         public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
         public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<PriceItem> PriceItems { get; set; }
-        public DbSet<Person> PrivateEntitySubscribers { get; set; }
+        public DbSet<ShareHolder> PrivateEntitySubscribers { get; set; }
         public DbSet<PersonHoldsSharesInPrivateEntity> PeopleHoldingSharesInPrivateEntities { get; set; }
         public DbSet<PersonRepresentsPerson> PeopleRepresentingPeople { get; set; }
         public DbSet<PersonRepresentsForeignEntity> PeopleRepresentingForeignEntities { get; set; }
@@ -45,10 +45,51 @@ namespace Fridge.Contexts {
         public DbSet<PersonSubscription> PeopleSubscriptionsInPrivateEntities { get; set; }
         public DbSet<ForeignEntitySubscription> ForeignEntitySubscriptionsInPrivateEntities { get; set; }
         public DbSet<PrivateEntitySubscription> PrivateEntitySubscriptionsInPrivateEntities { get; set; }
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Director> Directors { get; set; }
+        public DbSet<Secretary> Secretaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<Person>(entity =>
+            {
+                entity.ToTable("people");
+                
+                entity.HasIndex(e => e.CountryCode);
+
+                entity.Property(e => e.PersonId).HasColumnName("id");
+
+                entity.Property(e => e.CountryCode).HasColumnName("country");
+
+                entity.Property(e => e.Surname).HasColumnName("surname");
+
+                entity.Property(e => e.Names).HasColumnName("names");
+
+                entity.Property(e => e.Gender)
+                    .HasColumnName("sex")
+                    .HasConversion(c => c.ToString(), c => Enum.Parse<EGender>(c));
+
+                entity.Property(e => e.DateOfBirth).HasColumnName("dob");
+
+                entity.Property(e => e.NationalIdentification).HasColumnName("national_id_passport");
+
+                entity.Property(e => e.PhysicalAddress).HasColumnName("physical_address");
+
+                entity.Property(e => e.MobileNumber).HasColumnName("mobile_number");
+
+                entity.Property(e => e.EmailAddress).HasColumnName("email_address");
+                
+                entity.HasOne(d => d.Country)
+                    .WithMany(p => p.People)
+                    .HasForeignKey(d => d.CountryCode);
+                
+                entity.HasDiscriminator<string>("person_type")
+                    .HasValue<Director>("director")
+                    .HasValue<ShareHolder>("shareholder")                
+                    .HasValue<Secretary>("Secretary");
+            });
 
             modelBuilder.Entity<Application>(entity =>
             {
@@ -209,6 +250,8 @@ namespace Fridge.Contexts {
                     .HasMaxLength(45)
                     .HasColumnName("reference");
 
+                entity.Property(e => e.SecretaryId).HasColumnName("secretary");
+
                 entity.OwnsOne(e => e.Office, o =>
                 {
                     o.ToTable("office");
@@ -249,6 +292,11 @@ namespace Fridge.Contexts {
                     });
                 });
 
+                entity.HasOne(d => d.Secretary)
+                    .WithOne(p => p.PrivateEntity)
+                    .HasForeignKey<PrivateEntity>(d => d.SecretaryId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
                 entity.HasOne(d => d.CurrentApplication)
                     .WithOne(p => p.PrivateEntity)
                     .HasForeignKey<PrivateEntity>(d => d.ApplicationId)
@@ -262,6 +310,22 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.Name)
                     .WithMany(p => p.PrivateEntities)
                     .HasForeignKey(d => d.NameId);
+            });
+
+            modelBuilder.Entity<Director>(entity =>
+            {
+                entity.Property(e => e.DateOfAppointment).HasColumnName("date_of_appointment");
+                
+                entity.Property(e => e.PrivateEntityId).HasColumnName("entity");
+
+                entity.HasOne(p => p.PrivateEntity)
+                    .WithMany(p => p.Directors)
+                    .HasForeignKey(d => d.PrivateEntityId);
+            });
+
+            modelBuilder.Entity<Secretary>(entity =>
+            {
+                entity.Property(e => e.DateOfAppointment).HasColumnName("date_of_appointment");
             });
 
             modelBuilder.Entity<ExaminationTask>(entity =>
@@ -394,49 +458,11 @@ namespace Fridge.Contexts {
                     .HasForeignKey(d => d.MemorandumId);
             });
 
-            modelBuilder.Entity<Person>(entity =>
+            modelBuilder.Entity<ShareHolder>(entity =>
             {
-                entity.ToTable("subscriber");
-
-                entity.HasIndex(e => e.CountryCode);
-
-                entity.Property(e => e.PersonId).HasColumnName("id");
-
-                entity.Property(e => e.CountryCode).HasColumnName("country");
-
-                entity.Property(e => e.Surname).HasColumnName("surname");
-
-                entity.Property(e => e.Names).HasColumnName("names");
-
-                entity.Property(e => e.Gender)
-                    .HasColumnName("sex")
-                    .HasConversion(c => c.ToString(), c => Enum.Parse<EGender>(c));
-
-                entity.Property(e => e.DateOfBirth).HasColumnName("dob");
-
-                entity.Property(e => e.NationalIdentification).HasColumnName("national_id_passport");
-
-                entity.Property(e => e.PhysicalAddress).HasColumnName("physical_address");
-
-                entity.Property(e => e.MobileNumber).HasColumnName("mobile_number");
-
-                entity.Property(e => e.EmailAddress).HasColumnName("email_address");
-
-                entity.Property(e => e.DateOfAppointment).HasColumnName("date_of_appointment");
-
-                entity.Property(e => e.IsSecretary).HasColumnName("secretary");
-
-                entity.Property(e => e.IsDirector).HasColumnName("director");
-
                 entity.Property(e => e.Occupation).HasColumnName("occupation");
 
-                entity.Property(e => e.DateOfTakeUp).HasColumnName("take_up_date");
-
-                entity.Property(e => e.PersonId).HasColumnName("id");
-
-                entity.HasOne(d => d.Country)
-                    .WithMany(p => p.PrivateOwners)
-                    .HasForeignKey(d => d.CountryCode);
+                entity.Property(e => e.DateOfTakeUp).HasColumnName("take_up_date");                
             });
 
             modelBuilder.Entity<ShareClause>(entity =>

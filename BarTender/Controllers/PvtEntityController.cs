@@ -178,8 +178,8 @@ namespace BarTender.Controllers {
 
             return BadRequest("Could not reload application");
         }
-        
-        
+
+
         [HttpGet("names")]
         public async Task<IActionResult> GetApplicableNames()
         {
@@ -259,18 +259,18 @@ namespace BarTender.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpGet("name")]
-        public async Task<IActionResult> NameChosenForApplication(int nameId, string industrySector)
+        [HttpPost("name")]
+        public async Task<IActionResult> NameChosenForApplication(int nameId)
         {
-            // User user;
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
-            //         .ReadAsStringAsync();
-            //     user = JsonConvert.DeserializeObject<User>(response);
-            // }
+            User user;
+            using (var client = new HttpClient())
+            {
+                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                client.SetBearerToken(accessToken);
+                var response = await client.GetAsync("https://localhost:5001/connect/userinfo").Result.Content
+                    .ReadAsStringAsync();
+                user = JsonConvert.DeserializeObject<User>(response);
+            }
             //
             // var name = (
             //     from n in _eachDb.Names
@@ -390,12 +390,12 @@ namespace BarTender.Controllers {
             //     }
             // }
 
-            return Ok(await _privateEntityService.CreateApplicationAsync(_user, nameId, industrySector));
+            return Ok(await _privateEntityService.CreateApplicationAsync(user.Sub, nameId));
         }
 
         [AllowAnonymous]
-        [HttpPost("o")]
-        public async Task<IActionResult> SubmitOffice([FromBody] NewPrivateEntityOfficeRequestDto dto)
+        [HttpPost("office")]
+        public async Task<IActionResult> Office([FromBody] NewPrivateEntityOfficeRequestDto dto)
         {
             // var application = (
             //     from a in _eachDb.Applications
@@ -462,8 +462,24 @@ namespace BarTender.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpPost("memo")]
-        public async Task<IActionResult> SubmitClauses([FromBody] NewMemorandumRequestDto dto)
+        [HttpPost("directors")]
+        public async Task<IActionResult> Directors([FromBody] NewDirectorsRequestDto dto)
+        {
+            if (dto.Directors.Count > 1)
+                return Ok(await _privateEntityService.InsertDirectors(_user,dto));
+            return BadRequest("A minimum of two directors is required");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("secretary")]
+        public IActionResult Secretary([FromBody] NewSecretaryRequestDto dto)
+        {
+            return Ok(_privateEntityService.InsertSecretary(_user, dto));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("liability/clause")]
+        public async Task<IActionResult> Clauses([FromBody] NewLiabilityClauseRequestDto dto)
         {
             // var entitity = (
             //     from p in _eachDb.PvtEntities
@@ -503,14 +519,76 @@ namespace BarTender.Controllers {
             //             return Ok(memo.Id);
             //     }
             // }
-            return Ok(await _privateEntityService.InsertMemorandumOfAssociationAsync(_user, dto));
+            return Ok(await _privateEntityService.InsertLiabilityClauseAsync(_user, dto));
 
             return BadRequest();
         }
 
         [AllowAnonymous]
-        [HttpPost("ob")]
-        public async Task<IActionResult> SubmitObjects([FromBody] NewMemorandumOfAssociationObjectsRequestDto dto)
+        [HttpPost("share/clause")]
+        public async Task<IActionResult> ShareClause([FromBody] NewShareClausesRequestDto dto)
+        {
+            // var entity = (
+            //     from p in _eachDb.PvtEntities
+            //     from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
+            //     where a.Id == amendedArticleDto.ApplicationId
+            //           && p.Id == amendedArticleDto.PvtEntityId
+            //     select p
+            // ).FirstOrDefault();
+            //
+            // if (entity != null)
+            // {
+            //     if (entity.ArticlesId != null)
+            //     {
+            //         int count = 0;
+            //         foreach (var amendedArticle in amendedArticleDto.AmendedArticles)
+            //         {
+            //             int? amendedArticleId = null;
+            //             if (amendedArticle.Id == 0)
+            //             {
+            //                 amendedArticleId = _eachDb.AmmendedArticles
+            //                     .Value(a => a.Value, amendedArticle.Article)
+            //                     .Value(a => a.ArticleId, entity.ArticlesId)
+            //                     .InsertWithInt32Identity();
+            //             }
+            //             else
+            //             {
+            //                 var amendedArticleFromDb = (
+            //                     from a in _eachDb.AmmendedArticles
+            //                     where a.Id == amendedArticle.Id
+            //                     select a
+            //                 ).FirstOrDefault();
+            //
+            //                 if (amendedArticleFromDb != null)
+            //                 {
+            //                     amendedArticleFromDb.Value = amendedArticle.Article;
+            //                     if (_eachDb.Update(amendedArticleFromDb) == 1)
+            //                         amendedArticleId = amendedArticleFromDb.Id;
+            //                 }
+            //             }
+            //
+            //             if (amendedArticleId != null && amendedArticleId > 0)
+            //             {
+            //                 count++;
+            //                 continue;
+            //             }
+            //             else
+            //                 break;
+            //         }
+            //
+            //         if (count == amendedArticleDto.AmendedArticles.Count)
+            //         {
+            //             return NoContent();
+            //         }
+            //     }
+            // }
+
+            return Ok(await _privateEntityService.InsertShareClauseAsync(_user, dto));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("memorandum/objects")]
+        public async Task<IActionResult> Objects([FromBody] NewMemorandumOfAssociationObjectsRequestDto dto)
         {
             // var entity = (
             //     from p in _eachDb.PvtEntities
@@ -573,8 +651,8 @@ namespace BarTender.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpPost("a")]
-        public async Task<IActionResult> SubmitTableArticle([FromBody] NewArticleOfAssociationRequestDto dto)
+        [HttpPost("articles")]
+        public async Task<IActionResult> TableArticle([FromBody] NewArticleOfAssociationRequestDto dto)
         {
             // var entity = (
             //     from p in _eachDb.PvtEntities
@@ -661,76 +739,17 @@ namespace BarTender.Controllers {
             //     }
             // }
             return Ok(await _privateEntityService.InsertArticlesOfAssociationAsync(_user, dto));
-            return BadRequest();
         }
 
-        [AllowAnonymous]
-        [HttpPost("sc")]
-        public async Task<IActionResult> SubmitAmendedArticles([FromBody] NewShareClausesRequestDto dto)
+        [HttpPost("amended/articles")]
+        public IActionResult AmendedArticles([FromBody] NewAmendedArticlesRequestDto dto)
         {
-            // var entity = (
-            //     from p in _eachDb.PvtEntities
-            //     from a in _eachDb.Applications.InnerJoin(k => k.Id == p.ApplicationId)
-            //     where a.Id == amendedArticleDto.ApplicationId
-            //           && p.Id == amendedArticleDto.PvtEntityId
-            //     select p
-            // ).FirstOrDefault();
-            //
-            // if (entity != null)
-            // {
-            //     if (entity.ArticlesId != null)
-            //     {
-            //         int count = 0;
-            //         foreach (var amendedArticle in amendedArticleDto.AmendedArticles)
-            //         {
-            //             int? amendedArticleId = null;
-            //             if (amendedArticle.Id == 0)
-            //             {
-            //                 amendedArticleId = _eachDb.AmmendedArticles
-            //                     .Value(a => a.Value, amendedArticle.Article)
-            //                     .Value(a => a.ArticleId, entity.ArticlesId)
-            //                     .InsertWithInt32Identity();
-            //             }
-            //             else
-            //             {
-            //                 var amendedArticleFromDb = (
-            //                     from a in _eachDb.AmmendedArticles
-            //                     where a.Id == amendedArticle.Id
-            //                     select a
-            //                 ).FirstOrDefault();
-            //
-            //                 if (amendedArticleFromDb != null)
-            //                 {
-            //                     amendedArticleFromDb.Value = amendedArticle.Article;
-            //                     if (_eachDb.Update(amendedArticleFromDb) == 1)
-            //                         amendedArticleId = amendedArticleFromDb.Id;
-            //                 }
-            //             }
-            //
-            //             if (amendedArticleId != null && amendedArticleId > 0)
-            //             {
-            //                 count++;
-            //                 continue;
-            //             }
-            //             else
-            //                 break;
-            //         }
-            //
-            //         if (count == amendedArticleDto.AmendedArticles.Count)
-            //         {
-            //             return NoContent();
-            //         }
-            //     }
-            // }
-
-            return Ok(await _privateEntityService.InsertShareClauseAsync(_user, dto));
-
-            return BadRequest();
+            return Ok(_privateEntityService.InsertAmendedArticles(_user, dto));
         }
 
         [AllowAnonymous]
-        [HttpPost("p")]
-        public async Task<IActionResult> SubmitShareHoldingPeople([FromBody] NewShareHoldersRequestDto dto)
+        [HttpPost("shareholders")]
+        public async Task<IActionResult> ShareHoldingPeople([FromBody] NewShareHoldersRequestDto dto)
         {
             // var entity = (
             //     from p in _eachDb.PvtEntities
@@ -889,15 +908,9 @@ namespace BarTender.Controllers {
             return BadRequest();
         }
 
-        [HttpPost("e")]
-        public IActionResult SubmitShareHoldingEntities([FromBody] ShareHoldingEntityDto shareHoldingEntityDto)
-        {
-            return NoContent();
-        }
-
         [AllowAnonymous]
-        [HttpHead("s")]
-        public async Task<IActionResult> SubmitApplication(int applicationId)
+        [HttpHead("finish")]
+        public async Task<IActionResult> FinishApplication(int applicationId)
         {
             // var application = (
             //     from a in _eachDb.Applications
@@ -946,7 +959,7 @@ namespace BarTender.Controllers {
             //     }
             // }
 
-            if (await _privateEntityService.SubmitApplicationAsync(_user, applicationId) > 0)
+            if (await _privateEntityService.FinishApplicationAsync(_user, applicationId) > 0)
                 return NoContent();
             return BadRequest();
         }

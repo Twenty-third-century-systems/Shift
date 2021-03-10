@@ -1,8 +1,9 @@
 ﻿namespace Fridge.Constants {
     public enum EApplicationStatus {        
         Incomplete,
-        Submited,
+        Submitted,
         Assigned,
         Examined,
+        Approved        
     }
 }

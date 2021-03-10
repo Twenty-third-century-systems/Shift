@@ -4,13 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
-using DanceFlow.Clients.Task;
-using DanceFlow.Dtos;
 using DanceFlow.Models;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
+using Drinkers.InternalClients.Task;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

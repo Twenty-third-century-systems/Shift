@@ -81,6 +81,8 @@ namespace Shisha {
                     .UseDefaultLogging(provider);
             });
         }
+        
+        
 
         public void Configure(IApplicationBuilder app)
         {

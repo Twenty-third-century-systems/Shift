@@ -3,20 +3,20 @@
     Layout = "_Layout";
 }
 
-<input type="hidden" id="applicationId" value="@ViewBag.ApplicationId"/>
-<input type="hidden" id="pvtEntityId" value="@ViewBag.PvtEntityApplication"/>
+<input type="hidden" id="applicationId" value="@ViewBag.Application.Id"/>
+@* <input type="hidden" id="pvtEntityId" value="@ViewBag.PvtEntityApplication"/> *@
 
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">New Entity <small>(@ViewBag.NameRacho)</small></h1>
+                <h1 class="m-0 text-dark">New Entity: <small>@ViewBag.EntityName</small></h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">
-                        <a href="#">Entities / <span class="text-muted">Private company reg</span></a>
+                        <a href="#">Entities / <span class="text-muted">Private company registration</span></a>
                     </li>
                     @* <li class="breadcrumb-item active">Starter Page</li> *@
                 </ol>
@@ -31,12 +31,12 @@
     <ul class="nav">
         <li class="nav-item">
             <a class="nav-link" href="#step-1">
-                <strong>Office</strong>
+                <strong>Industry sector and Office</strong>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#step-2">
-                <strong>Memorandum of association</strong>
+                <strong>Directors and Secretary</strong>
             </a>
         </li>
         <li class="nav-item">
@@ -51,14 +51,15 @@
         </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content container-fluid">
 
         <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
             <partial name="EntitiesPartial/_OfficeFormPartial"/>
         </div>
 
         <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
-            <partial name="EntitiesPartial/_MemorandumOfAssociationPartial"/>
+            @* <partial name="EntitiesPartial/_MemorandumOfAssociationPartial"/> *@
+            <partial name="EntitiesPartial/_DirectorSecretaryPartial"/>
         </div>
 
         <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
@@ -94,9 +95,11 @@
     <script type="text/javascript" src="~/js/new-entity/data-tables-conf.js"></script>
     <!-- custom validations for address form -->
     <script type="text/javascript" src="~/js/new-entity/custom-validations.js"></script>
+    <!-- secretary-form-validation -->
+    <script type="text/javascript" src="~/js/new-entity/secretary-custom-validation.js"></script>
     <!-- custom smart-wizard configuration -->
     <script type="text/javascript" src="~/js/new-entity/step-wizard-conf.js"></script>
     <!-- application-reload -->
-    
+
     @* <script type="text/javascript" src="~/js/new-entity/application-reload.js"></script> *@
 }

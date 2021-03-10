@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 
-namespace DanceFlow.Clients.NameSearch {
+namespace Drinkers.InternalClients.NameSearch {
     public class NameSearchApiService : INameSearchApiService {
         private readonly HttpClient _client;
 

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using DanceFlow.Clients.NameSearch;
-using DanceFlow.Clients.Task;
-using DanceFlow.Dtos;
-using DanceFlow.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using DanceFlow.Dtos;
+using Drinkers.InternalClients.NameSearch;
+using Drinkers.InternalClients.Task;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 using Task = System.Threading.Tasks.Task;
 
 namespace DanceFlow.Hubs {

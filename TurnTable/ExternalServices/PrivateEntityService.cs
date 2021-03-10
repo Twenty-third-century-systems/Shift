@@ -33,7 +33,7 @@ namespace TurnTable.ExternalServices {
             return registeredNameResponseDtos;
         }
 
-        public async Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId, string industrySector)
+        public async Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId)
         {
             // TODO: create a dto including the IndustrySector
             // Getting the reserved name
@@ -49,13 +49,21 @@ namespace TurnTable.ExternalServices {
                     name.NameSearch.Application.SortingOffice.CityId);
 
             // Constructing a new Private entity and associating with the application
-            var privateEntity = new PrivateEntity(name, industrySector);
+            var privateEntity = new PrivateEntity(name);
+            privateEntity.MemorandumOfAssociation = new MemorandumOfAssociation();
             application.PrivateEntity = privateEntity;
+
 
             bool resubmission = false;
             // Mark name as used
             if (name.Status == ENameStatus.Used)
             {
+                // await _context.Entry(name).Collection(n => n.PrivateEntities).Query().Include(p => p.CurrentApplication)
+                //     .LoadAsync();
+                // if (name.PrivateEntities.Count > 0)
+                // {
+                //     var entity = name.PrivateEntities.First();
+                // }
                 resubmission = true;
             }
             else
@@ -67,15 +75,7 @@ namespace TurnTable.ExternalServices {
             // Mark application for insertion
             await _context.AddAsync(application);
 
-            // Commit to database
-            await _context.SaveChangesAsync();
-
-            // Construct and return resource
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
 
         public async Task<ApplicationResponseDto> InsertOfficeAsync(Guid user, NewPrivateEntityOfficeRequestDto dto)
@@ -83,90 +83,74 @@ namespace TurnTable.ExternalServices {
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
 
             application.PrivateEntity.Office = _mapper.Map<Office>(dto);
-            await _context.SaveChangesAsync();
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            application.PrivateEntity.IndustrySector = dto.IndustrySector;
+            return await ReturnApplicationResponse(application);
         }
 
-        public async Task<ApplicationResponseDto> InsertMemorandumOfAssociationAsync(Guid user,
-            NewMemorandumRequestDto dto)
+        // TODO: change from dto to just a string
+        public async Task<ApplicationResponseDto> InsertLiabilityClauseAsync(Guid user,
+            NewLiabilityClauseRequestDto dto)
         {
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
-            application.PrivateEntity.MemorandumOfAssociation =
-                _mapper.Map<NewMemorandumRequestDto, MemorandumOfAssociation>(dto);
+            await LoadSavedMemorandumAsync(application);
+            application.PrivateEntity.MemorandumOfAssociation ??= new MemorandumOfAssociation();
+            application.PrivateEntity.MemorandumOfAssociation.LiabilityClause = dto.LiabilityClause;
 
-            await _context.SaveChangesAsync();
-
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
 
         public async Task<ApplicationResponseDto> InsertMemorandumObjectsAsync(Guid user,
             NewMemorandumOfAssociationObjectsRequestDto dto)
         {
-            // Load Application from db
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
-
-            // Load Memo
             await LoadSavedMemorandumAsync(application);
-
-            // Add Objects
+            application.PrivateEntity.MemorandumOfAssociation ??= new MemorandumOfAssociation();
             application.PrivateEntity.MemorandumOfAssociation.MemorandumObjects = _mapper
                 .Map<List<NewMemorandumOfAssociationObjectRequestDto>, List<MemorandumOfAssociationObject>
                 >(dto.Objects);
-
-            await _context.SaveChangesAsync();
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
 
         public async Task<ApplicationResponseDto> InsertArticlesOfAssociationAsync(Guid user,
             NewArticleOfAssociationRequestDto dto)
         {
-            if (!dto.TableOfArticles.Equals(null) && dto.AmendedArticles.Count > 0)
-                throw new Exception("You must use the set tables of Articles or a custom table, not both.");
-
-            // Getting Application from database 
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
-
-            // Adding ArticlesOfAssociation
             application.PrivateEntity.ArticlesOfAssociation =
                 _mapper.Map<NewArticleOfAssociationRequestDto, ArticlesOfAssociation>(dto);
-
-            await _context.SaveChangesAsync();
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
+
+        public async Task<ApplicationResponseDto> InsertAmendedArticles(Guid user, NewAmendedArticlesRequestDto dto)
+        {
+            var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
+            application.PrivateEntity.ArticlesOfAssociation ??= new ArticlesOfAssociation();
+            application.PrivateEntity.ArticlesOfAssociation.AmendedArticles =
+                _mapper.Map<List<AmendedArticle>>(dto.AmendedArticles);
+            return await ReturnApplicationResponse(application);
+        }
+
+        public async Task<ApplicationResponseDto> InsertDirectors(Guid user, NewDirectorsRequestDto dto)
+        {
+            var application = await GetPrivateEntityApplicationAsync(user,dto.ApplicationId);
+            application.PrivateEntity.Directors = _mapper.Map<List<Director>>(dto.Directors);
+            return await ReturnApplicationResponse(application);
+        }
+
+        public async Task<ApplicationResponseDto> InsertSecretary(Guid user, NewSecretaryRequestDto dto)
+        {
+            var application = await GetPrivateEntityApplicationAsync(user,dto.ApplicationId);
+            application.PrivateEntity.Secretary = _mapper.Map<Secretary>(dto.Secretary);
+            return await ReturnApplicationResponse(application);
+        }
+
 
         public async Task<ApplicationResponseDto> InsertShareClauseAsync(Guid user, NewShareClausesRequestDto dto)
         {
-            // Get application from database
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
-
             await LoadSavedMemorandumAsync(application);
-
-            // Add ShareClause(s)
             application.PrivateEntity.MemorandumOfAssociation.ShareClauses =
                 _mapper.Map<List<NewShareClauseRequestDto>, List<ShareClause>>(dto.Clauses);
-
-            await _context.SaveChangesAsync();
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
 
         public async Task<ApplicationResponseDto> InsertMembersAsync(Guid user, NewShareHoldersRequestDto dto)
@@ -248,25 +232,13 @@ namespace TurnTable.ExternalServices {
                 }
                 else throw new Exception("One of the shareholding entities is not represented.");
             }
-
-            await _context.SaveChangesAsync();
-            return new ApplicationResponseDto
-            {
-                Id = application.ApplicationId,
-                Service = application.Service.ToString()
-            };
+            return await ReturnApplicationResponse(application);
         }
 
-        private static void AddPrivateEntityMember(Application application, Person person)
-        {
-            application.PrivateEntity.PersonHoldsSharesInPrivateEntities.Add(
-                new PersonHoldsSharesInPrivateEntity(application.PrivateEntity, person));
-        }
-
-        public async Task<int> SubmitApplicationAsync(Guid user, int applicationId)
+        public async Task<int> FinishApplicationAsync(Guid user, int applicationId)
         {
             var application = await GetPrivateEntityApplicationAsync(user, applicationId);
-            application.Status = EApplicationStatus.Submited;
+            application.Status = EApplicationStatus.Submitted;
             return await _context.SaveChangesAsync();
         }
 
@@ -279,9 +251,7 @@ namespace TurnTable.ExternalServices {
             if (previousApplication.Status == EApplicationStatus.Examined &&
                 previousApplication.RaisedQueries.Count > 0)
             {
-                
-                var newApplication = await CreateApplicationAsync(user, previousApplication.PrivateEntity.NameId,
-                    previousApplication.PrivateEntity.IndustrySector);
+                var newApplication = await CreateApplicationAsync(user, previousApplication.PrivateEntity.NameId);
                 var createdApplication = await _context.Applications.FindAsync(newApplication.Id);
                 createdApplication.PrivateEntity.LastApplicationId = previousApplication.ApplicationId;
                 if (await _context.SaveChangesAsync() > 0)
@@ -293,6 +263,8 @@ namespace TurnTable.ExternalServices {
 
             return null;
         }
+        
+        // Helper methods
 
         public async Task<Application> GetPrivateEntityApplicationAsync(Guid user, int applicationId)
         {
@@ -309,10 +281,9 @@ namespace TurnTable.ExternalServices {
                 .Reference(p => p.MemorandumOfAssociation).LoadAsync();
         }
 
-        private Person MapPerson(NewShareHolderRequestDto dto,
-            ICollection<ShareClause> shareClauses)
+        private ShareHolder MapPerson(NewShareHolderRequestDto dto,ICollection<ShareClause> shareClauses)
         {
-            var person = _mapper.Map<Person>(dto);
+            var person = _mapper.Map<ShareHolder>(dto);
             foreach (var subscription in dto.Subs)
             {
                 person.PersonSubscriptions.Add(
@@ -321,6 +292,23 @@ namespace TurnTable.ExternalServices {
             }
 
             return person;
+        }        
+
+        private static void AddPrivateEntityMember(Application application, ShareHolder shareHolder)
+        {
+            application.PrivateEntity.PersonHoldsSharesInPrivateEntities.Add(
+                new PersonHoldsSharesInPrivateEntity(application.PrivateEntity, shareHolder));
+        }
+
+        private async Task<ApplicationResponseDto> ReturnApplicationResponse(Application application)
+        {
+            if (await _context.SaveChangesAsync() > 0)
+                return new ApplicationResponseDto
+                {
+                    Id = application.ApplicationId,
+                    Service = application.Service.ToString()
+                };
+            return null;
         }
     }
 }

@@ -15,17 +15,17 @@
                             <div class="form-group">
                                 <label for="peopleCountry">Country</label>
                                 <select class="form-control select2" id="peopleCountry" name="peopleCountry">
-                                    @foreach (var value in ViewBag.Countries)
-                                    {
-                                        if (value.Name.Equals("Zimbabwe"))
-                                        {
-                                            <option selected value="@value.Code">@value.Name</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@value.Code">@value.Name</option>
-                                        }
-                                    }
+                                    @* @foreach (var value in ViewBag.Countries) *@
+                                    @* { *@
+                                    @*     if (value.Name.Equals("Zimbabwe")) *@
+                                    @*     { *@
+                                    @*         <option selected value="@value.Code">@value.Name</option> *@
+                                    @*     } *@
+                                    @*     else *@
+                                    @*     { *@
+                                    @*         <option value="@value.Code">@value.Name</option> *@
+                                    @*     } *@
+                                    @* } *@
                                 </select>
                             </div>
                         </div>
@@ -58,10 +58,10 @@
                                 <label for="gender">Gender</label>
                                 <select class="form-control select2" id="gender" name="gender">
                                     <option selected></option>
-                                    @foreach (var value in ViewBag.Gender)
-                                    {
-                                        <option value="@value.Id">@value.Value</option>
-                                    }
+                                    @* @foreach (var value in ViewBag.Gender) *@
+                                    @* { *@
+                                    @*     <option value="@value.Id">@value.Value</option> *@
+                                    @* } *@
                                 </select>
                             </div>
                         </div>

@@ -57,7 +57,7 @@ namespace TurnTable.ExternalServices {
         {
             // Initialize a new Application
             var application =
-                new Application(user, EService.NameSearch, EApplicationStatus.Submited, dto.SortingOffice);
+                new Application(user, EService.NameSearch, EApplicationStatus.Submitted, dto.SortingOffice);
 
             // Initialize a NameSearch fro mapper
             var nameSearch = _mapper.Map<NewNameSearchRequestDto, NameSearch>(dto);

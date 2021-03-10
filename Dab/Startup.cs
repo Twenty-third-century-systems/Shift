@@ -1,17 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Dab.Clients.NameSearch;
+using Dab.Clients.PrivateEntity;
+using Drinkers.ExternalClients.NameSearch;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +44,7 @@ namespace Dab {
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("scope1");
-                    options.Scope.Add("scope3");
+                    // options.Scope.Add("scope3");
                     options.Scope.Add("offline_access");
 
                     options.ResponseMode = "form_post";
@@ -60,6 +55,22 @@ namespace Dab {
 
             services.AddHttpContextAccessor();
             services.AddHttpClient<INameSearchApiClientService, NameSearchApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri(Configuration["Api"]);
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
+            
+            services.AddHttpClient<IPrivateEntityApiClientService, PrivateEntityApiClientService>(
                     async (serviceProvider, client) =>
                     {
                         var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();

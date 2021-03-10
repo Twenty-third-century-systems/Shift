@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Dab.Clients.NameSearch;
-using Dab.Dtos;
-using Dab.Globals;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Dab.Models;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
+using Drinkers.ExternalClients.NameSearch;
 
 namespace Dab.Controllers {
     public class HomeController : Controller {

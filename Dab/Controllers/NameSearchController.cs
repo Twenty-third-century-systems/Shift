@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoMapper;
-using BarTender.Dtos;
 using BarTender.Models;
 using Cabinet.Dtos.External.Request;
-using Dab.Clients.NameSearch;
-using Dab.Dtos;
-using Dab.Globals;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
+using Drinkers.ExternalClients.NameSearch;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using NameSearchDetails = Dab.Models.NameSearchDetails;
 
 namespace Dab.Controllers {
     [Route("name-search")]

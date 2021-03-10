@@ -6,6 +6,13 @@
 
     $('#officeForm').validate({
         rules: {
+            effectiveFrom: {
+                required: true,
+            },
+            industrySector: {
+                required: true,
+                minlength: 3,
+            },
             physicalAddress: {
                 required: true,
                 minlength: 3,
@@ -14,14 +21,14 @@
                 required: true,
                 minlength: 3,
             },
-            officeCity: {
+            cityTown: {
                 required: true,
             },
             emailAddress: {
                 required: true,
                 email: true,
             },
-            telNumber: {
+            telephoneNumber: {
                 required: true,
             },
             mobileNumber: {
@@ -29,6 +36,13 @@
             },
         },
         messages: {
+            effectiveFrom: {
+                required: 'This information is required.',
+            },
+            industrySector: {
+                required: 'This information is required.',
+                minlength: 'Must be at least Three characters.'
+            },
             physicalAddress: {
                 required: 'This information is required.',
                 minlength: 'Must be at least Three characters.'
@@ -37,14 +51,14 @@
                 required: 'This information is required.',
                 minlength: 'Must be at least Three characters.'
             },
-            officeCity: {
+            cityTown: {
                 required: 'This information is required.',
             },
             emailAddress: {
                 required: 'This information is required.',
                 email: 'This is not a valid email.'
             },
-            telNumber: {
+            telephoneNumber: {
                 required: 'This information is required.',
             },
             mobileNumber: {
@@ -57,8 +71,7 @@
                 url: '/entity/office',
                 data: {
                     applicationId: $('#applicationId').val(),
-                    pvtEntityId: $('#pvtEntityId').val(),
-                    office: $(form).serializeToJSON()
+                    addressInformation: $(form).serializeToJSON()
                 },
                 success: function () {
                     officeSaved = true;
@@ -79,6 +92,7 @@
         },
         unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
+            // $(element).addClass('is-valid');
         }
     });
 

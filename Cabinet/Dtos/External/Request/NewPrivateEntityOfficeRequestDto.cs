@@ -8,5 +8,6 @@ namespace Cabinet.Dtos.External.Request {
         public string TelephoneNumber { get; set; }
         public string EmailAddress { get; set; }
         public DateTime EffectiveFrom { get; set; }
+        public string IndustrySector { get; set; }
     }
 }

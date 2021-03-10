@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace Cabinet.Dtos.External.Request {
-    public class NewArticleOfAssociationRequestDto {
+    public class NewDirectorsRequestDto {
         public int ApplicationId { get; set; }
-        public int? TableOfArticles { get; set; }
+        public List<NewDirectorSecretaryRequestDto> Directors { get; set; }
     }
 }

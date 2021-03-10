@@ -47,7 +47,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cabinet\Cabinet.csproj" />
+      <ProjectReference Include="..\Drinkers\Drinkers.csproj" />
     </ItemGroup>
 
 </Project>
