@@ -125,9 +125,9 @@ namespace Dab.Controllers {
         //===========================================================================================================
 
         [HttpPost("directors")]
-        public async Task<IActionResult> Directors()
+        public async Task<IActionResult> Directors(NewDirectorsRequestDto dto)
         {
-            if (await _privateEntityApiClientService.NewDirectors(new NewDirectorsRequestDto()) != null)
+            if (await _privateEntityApiClientService.NewDirectors(dto) != null)
                 return Ok();
             return BadRequest("Something went wrong in saving Directors");
         }

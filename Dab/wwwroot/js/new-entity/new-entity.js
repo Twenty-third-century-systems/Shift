@@ -4,6 +4,7 @@ let articlesSaved = false;
 let subscribersSaved = false;
 let memoId = undefined;
 
+let directors = []
 let objects = [];
 let amendedArticles = [];
 let memberPeople = [];
@@ -44,6 +45,27 @@ $(document).ready(function () {
     // $('#shares').on("input", function () {
     //     shares = $('#shares').val();
     // });
+    $('#submitDirectors').click(function () {
+        if (directors.length > 1) {
+            $.ajax({
+                type: 'Post',
+                url: '/entity/directors',
+                data: {
+                    applicationId: $('#applicationId').val(),
+                    directors: directors
+                },
+                success: function (data) {
+                    articlesSaved = true;
+                    toastr.success("Amended articles saved saved.");
+                },
+                error: function () {
+                    toastr.error("Something went wrong in saving articles. Refresh page and resubmit.");
+                },
+            });
+        } else {
+            toastr.warning("A minimum of two directors is required.")
+        }
+    });
 
     $('#submitObjects').click(function () {
         if (objects.length > 0) {

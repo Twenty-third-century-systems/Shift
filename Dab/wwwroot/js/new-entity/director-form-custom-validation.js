@@ -17,7 +17,7 @@
 }, "You are not old enough!");
 
 $(document).ready(function () {
-    $('#secretaryForm').validate({
+    $('#directorForm').validate({
         rules: {
             countryCode: {
                 required: true,
@@ -46,6 +46,7 @@ $(document).ready(function () {
             },
             emailAddress: {
                 required: true,
+                email: true,
             },
             dateOfAppointment: {
                 required: true,
@@ -79,26 +80,28 @@ $(document).ready(function () {
             },
             emailAddress: {
                 required: 'This information is required.',
+                email: 'This is not a valid email.'
             },
             dateOfAppointment: {
                 required: 'This information is required.',
             },
         },
         submitHandler: function (form) {
-            $.ajax({
-                type: 'Post',
-                url: '/entity/secretary',
-                data: {
-                    applicationId: $('#applicationId').val(),
-                    secretary: $(form).serializeToJSON()
-                },
-                success: function () {
-                    toastr.success("Secretary saved.");
-                },
-                error: function (err) {
-                    toastr.error("Something went wrong in saving secretary details. Refresh page and resubmit.")
-                },
-            });
+            let input = $(form).serializeToJSON();
+            directors.push(input);
+            tblDirectors.row.add([
+                input.countryCode,
+                input.surname,
+                input.names,
+                input.gender,
+                input.dateOfBirth,
+                input.nationalIdentification,
+                input.physicalAddress,
+                input.mobileNumber,
+                input.emailAddress,
+                input.dateOfAppointment
+            ]).draw(false);
+            $('#directorForm').trigger('reset');
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
