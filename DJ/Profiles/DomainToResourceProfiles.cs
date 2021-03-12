@@ -72,7 +72,7 @@ namespace DJ.Profiles {
             CreateMap<ShareClause, TaskPrivateEntityShareClauseResponseDto>()
                 .ForMember(
                     dest => dest.Value,
-                    op => op.MapFrom(src => $"{src.Title} @ ${src.NominalValue} each"));
+                    op => op.MapFrom(src => $"{src.TotalNumberOfShares} {src.Title} shares"));
 
             // MemorandumObject => TaskPrivateEntityMemorandumObjectResponseDto
             CreateMap<MemorandumOfAssociation, TaskPrivateEntityMemorandumObjectResponseDto>();

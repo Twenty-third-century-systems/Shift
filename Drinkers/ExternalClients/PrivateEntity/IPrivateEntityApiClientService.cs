@@ -8,5 +8,7 @@ namespace Dab.Clients.PrivateEntity {
         Task<ApplicationResponseDto> NewPrivateEntityOffice(NewPrivateEntityOfficeRequestDto dto);        
         Task<ApplicationResponseDto> NewDirectors(NewDirectorsRequestDto dto);     
         Task<ApplicationResponseDto> NewSecretary(NewSecretaryRequestDto dto);
+        Task<ApplicationResponseDto> Objectives(NewMemorandumOfAssociationObjectsRequestDto dto);
+        Task<ApplicationResponseDto> LiabilityClause(NewLiabilityClauseRequestDto dto);
     }
 }

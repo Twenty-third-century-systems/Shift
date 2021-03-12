@@ -34,6 +34,7 @@ namespace Fridge.Models {
         public EntityName Name { get; set; }
         public MemorandumOfAssociation MemorandumOfAssociation { get; set; }
 
+        // Secretary
         public Secretary Secretary { get; set; }
         // Directors
         public ICollection<Director> Directors { get; set; }

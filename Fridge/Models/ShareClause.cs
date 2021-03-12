@@ -11,7 +11,7 @@ namespace Fridge.Models {
 
         public int ShareClauseId { get; set; }
         public string Title { get; set; }
-        public double NominalValue { get; set; }
+        // public double NominalValue { get; set; }
         public int TotalNumberOfShares { get; set; }
         public int MemorandumId { get; set; }
 

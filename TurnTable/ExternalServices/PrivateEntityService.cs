@@ -149,7 +149,7 @@ namespace TurnTable.ExternalServices {
             var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
             await LoadSavedMemorandumAsync(application);
             application.PrivateEntity.MemorandumOfAssociation.ShareClauses =
-                _mapper.Map<List<NewShareClauseRequestDto>, List<ShareClause>>(dto.Clauses);
+                _mapper.Map<List<ShareClause>>(dto.Clauses);
             return await ReturnApplicationResponse(application);
         }
 

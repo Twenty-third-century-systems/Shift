@@ -475,7 +475,7 @@ namespace Fridge.Contexts {
 
                 entity.Property(e => e.Title).HasColumnName("title");
 
-                entity.Property(e => e.NominalValue).HasColumnName("value");
+                // entity.Property(e => e.NominalValue).HasColumnName("value");
 
                 entity.Property(e => e.MemorandumId).HasColumnName("memo");
 

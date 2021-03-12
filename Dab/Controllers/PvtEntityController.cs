@@ -121,7 +121,7 @@ namespace Dab.Controllers {
 
             return BadRequest();
         }
-        
+
         //===========================================================================================================
 
         [HttpPost("directors")]
@@ -132,52 +132,70 @@ namespace Dab.Controllers {
             return BadRequest("Something went wrong in saving Directors");
         }
 
-        [HttpPost("secretary")]        
+        [HttpPost("secretary")]
         public async Task<IActionResult> Secretary(NewSecretaryRequestDto dto)
         {
             if (await _privateEntityApiClientService.NewSecretary(dto) != null)
                 return Ok();
             return BadRequest("Something went wrong in saving Directors");
         }
-        
+
         //===========================================================================================================
 
-        [HttpPost("clause")]
-        public async Task<IActionResult> ShareAndLiabilityClauses(LiabilityShareClausesDto liabilityShareClausesDto)
+        [HttpPost("liability/clause")]
+        public async Task<IActionResult> ShareAndLiabilityClauses(LiabilityClauseDto dto)
         {
-            using (var client = new HttpClient())
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = client
-                    .PostAsJsonAsync<LiabilityShareClausesDto>(ApiUrls.SubmitPvtApplicationsClauses,
-                        liabilityShareClausesDto).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    return Ok(JsonConvert.DeserializeObject<int>(resp));
-                }
-            }
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var response = client
+            //         .PostAsJsonAsync<LiabilityShareClausesDto>(ApiUrls.SubmitPvtApplicationsClauses,
+            //             dto).Result;
+            //     if (response.IsSuccessStatusCode)
+            //     {
+            //         var resp = await response.Content.ReadAsStringAsync();
+            //         return Ok(JsonConvert.DeserializeObject<int>(resp));
+            //     }
+            // }
+            var liabilityClause = _mapper.Map<NewLiabilityClauseRequestDto>(dto);
+            if (await _privateEntityApiClientService.LiabilityClause(liabilityClause) != null)
+                return Ok();
 
             return BadRequest();
         }
 
         [HttpPost("objects")]
-        public async Task<IActionResult> Objects(MemorandumObjectsDto memorandumObjectsDto)
+        public async Task<IActionResult> Objects(MemorandumObjectsRequestDto dto)
         {
-            // Handle Updates to objectives 
-            using (var client = new HttpClient())
+            //
+            // using (var client = new HttpClient())
+            // {
+            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //     client.SetBearerToken(accessToken);
+            //     var response = client
+            //         .PostAsJsonAsync<MemorandumObjectsRequestDto>(ApiUrls.SubmitPvtApplicationsObjects,
+            //             memorandumObjectsRequestDto).Result;
+            //     if (response.IsSuccessStatusCode)
+            //     {
+            //         return NoContent();
+            //     }
+            // }
+
+            var newMemo = new NewMemorandumOfAssociationObjectsRequestDto
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = client
-                    .PostAsJsonAsync<MemorandumObjectsDto>(ApiUrls.SubmitPvtApplicationsObjects,
-                        memorandumObjectsDto).Result;
-                if (response.IsSuccessStatusCode)
+                ApplicationId = dto.ApplicationId
+            };
+            foreach (var dtoObject in dto.Objects)
+            {
+                newMemo.Objects.Add(new NewMemorandumOfAssociationObjectRequestDto
                 {
-                    return NoContent();
-                }
+                    Value = dtoObject.Objective
+                });
             }
+
+            if (await _privateEntityApiClientService.Objectives(newMemo) != null)
+                return Ok();
 
             return BadRequest();
         }

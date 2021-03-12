@@ -42,5 +42,21 @@ namespace Dab.Clients.PrivateEntity {
                 return await response.Content.ReadAsAsync<ApplicationResponseDto>();
             return null;
         }
+
+        public async Task<ApplicationResponseDto> Objectives(NewMemorandumOfAssociationObjectsRequestDto dto)
+        {
+            var response = await _client.PostAsJsonAsync("entity/memorandum/objects", dto);
+            if(response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<ApplicationResponseDto>();
+            return null;
+        }
+
+        public async Task<ApplicationResponseDto> LiabilityClause(NewLiabilityClauseRequestDto dto)
+        {
+            var response = await _client.PostAsJsonAsync("entity/liability/clause", dto);
+            if(response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<ApplicationResponseDto>();
+            return null;
+        }
     }
 }

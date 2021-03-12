@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BarTender.Models;
+using Cabinet.Dtos.External.Request;
 using Dab.Models;
 
 namespace BarTender.Dtos {
@@ -12,7 +13,7 @@ namespace BarTender.Dtos {
         //TODO: Create proper object
         public string ShareClause { get; set; }
         //Objectives
-        public List<SingleObjective> Objectives { get; set; } = new List<SingleObjective>();
+        public List<SingleObjectiveRequestDto> Objectives { get; set; } = new List<SingleObjectiveRequestDto>();
         //Articles of association
         public string TableOfArticles { get; set; }
         //Amended Article

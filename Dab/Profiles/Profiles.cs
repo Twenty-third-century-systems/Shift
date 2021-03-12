@@ -2,7 +2,7 @@
 using Cabinet.Dtos.External.Request;
 
 namespace Dab.Profiles {
-    public class Profiles:Profile {
+    public class Profiles : Profile {
         public Profiles()
         {
             // NewNameSearchFormRequestDto => NewNameSearchRequestDto
@@ -11,11 +11,16 @@ namespace Dab.Profiles {
 
             // PrivateOfficeAddressRequestDto => NewPrivateEntityAddressRequestDto
             CreateMap<PrivateOfficeAddressRequestDto, NewPrivateEntityAddressRequestDto>();
-            
-            
+
+
             // PrivateOfficeAddressRequestDto => NewPrivateEntityOfficeRequestDto
             CreateMap<PrivateOfficeAddressRequestDto, NewPrivateEntityOfficeRequestDto>();
 
+
+            // 
+            CreateMap<LiabilityClauseDto, NewLiabilityClauseRequestDto>()
+                .ForMember(dest => dest.LiabilityClause,
+                    op => op.MapFrom(src => src.Clause.LiabilityClause));
         }
     }
 }

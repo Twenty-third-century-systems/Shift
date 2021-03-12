@@ -79,14 +79,14 @@ $(document).ready(function () {
                 },
                 success: function (data) {
                     memorandumSaved = true;
-                    toastr.success("Memorandum saved.");
+                    toastr.success("Objects saved successfully.");
                 },
                 error: function () {
-                    toastr.error("Something went wrong in saving office details. Refresh page and resubmit.");
+                    toastr.error("Something went wrong in Objectives. Refresh page and try again.");
                 },
             });
         } else {
-            toastr.warning("You haven't added objects yet.")
+            toastr.error("You haven't added objects yet.")
         }
     });
 

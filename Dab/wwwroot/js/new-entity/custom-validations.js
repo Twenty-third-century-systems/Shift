@@ -96,21 +96,12 @@
         }
     });
 
-    $('#clausesForm').validate({
+    $('#liabilityClauseForm').validate({
         rules: {
             liabilityClause: {
                 required: true,
                 minlength: 5,
                 lettersonly: true,
-            },
-            shareClause: {
-                required: true,
-                minlength: 5,
-                lettersonly: true,
-            },
-            shares: {
-                required: true,
-                digits: true
             },
         },
         messages: {
@@ -119,24 +110,14 @@
                 minlength: 'Must be at least Five characters.',
                 lettersonly: 'Only letters of the alphabet required.',
             },
-            shareClause: {
-                required: 'This information is required.',
-                minlength: 'Must be at least Five characters.',
-                lettersonly: 'Only letters of the alphabet required.',
-            },
-            shares: {
-                required: 'This information is required.',
-                digits: 'Only digits required.'
-            },
         },
         submitHandler: function (form) {
             $.ajax({
                 type: 'Post',
-                url: '/entity/clause',
+                url: '/entity/liability/clause',
                 data: {
                     applicationId: $('#applicationId').val(),
-                    pvtEntityId: $('#pvtEntityId').val(),
-                    clauses: $(form).serializeToJSON()
+                    clause: $(form).serializeToJSON()
                 },
                 success: function (data) {
                     memoId = data;
