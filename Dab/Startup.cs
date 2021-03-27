@@ -1,8 +1,8 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
-using Dab.Clients.PrivateEntity;
 using Drinkers.ExternalClients.NameSearch;
+using Drinkers.ExternalClients.PrivateEntity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

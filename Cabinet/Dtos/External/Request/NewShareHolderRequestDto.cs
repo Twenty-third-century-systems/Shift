@@ -6,6 +6,7 @@ namespace Cabinet.Dtos.External.Request {
         public NewShareHolderRequestDto()
         {
             PeopleRepresented = new List<NewShareHolderRequestDto>();
+            Subs = new List<ShareholderSubscriptionDto>();
         }
         public string Occupation { get; set; }
         public DateTime? DateOfTakeUp { get; set; }

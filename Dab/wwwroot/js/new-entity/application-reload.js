@@ -54,8 +54,8 @@
             }
             //Populating saved members
             if (data.members != null) {
-                tblPeople.destroy();
-                tblPeople = $('#tblPeople').DataTable({
+                tblShareholders.destroy();
+                tblShareholders = $('#tblPeople').DataTable({
                     responsive: true,
                     scrollX: true,
                     data: data.members,

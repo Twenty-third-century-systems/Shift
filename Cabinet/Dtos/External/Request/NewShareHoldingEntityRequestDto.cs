@@ -2,6 +2,11 @@
 
 namespace Cabinet.Dtos.External.Request {
     public class NewShareHoldingEntityRequestDto {
+        public NewShareHoldingEntityRequestDto()
+        {
+            Nominees = new List<NewShareHolderRequestDto>();
+            Subs = new List<ShareholderSubscriptionDto>();
+        }
         public string CountryCode { get; set; }
         public string CompanyReference { get; set; }
         public string Name { get; set; }

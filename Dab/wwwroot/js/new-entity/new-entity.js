@@ -6,13 +6,14 @@ let memoId = undefined;
 
 let directors = []
 let objects = [];
+let shareClauses = [];
 let amendedArticles = [];
-let memberPeople = [];
+let shareHolders = [];
 let memberEntities = [];
 let shares = 0;
 
 
-$('#amendedArticlesDisplay').hide();
+// $('#amendedArticlesDisplay').hide();
 
 $(document).ready(function () {
 
@@ -41,7 +42,7 @@ $(document).ready(function () {
     $("#prefShares").on("input", function () {
         calculateTotalShares();
     });
-    
+
     // $('#shares').on("input", function () {
     //     shares = $('#shares').val();
     // });
@@ -90,6 +91,29 @@ $(document).ready(function () {
         }
     });
 
+    $('#submitShareClauses').click(function () {
+        if (shareClauses.length > 0) {
+            $.ajax({
+                type: 'Post',
+                url: '/entity/share/clauses',
+                data: {
+                    applicationId: $('#applicationId').val(),
+                    clauses: shareClauses
+                },
+                success: function (data) {
+                    memorandumSaved = true;
+                    toastr.success("Share clauses saved successfully.");
+                    shareClauses.forEach(shareClause => $('#shareClass').append('<option value=' + shareClause.title + '>' + shareClause.title + '</option>'));
+                },
+                error: function () {
+                    toastr.error("Something went wrong in share clauses. Refresh page and try again.");
+                },
+            });
+        } else {
+            toastr.error("You haven't added objects yet.")
+        }
+    });
+
     $('#submitAmendedArticles').click(function () {
         if (amendedArticles.length > 0) {
             $.ajax({
@@ -114,17 +138,16 @@ $(document).ready(function () {
     });
 
     $('#submitShareHolders').click(function () {
-        if (memberPeople.length > 0) {
+        if (shareHolders.length > 0) {
             $.ajax({
                 type: 'Post',
-                url: '/entity/people',
+                url: '/entity/shareHolders',
                 data: {
                     applicationId: $('#applicationId').val(),
-                    pvtEntityId: $('#pvtEntityId').val(),
-                    people: memberPeople
+                    ShareHolders: shareHolders
                 },
                 success: function (data) {
-                    toastr.success("Members saved.");
+                    toastr.success("Share holders saved.");
                 },
                 error: function () {
                     toastr.error("Something went wrong in saving articles. Refresh page and resubmit.");

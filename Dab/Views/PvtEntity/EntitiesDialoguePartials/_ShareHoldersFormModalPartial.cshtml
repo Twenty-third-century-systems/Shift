@@ -1,0 +1,248 @@
+﻿<div class="modal fade" id="modal-people">
+<div class="modal-dialog modal-xl">
+<div class="modal-content">
+<div class="modal-header">
+    <h4 class="modal-title">Enter shareholder details</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form id="shareHoldersForm">
+<div class="modal-body">
+<div class="row">
+<div class="col-md-6">
+    <h3>
+        <small>Nominee/ Shareholder</small>
+    </h3>
+    <hr class="w-100"/>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeCountryCode">Country</label>
+                <select type="text" name="nomineeCountryCode" class="form-control select2" id="nomineeCountryCode">
+                    <option selected></option>
+                    <option value="ZWE">Zimbabwe</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeSurname">Surname</label>
+                <input type="text" name="nomineeSurname" class="form-control" id="nomineeSurname">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeNames">Names <small>space seperated</small></label>
+                <input type="text" name="nomineeNames" class="form-control" id="nomineeNames">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeGender">Gender</label>
+                <select type="text" name="nomineeGender" class="form-control select2" id="nomineeGender">
+                    <option selected></option>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeDateOfBirth">Date of birth</label>
+                <input type="date" class="form-control" name="nomineeDateOfBirth" id="nomineeDateOfBirth">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeNationalIdentification">National Id</label>
+                <input type="text" name="nomineeNationalIdentification" class="form-control" id="nomineeNationalIdentification">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineePhysicalAddress">Physical address</label>
+                <input type="text" name="nomineePhysicalAddress" class="form-control" id="nomineePhysicalAddress">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeMobileNumber">Mobile number</label>
+                <input type="text" name="nomineeMobileNumber" class="form-control" id="nomineeMobileNumber">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeEmailAddress">Email address</label>
+                <input type="text" name="nomineeEmailAddress" class="form-control" id="nomineeEmailAddress">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeDateOfAppointment">Take up date</label>
+                <input type="date" class="form-control" name="nomineeDateOfAppointment" id="nomineeDateOfAppointment">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomineeOccupation">Occupation</label>
+                <input type="text" name="nomineeOccupation" class="form-control" id="nomineeOccupation">
+            </div>
+        </div>
+    </div>
+    <hr class="w-100"/>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="shareClass">Share class</label>
+                <select type="text" name="shareClass" class="form-control select2" id="shareClass">
+                    <option selected></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="amountSubscribed">Number of shares subscribed</label>
+                <input type="text" name="amountSubscribed" class="form-control" id="amountSubscribed">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="sharesSubscribed"></div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <h3>
+        <small>Beneficiary individual</small>
+    </h3>
+    <hr class="w-100"/>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryCountryCode">Country</label>
+                <select type="text" name="beneficiaryCountryCode" class="form-control select2" id="beneficiaryCountryCode">
+                    <option selected></option>
+                    <option value="ZWE">Zimbabwe</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiarySurname">Surname</label>
+                <input type="text" name="beneficiarySurname" class="form-control" id="beneficiarySurname">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryNames">Names <small>space seperated</small></label>
+                <input type="text" name="beneficiaryNames" class="form-control" id="beneficiaryNames">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryGender">Gender</label>
+                <select type="text" name="beneficiaryGender" class="form-control select2" id="beneficiaryGender">
+                    <option selected></option>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryDateOfBirth">Date of birth</label>
+                <input type="date" class="form-control" name="beneficiaryDateOfBirth" id="beneficiaryDateOfBirth">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryNationalIdentification">National Id</label>
+                <input type="text" name="beneficiaryNationalIdentification" class="form-control" id="beneficiaryNationalIdentification">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryPhysicalAddress">Physical address</label>
+                <input type="text" name="beneficiaryPhysicalAddress" class="form-control" id="beneficiaryPhysicalAddress">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryMobileNumber">Mobile number</label>
+                <input type="text" name="beneficiaryMobileNumber" class="form-control" id="beneficiaryMobileNumber">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryEmailAddress">Email address</label>
+                <input type="text" name="beneficiaryEmailAddress" class="form-control" id="beneficiaryEmailAddress">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryDateOfAppointment">Take up date</label>
+                <input type="date" class="form-control" name="beneficiaryDateOfAppointment" id="beneficiaryDateOfAppointment">
+            </div>
+        </div>
+    </div>
+    <hr class="w-100"/>
+    <h3>
+        <small>Beneficiary entity</small>
+    </h3>
+    <hr class="w-100"/>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryEntityCountry">Country</label>
+                <select type="text" name="beneficiaryEntityCountry" class="form-control select2" id="beneficiaryEntityCountry">
+                    <option selected></option>
+                    <option value="ABW">Aruba</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryEntityName">Name</label>
+                <input type="text" name="beneficiaryEntityName" class="form-control" id="beneficiaryEntityName">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="beneficiaryEntityReference">Ref</label>
+                <input type="text" name="beneficiaryEntityReference" class="form-control" id="beneficiaryEntityReference">
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-plus"></i> Add</button>
+
+    <!-- /.submit button-->
+</div>
+</form>
+</div>
+<!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

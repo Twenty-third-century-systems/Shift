@@ -45,7 +45,12 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link " href="#step-4">
+            <a class="nav-link" href="#step-4">
+                <strong>Share subscribers</strong>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="#step-5">
                 <strong>Ariticles of association</strong>
             </a>
         </li>
@@ -63,12 +68,14 @@
 
         <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
             <partial name="EntitiesPartial/_MemorandumOfAssociationPartial"/>
-            @* <partial name="EntitiesPartial/_ArticlesOfAssociationPartial"/> *@
         </div>
 
         <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
-            <partial name="EntitiesPartial/_ShareSubscribersPartial"/>
+            <partial name="EntitiesPartial/_ShareholdersPartial"/>
+        </div>
 
+        <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-4">            
+            <partial name="EntitiesPartial/_ArticlesOfAssociationPartial"/>
         </div>
 
     </div>
@@ -77,8 +84,9 @@
 
 <partial name="EntitiesDialoguePartials/_DirectorFormModalPartial"/>
 <partial name="EntitiesDialoguePartials/_ObjectiveFormModalPartial"/>
+<partial name="EntitiesDialoguePartials/_ShareClauseFormModalPartial"/>
 <partial name="EntitiesDialoguePartials/_ArticleFormModalPartial"/>
-<partial name="EntitiesDialoguePartials/_PeopleFormModalPartial"/>
+<partial name="EntitiesDialoguePartials/_ShareHoldersFormModalPartial"/>
 <partial name="EntitiesDialoguePartials/_EntityFormModalPartial"/>
 
 
@@ -100,6 +108,10 @@
     <script type="text/javascript" src="~/js/new-entity/secretary-form-custom-validation.js"></script>
     <!-- director-form-validation -->
     <script type="text/javascript" src="~/js/new-entity/director-form-custom-validation.js"></script>
+    <!-- share-clause-form-validation -->
+    <script type="text/javascript" src="~/js/new-entity/share-clause-form-custom-validation.js"></script>    
+    <!-- share-holders-form-validation -->
+    <script type="text/javascript" src="~/js/new-entity/share-holders-form-custom-validation.js"></script>
     <!-- custom smart-wizard configuration -->
     <script type="text/javascript" src="~/js/new-entity/step-wizard-conf.js"></script>
     <!-- application-reload -->

@@ -17,7 +17,7 @@ namespace BarTender.Dtos {
         //Articles of association
         public string TableOfArticles { get; set; }
         //Amended Article
-        public List<AmendedArticle> AmendedArticles { get; set; } = new List<AmendedArticle>();    
+        public List<AmendedArticleDto> AmendedArticles { get; set; } = new List<AmendedArticleDto>();    
         //Subscribers to go here
         public List<ShareHoldingMember> Members { get; set; } = new List<ShareHoldingMember>();
         //TODO: Create proper object

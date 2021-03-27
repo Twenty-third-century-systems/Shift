@@ -169,13 +169,15 @@ namespace TurnTable.ExternalServices {
             foreach (var personDto in dto.People)
             {
                 var person = MapPerson(personDto, shareClauses);
+                await _context.AddAsync(person);
                 if (personDto.HasBeneficiaries())
                     foreach (var benefactor in personDto.PeopleRepresented)
                     {
+                        var beneficiary = MapPerson(benefactor, shareClauses);
+                        await _context.AddAsync(beneficiary);
                         person.PersonRepresentsPersonss.Add(new PersonRepresentsPerson(person,
-                            MapPerson(benefactor, shareClauses)));
-                    }
-
+                            beneficiary));
+                    }                
                 AddPrivateEntityMember(application, person);
             }
 
@@ -224,6 +226,7 @@ namespace TurnTable.ExternalServices {
                             var person = MapPerson(nominee, shareClauses);
                             shareholdingForeignEntity.PersonRepresentsForeignEntities.Add(
                                 new PersonRepresentsForeignEntity(shareholdingForeignEntity, person));
+                            await _context.AddAsync(shareholdingForeignEntity);
                             AddPrivateEntityMember(application, person);
                         }
 
@@ -238,6 +241,7 @@ namespace TurnTable.ExternalServices {
         public async Task<int> FinishApplicationAsync(Guid user, int applicationId)
         {
             var application = await GetPrivateEntityApplicationAsync(user, applicationId);
+            
             application.Status = EApplicationStatus.Submitted;
             return await _context.SaveChangesAsync();
         }

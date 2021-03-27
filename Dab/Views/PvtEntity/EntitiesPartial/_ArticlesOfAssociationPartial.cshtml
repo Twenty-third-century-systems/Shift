@@ -17,9 +17,8 @@
                         <label>Table of articles</label>
                         <select class="form-control select2" name="tableOfArticles" id="tableOfArticles" style="width: 100%;">
                             <option selected="selected"></option>
-                            <option value="table A">Table A</option>
-                            <option value="table B">Table B</option>
-                            <option value="other">Other</option>
+                            <option value="0">Table A</option>
+                            <option value="1">Table B</option>
                         </select>
                     </div>
                     <!-- /.form-group -->
@@ -44,13 +43,13 @@
                     </h3>
                 </div>
                 <!-- /.title -->
-                <button type="button" class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-article">
-                    <i class="fas fa-plus"></i> Add
-                </button>
             </div>
             <!-- /.card-header -->
             <!-- form begin -->
-            <div class="card-body">
+            <div class="card-body">                
+                <button type="button" class="btn btn-default btn-sm float-right" data-toggle="modal" data-target="#modal-article">
+                    <i class="fas fa-plus"></i> Add
+                </button>
                 <table id="tblArticles" class="table table-striped w-100">
                     <thead>
                     <tr>

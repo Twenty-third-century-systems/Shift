@@ -43,9 +43,9 @@
                 data: $(form).serialize(),
                 success: function (data) {
                     toastr.success('Task has been allocated');
-                    if ($("[name='serviceId']").val() === 0)
+                    if ($('#service').val() === 0)
                         $('#nameSearchCount').text(data)
-                    if ($("[name='serviceId']").val() === 1)
+                    if ($('#service').val() === 1)
                         $('#pvtEntityCount').text(data)
                     console.log(data)
                     $('#allocateTasks').trigger('reset');
