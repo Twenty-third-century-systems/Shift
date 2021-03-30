@@ -101,190 +101,331 @@
 <ul class="nav">
     <li class="nav-item">
         <a class="nav-link" href="#step-1">
-            <strong>Office</strong>
+            <strong>Industry sector and Office</strong>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="#step-2">
-            <strong>Memorandum of association</strong>
+            <strong>Directors and Secretary</strong>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="#step-3">
-            <strong>Articles of association</strong>
+            <strong>Memorandum of Association</strong>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link " href="#step-4">
-            <strong>Share subcribers and secretary</strong>
+            <strong>Share subscribers</strong>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link " href="#step-5">
+            <strong>Ariticles of association</strong>
         </a>
     </li>
 </ul>
 
 <div class="tab-content mt-4">
 
-    <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
-        <!-- form start -->
-        <form role="form">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="physicalAddress">Physical address</label>
-                        <input type="text" name="physicalAddress" class="form-control" id="physicalAddress" readonly>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="officeCity">City</label>
-                        <input type="text" name="officeCity" class="form-control" id="officeCity" readonly>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="postalAddress">Postal address</label>
-                        <input type="text" name="postalAddress" class="form-control" id="postalAddress" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="emailAddress">Email address</label>
-                        <input type="email" name="emailAddress" class="form-control" id="emailAddress" readonly>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="telNumber">Telephone number</label>
-                        <input type="tel" name="telNumber" class="form-control" id="telNumber" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="mobileNumber">Mobile number</label>
-                        <input type="tel" name="mobileNumber" class="form-control" id="mobileNumber" readonly>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
-        <div class="card card-info card-outline card-outline-tabs shadow-none">
-            <div class="card-header p-0 border-bottom-0">
-                <ul class="nav nav-tabs" id="memorandum-tab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="memorandum-home-tab" data-toggle="pill" href="#memorandum-home" role="tab" aria-controls="memorandum-home" aria-selected="true">Objects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="memorandum-profile-tab" data-toggle="pill" href="#memorandum-profile" role="tab" aria-controls="memorandum-profile" aria-selected="false">Share and Liability clauses</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card-body">
-                <div class="tab-content" id="memorandum-tabContent">
-                    <div class="tab-pane fade show active" id="memorandum-home" role="tabpanel" aria-labelledby="memorandum-home-tab">
-                        <table id="tblObjects" class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Object</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tab-pane fade" id="memorandum-profile" role="tabpanel" aria-labelledby="memorandum-profile-tab">
-                        <!-- form begin -->
-                        <form role="form" id="clausesForm">
-                            <div class="form-group">
-                                <label for="liabilityClause">Liability clause</label>
-                                <input type="text" name="liabilityClause" class="form-control" id="liabilityClause" readonly>
-                            </div>
-                            <!-- /.form-group -->
-                            <div class="form-group">
-                                <label for="shareClause">Share clause</label>
-                                <input type="text" name="shareClause" class="form-control" id="shareClause" readonly>
-                            </div>
-                            <!-- /.form-group -->
-                        </form>
-                        <!-- /.form -->
-                    </div>
-                </div>
-            </div>
-            <!-- /.card -->
+<div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+    <div class="card card-info card-outline card-outline-tabs shadow-none">
+        <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="industry-office-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="industry-tab" data-toggle="pill" href="#industry-tab-content" role="tab" aria-controls="industry-tab-content" aria-selected="true">Industry sector</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="office-tab" data-toggle="pill" href="#office-tab-content" role="tab" aria-controls="office-tab-content" aria-selected="false">Office</a>
+                </li>
+            </ul>
         </div>
-    </div>
 
-
-    <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
-        <div class="card card-info card-outline card-outline-tabs shadow-none">
-            <div class="card-header p-0 border-bottom-0">
-                <ul class="nav nav-tabs" id="articles-tab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="articles-home-tab" data-toggle="pill" href="#articles-home" role="tab" aria-controls="articles-home" aria-selected="true">Table of articles</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="articles-profile-tab" data-toggle="pill" href="#articles-profile" role="tab" aria-controls="articles-profile" aria-selected="false">Amended articles</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content" id="custom-tabs-four-tabContent">
-                    <div class="tab-pane fade show active" id="articles-home" role="tabpanel" aria-labelledby="articles-home-tab">
-                        <form>
-
-                            <div class="form-group">
-                                <label for="tableOfArticles">Selected Table of Articles</label>
-                                <input type="text" name="tableOfArticles" class="form-control" id="tableOfArticles" readonly>
-                            </div>
-                            <!-- /.form-group -->
-                        </form>
+        <div class="card-body">
+            <div class="tab-content" id="industry-office-tabContent">
+                <div class="tab-pane fade show active" id="industry-tab-content" role="tabpanel" aria-labelledby="memorandum-home-tab">
+                    <div class="form-group">
+                        <label for="industrySector">Industry sector</label>
+                        <input type="text" name="industrySector" class="form-control" id="industrySector" readonly>
                     </div>
-                    <div class="tab-pane fade" id="articles-profile" role="tabpanel" aria-labelledby="articles-profile-tab">
-                        <table id="tblArticles" class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Amended article</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                </div>
+                <div class="tab-pane fade" id="office-tab-content" role="tabpanel" aria-labelledby="memorandum-profile-tab">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>With effect from</label>
+                                <input type="date" class="form-control" name="effectiveFrom" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="physicalAddress">Physical address</label>
+                                <input type="text" name="physicalAddress" class="form-control" id="physicalAddress" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="officeCity">City</label>
+                                <input type="text" name="cityTown" class="form-control" id="officeCity" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="postalAddress">Postal address</label>
+                                <input type="text" name="postalAddress" class="form-control" id="postalAddress" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="emailAddress">Email address</label>
+                                <input type="email" name="emailAddress" class="form-control" id="emailAddress" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="telNumber">Telephone number</label>
+                                <input type="tel" name="telephoneNumber" class="form-control" id="telNumber" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="mobileNumber">Mobile number</label>
+                                <input type="tel" name="mobileNumber" class="form-control" id="mobileNumber" readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- /.card -->
         </div>
+        <!-- /.card -->
     </div>
+</div>
 
+<div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+    <div class="card card-info card-outline card-outline-tabs shadow-none">
+        <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="directors-secretary-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="directors-tab" data-toggle="pill" href="#directors-tab-content" role="tab" aria-controls="directors-tab-content" aria-selected="true">Directors</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="secretary-tab" data-toggle="pill" href="#secretary-tab-content" role="tab" aria-controls="secretary-tab-content" aria-selected="false">Secretary</a>
+                </li>
+            </ul>
+        </div>
 
-    <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">            
-        <table id="tblPeople" class="table table-striped ">
-            <thead>
-            <tr>
-                <th>Country</th>
-                <th>National ID</th>
-                <th>Surname</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Physical address</th>
-                <th>Secretary</th>
-                <th>Member</th>
-                <th>Director</th>
-                <th>Ordinary shares</th>
-                <th>Preference shares</th>
-                <th>Total shares</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div class="card-body">
+            <div class="tab-content" id="directors-secretary-tabContent">
+                <div class="tab-pane fade show active" id="directors-tab-content" role="tabpanel" aria-labelledby="memorandum-home-tab">
+                    <table id="tblObjects" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Object</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="secretary-tab-content" role="tabpanel" aria-labelledby="memorandum-profile-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="countryCode">Country</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="surname">Surname</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="names">Names <small>space seperated</small></label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dateOfBirth">Date of birth</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nationalIdentification">National Id</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="physicalAddress">Physical address</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="mobileNumber">Mobile number</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="emailAddress">Email address</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dateOfAppointment">Date of appointment</label>
+                                <input type="text" name="surname" class="form-control" id="surname" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
     </div>
+</div>
+
+<div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+    <div class="card card-info card-outline card-outline-tabs shadow-none">
+        <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="memorandum-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="objects-tab" data-toggle="pill" href="#objects-tab-content" role="tab" aria-controls="objects-tab-content" aria-selected="true">Objects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="liability-clause-tab" data-toggle="pill" href="#liability-clause-tab-content" role="tab" aria-controls="liability-clause-tab-content" aria-selected="false">Liability clause</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="share-clause-tab" data-toggle="pill" href="#share-clause-tab-content" role="tab" aria-controls="share-clause-tab-content" aria-selected="false">Share clause</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="memorandum-tabContent">
+                <div class="tab-pane fade show active" id="objects-tab-content" role="tabpanel" aria-labelledby="articles-home-tab">
+
+                    <table class="table table-striped w-100">
+                        <thead>
+                        <tr>
+                            <th>OBJECTIVE</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="liability-clause-tab-content" role="tabpanel" aria-labelledby="articles-profile-tab">
+                    <div class="form-group">
+                        <label for="liabilityClause">Liability clause</label>
+                        <textarea type="text" name="liabilityClause" class="form-control" id="liabilityClause" readonly></textarea>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="share-clause-tab-content" role="tabpanel" aria-labelledby="articles-profile-tab">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>TITLE</th>
+                            <th>TOTAL NUMBER SHARES</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
+    <table id="tblPeople" class="table table-striped ">
+        <thead>
+        <tr>
+            <th>Country</th>
+            <th>National ID</th>
+            <th>Surname</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Physical address</th>
+            <th>Secretary</th>
+            <th>Member</th>
+            <th>Director</th>
+            <th>Ordinary shares</th>
+            <th>Preference shares</th>
+            <th>Total shares</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+    <div class="card card-info card-outline card-outline-tabs shadow-none">
+        <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="articles-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="articles-home-tab" data-toggle="pill" href="#articles-home" role="tab" aria-controls="articles-home" aria-selected="true">Table of articles</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="articles-profile-tab" data-toggle="pill" href="#articles-profile" role="tab" aria-controls="articles-profile" aria-selected="false">Amended articles</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="custom-tabs-four-tabContent">
+                <div class="tab-pane fade show active" id="articles-home" role="tabpanel" aria-labelledby="articles-home-tab">
+                    <form>
+
+                        <div class="form-group">
+                            <label for="tableOfArticles">Selected Table of Articles</label>
+                            <input type="text" name="tableOfArticles" class="form-control" id="tableOfArticles" readonly>
+                        </div>
+                        <!-- /.form-group -->
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="articles-profile" role="tabpanel" aria-labelledby="articles-profile-tab">
+                    <table id="tblArticles" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Amended article</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
 </div>
 
 </div>
