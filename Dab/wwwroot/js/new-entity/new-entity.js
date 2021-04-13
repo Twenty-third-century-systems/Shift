@@ -103,6 +103,7 @@ $(document).ready(function () {
                 success: function (data) {
                     memorandumSaved = true;
                     toastr.success("Share clauses saved successfully.");
+                    console.log(shareClauses)
                     shareClauses.forEach(shareClause => $('#shareClass').append('<option value=' + shareClause.title + '>' + shareClause.title + '</option>'));
                 },
                 error: function () {

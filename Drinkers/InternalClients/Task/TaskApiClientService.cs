@@ -44,7 +44,7 @@ namespace Drinkers.InternalClients.Task {
             return null;
         }
 
-        public async Task<List<AllocatedNameSearchTaskApplicationResponseDto>> GetAllocatedTaskApplicationsAsync(
+        public async Task<List<AllocatedNameSearchTaskApplicationResponseDto>> GetAllocatedNameSearchTaskApplicationsAsync(
             int taskId)
         {
             var response = await _client.GetAsync($"tasks/{taskId}/ns");
@@ -59,6 +59,15 @@ namespace Drinkers.InternalClients.Task {
             if(response.IsSuccessStatusCode)
                 return true;
             return false;
+        }
+
+        public async Task<List<AllocatedPrivateEntityTaskApplicationResponseDto>> GetPvtEntityTaskApplication(
+            int taskId)
+        {
+            var response = await _client.GetAsync($"tasks/{taskId}/pla");   
+            if(response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<List<AllocatedPrivateEntityTaskApplicationResponseDto>>();
+            return null;
         }
     }
 }

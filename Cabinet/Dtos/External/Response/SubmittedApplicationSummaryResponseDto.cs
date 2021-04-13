@@ -1,5 +1,5 @@
 ﻿namespace Cabinet.Dtos.External.Response {
-    public class SubmittedApplicationResponseDto {
+    public class SubmittedApplicationSummaryResponseDto {
         public int ApplicationId { get; set; }
         public string DateSubmitted { get; set; }
         public string Status { get; set; }

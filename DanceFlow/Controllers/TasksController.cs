@@ -17,7 +17,7 @@ namespace DanceFlow.Controllers {
         private readonly ITaskApiClientService _taskApiClientService;
         private readonly INameSearchApiService _nameSearchApiService;
 
-        public TasksController(ITaskApiClientService taskApiClientService,INameSearchApiService nameSearchApiService)
+        public TasksController(ITaskApiClientService taskApiClientService, INameSearchApiService nameSearchApiService)
         {
             _taskApiClientService = taskApiClientService;
             _nameSearchApiService = nameSearchApiService;
@@ -73,7 +73,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("name-search/{taskId}/applications")]
         public async Task<IActionResult> NameSearchTaskApplications(int taskId)
         {
-            return Ok(await _taskApiClientService.GetAllocatedTaskApplicationsAsync(taskId));
+            return Ok(await _taskApiClientService.GetAllocatedNameSearchTaskApplicationsAsync(taskId));
             // using (var client = new HttpClient())
             // {
             //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/ns").Result.Content
@@ -96,14 +96,19 @@ namespace DanceFlow.Controllers {
         [HttpGet("pvt-entity/{task}/applications")]
         public async Task<IActionResult> PvtEntityTaskApplications(int task)
         {
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/pla").Result.Content
-                    .ReadAsStringAsync();
-                List<PvtApplicationTaskDto> taskApplications =
-                    JsonConvert.DeserializeObject<List<PvtApplicationTaskDto>>(response);
-                return Ok(taskApplications);
-            }
+            // using (var client = new HttpClient())
+            // {
+            //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/pla").Result.Content
+            //         .ReadAsStringAsync();
+            //     List<PvtApplicationTaskDto> taskApplications =
+            //         JsonConvert.DeserializeObject<List<PvtApplicationTaskDto>>(response);
+            //     return Ok(taskApplications);
+            // }
+
+            var taskPrivateEntityApplications = await _taskApiClientService.GetPvtEntityTaskApplication(task);
+            if (taskPrivateEntityApplications != null)
+                return Ok(taskPrivateEntityApplications);
+            return NotFound();
         }
 
 
@@ -153,9 +158,9 @@ namespace DanceFlow.Controllers {
         [HttpGet("finish/{taskId}")]
         public async Task<IActionResult> FinishTask(int taskId)
         {
-           if( await _taskApiClientService.FinishTaskAsync(taskId))
-               return RedirectToAction("Tasks");
-           return BadRequest("Could not finish task. Try again.");
+            if (await _taskApiClientService.FinishTaskAsync(taskId))
+                return RedirectToAction("Tasks");
+            return BadRequest("Could not finish task. Try again.");
         }
     }
 }

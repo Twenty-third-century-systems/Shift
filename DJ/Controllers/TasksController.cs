@@ -470,8 +470,6 @@ namespace DJ.Controllers {
             //     return Ok(pvtApplicationTasks);
             // }
             return Ok(await _taskService.GetPrivateEntityTaskApplicationAsync(taskId));
-
-            return BadRequest();
         }
 
         [AllowAnonymous]

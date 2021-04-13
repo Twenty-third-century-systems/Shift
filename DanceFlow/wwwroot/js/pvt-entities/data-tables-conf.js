@@ -1,10 +1,12 @@
-﻿let objectsTable = undefined;
-let peopleTable = undefined;
+﻿let directorsTable = undefined;
+let memberTable = undefined;
 let articlesTable = undefined;
+let objectivesTable = undefined;
+let shareClauseTable = undefined;
 
 $(document).ready(function () {
 
-        objectsTable = $('#tblObjects').DataTable({
+        directorsTable = $('#tblDirectors').DataTable({
             responsive: true,
             scrollX: true,
             lengthMenu: [
@@ -13,7 +15,26 @@ $(document).ready(function () {
             ],
         });
 
-        peopleTable = $('#tblPeople').DataTable({
+
+        objectivesTable = $('#tblObjectives').DataTable({
+            responsive: true,
+            scrollX: true,
+            lengthMenu: [
+                [4, 10],
+                ['4 rows', '10 rows']
+            ],
+        });
+
+        shareClauseTable = $('#tblShareClass').DataTable({
+            responsive: true,
+            scrollX: true,
+            lengthMenu: [
+                [4, 10],
+                ['4 rows', '10 rows']
+            ],
+        });
+
+        memberTable = $('#tblMembers').DataTable({
             responsive: true,
             scrollX: true,
             lengthMenu: [

@@ -37,7 +37,7 @@ namespace TurnTable.ExternalServices {
             dto.AccountBalance = await _paymentService.GetBalanceAsync(user);
             // All applications by user
             var applicationsByUser = await _mapper
-                .ProjectTo<SubmittedApplicationResponseDto>(
+                .ProjectTo<SubmittedApplicationSummaryResponseDto>(
                     _context.Applications
                         .Where(a => !a.Status.Equals(EApplicationStatus.Incomplete) && a.User == user))
                 .ToListAsync();
@@ -54,13 +54,13 @@ namespace TurnTable.ExternalServices {
 
                 // Approved applications
                 var approvedNameSearches = await _mapper
-                    .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
+                    .ProjectTo<SubmittedApplicationSummaryResponseDto>(_context.Applications
                         .Include(a => a.NameSearch)
                         .ThenInclude(n => n.Names)
                         .Where(a => a.Service.Equals(EService.NameSearch))).ToListAsync();
 
                 var approvedEntities = await _mapper
-                    .ProjectTo<SubmittedApplicationResponseDto>(_context.Applications
+                    .ProjectTo<SubmittedApplicationSummaryResponseDto>(_context.Applications
                         .Include(a => a.PrivateEntity)
                         .Where(a => !a.DateExamined.Equals(null) && !string.IsNullOrEmpty(a.PrivateEntity.Reference)))
                     .ToListAsync();

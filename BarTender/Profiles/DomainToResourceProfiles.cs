@@ -7,7 +7,7 @@ namespace BarTender.Profiles {
         public DomainToResourceProfiles()
         {
             // Application => SubmittedApplicationRequestDto
-            CreateMap<Application, SubmittedApplicationResponseDto>()
+            CreateMap<Application, SubmittedApplicationSummaryResponseDto>()
                 .ForMember(dest => dest.Status, op =>
                     op.MapFrom(src => src.Status.ToString()));
 

@@ -9,7 +9,8 @@ namespace Drinkers.InternalClients.Task {
         Task<List<UnallocatedApplicationResponseDto>> GetAllUnallocatedApplicationsAsync(int office);
         Task<int?> PostMultipleApplicationTaskAsync(NewTaskAllocationRequestDto dto);
         Task<List<AllocatedTaskResponseDto>> GetAllocatedTasksAsync(Guid examinerId);
-        Task<List<AllocatedNameSearchTaskApplicationResponseDto>> GetAllocatedTaskApplicationsAsync(int taskId);
+        Task<List<AllocatedNameSearchTaskApplicationResponseDto>> GetAllocatedNameSearchTaskApplicationsAsync(int taskId);
         Task<bool> FinishTaskAsync(int taskId);
+        Task<List<AllocatedPrivateEntityTaskApplicationResponseDto>> GetPvtEntityTaskApplication(int taskId);
     }
 }

@@ -1,14 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cabinet.Dtos.External.Response;
 
 namespace Cabinet.Dtos.Internal.Response {
     public class AllocatedPrivateEntityTaskApplicationResponseDto {
-        public int ApplicationId { get; set; }
-        public Guid User { get; set; }
-        public string Service { get; set; }
-        public DateTime DateSubmitted { get; set; }
-        public DateTime DateExamined { get; set; }
-        public string Status { get; set; }
+        public SubmittedApplicationResponseDto Application { get; set; }
 
-        public TaskPrivateEntityResponseDto PrivateEntity { get; set; }
+        public AllocatedPrivateEntityTaskApplicationResponseDto()
+        {
+            Members = new List<TaskPrivateEntityShareHolderResponseDto>();
+            Directors = new List<TaskPrivateEntityPersonResponseDto>();
+        }
+
+        public string Name { get; set; }
+
+        public string IndustrySector { get; set; }
+        
+        public TaskPrivateEntityOfficeResponseDto Office { get; set; }
+
+        public TaskPrivateEntityArticlesOfAssociationResponseDto ArticlesOfAssociation { get; set; }
+
+        public TaskPrivateEntityMemorandumResponseDto MemorandumOfAssociation { get; set; }
+
+        public List<TaskPrivateEntityPersonResponseDto> Directors { get; set; }
+
+        public TaskPrivateEntityPersonResponseDto Secretary { get; set; }
+
+        public List<TaskPrivateEntityShareHolderResponseDto> Members { get; set; }
     }
 }

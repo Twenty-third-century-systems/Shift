@@ -1,5 +1,4 @@
-﻿
-let taskApplications = undefined;
+﻿let taskApplications = undefined;
 let index = undefined;
 
 function displayPage() {
@@ -7,71 +6,113 @@ function displayPage() {
         let applicationSelect =
             '<li class="nav-item">\n' +
             '                    <a class="nav-link" href="#">\n' +
-            '                        <i class="far fa-folder"></i> Application - <small>' + e.application.user + '</small>\n' +
+            '                        <i class="far fa-folder"></i> Application - <small></small>\n' +
             '                    </a>\n' +
             '                </li>';
 
-        if (!e.application.examined) {
+        if (e.application.status !== "Examined") { // check if application was examined
             $(applicationSelect)
                 .css('cursor', 'pointer')
                 .click(function () {
-                    //Activate btn-done
+                    // Activate btn-done
                     $('#btn-done').removeClass('disabled');
-                    //Reset step wizard
+                    
+                    // Reset step wizard
                     $('#smartwizard').smartWizard("reset");
 
-                    //Save ApplicationId
-                    $('#applicationId').val(e.application.id);
+                    // ApplicationId
+                    $('#applicationId').val(e.applicationId);
 
-                    //Populate office
-                    $('#physicalAddress').val(e.registeredRegOffice.physicalAddress);
-                    $('#officeCity').val(e.registeredRegOffice.officeCity);
-                    $('#postalAddress').val(e.registeredRegOffice.postalAddress);
-                    $('#emailAddress').val(e.registeredRegOffice.emailAddress);
-                    $('#telNumber').val(e.registeredRegOffice.telNumber);
-                    $('#mobileNumber').val(e.registeredRegOffice.mobileNumber);
+                    // Industry 
+                    $('#industrySector').val(e.industrySector);
 
-                    //Populate Objects table
-                    if (e.memorandumOfAssociation.objectives.length > 0) {
-                        e.memorandumOfAssociation.objectives.forEach((o, index) => {
-                            objectsTable.row.add([
-                                o.objective
+                    // Office 
+                    $('#effectiveFrom').val(e.office.effectiveFrom);
+                    $('#physicalAddress').val(e.office.physicalAddress);
+                    $('#officeCity').val(e.office.cityTown);
+                    $('#postalAddress').val(e.office.postalAddress);
+                    $('#emailAddress').val(e.office.emailAddress);
+                    $('#telNumber').val(e.office.telephoneNumber);
+                    $('#mobileNumber').val(e.office.mobileNumber);
+
+                    // Directors
+                    if (e.directors.length > 0) {
+                        e.directors.forEach((d, index) => {
+                            directorsTable.row.add([
+                                d.fullName,
+                                d.country,
+                                d.gender,
+                                d.dateOfBirth,
+                                d.nationalIdentification,
+                                d.physicalAddress,
+                                d.mobileNumber,
+                                d.emailAddress,
+                                d.dateOfAppointment,
                             ]).draw(false);
                         });
                     }
 
-                    //Populate Clauses
-                    $('#liabilityClause').val(e.memorandumOfAssociation.liabilityShareClauses.liabilityClause);
-                    $('#shareClause').val(e.memorandumOfAssociation.liabilityShareClauses.shareClause);
+                    // Secretary
+                    $('#secretaryCountry').val(e.secretary.country);
+                    $('#secretaryFullName').val(e.secretary.fullName);
+                    $('#secretaryGender').val(e.secretary.gender);
+                    $('#secretaryDOB').val(e.secretary.dateOfBirth);
+                    $('#secretaryNationalId').val(e.secretary.nationalIdentification);
+                    $('#secretaryPhysicalAddress').val(e.secretary.physicalAddress);
+                    $('#secretaryMobile').val(e.secretary.mobileNumber);
+                    $('#secretaryEmail').val(e.secretary.emailAddress);
+                    $('#secretaryDOA').val(e.secretary.dateOfAppointment);
 
-                    //Populate Table of articles field
-                    $('#tableOfArticles').val(e.articlesOfAssociation.articleTable.tableOfArticles);
+                    // Objects table
+                    if (e.memorandumOfAssociation.memorandumObjects.length > 0) {
+                        e.memorandumOfAssociation.memorandumObjects.forEach((o, index) => {
+                            objectivesTable.row.add([
+                                o.value
+                            ]).draw(false);
+                        });
+                    }
 
-                    //Populate Table of amended articles
+                    // Liability
+                    $('#liabilityClause').val(e.memorandumOfAssociation.liabilityClause);
+
+                    // Share clause
+                    if (e.memorandumOfAssociation.shareClauses.length > 0) {
+                        e.memorandumOfAssociation.shareClauses.forEach((s, index) => {
+                            shareClauseTable.row.add([
+                                s.value
+                            ]).draw(false);
+                        });
+                    }
+
+                    // Members
+                    if (e.members.length > 0) {
+                        e.members.forEach((m, index) => {
+                            memberTable.row.add([
+                                m.fullName,
+                                m.country,
+                                m.gender,
+                                m.dateOfBirth,
+                                m.nationalIdentification,
+                                m.physicalAddress,
+                                m.mobileNumber,
+                                m.emailAddress,
+                                m.dateOfTakeUp,
+                                m.occupation
+                            ]).draw(false);
+                        });
+                    }
+                    
+                    
+                    
+
+                    // Articles of association
+                    $('#tableOfArticles').val(e.articlesOfAssociation.tableOfArticles);
+
+                    // Amended articles
                     if (e.articlesOfAssociation.amendedArticles > 0) {
-                        e.articlesOfAssociation.amendedArticles.forEach((e, index) => {
+                        e.articlesOfAssociation.amendedArticles.forEach((a, index) => {
                             articlesTable.row.add([
-                                e.article
-                            ]).draw(false);
-                        });
-                    }
-
-                    //populate members
-                    if (e.shareHolders.length > 0) {
-                        e.shareHolders.forEach((e, index) => {
-                            peopleTable.row.add([
-                                e.peopleCountry,
-                                e.nationalId,
-                                e.memberSurname,
-                                e.memberName,
-                                e.gender,
-                                e.phyAddress,
-                                e.isSecretary,
-                                e.isMember,
-                                e.isDirector,
-                                e.ordShares,
-                                e.prefShares,
-                                parseInt(e.ordShares) + parseInt(e.prefShares),
+                                e.value
                             ]).draw(false);
                         });
                     }
@@ -83,7 +124,7 @@ function displayPage() {
     });
 }
 
-function getAndDisplayData(){
+function getAndDisplayData() {
     $.ajax({
         type: 'Get',
         url: $('#task-id').val() + '/applications',

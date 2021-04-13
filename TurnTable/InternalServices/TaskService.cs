@@ -61,8 +61,20 @@ namespace TurnTable.InternalServices {
 
             foreach (var application in applications)
             {
-                application.ExaminationTask = task;
-                application.Status = EApplicationStatus.Assigned;
+                if (application.Service == EService.NameSearch)
+                {
+                    application.ExaminationTask = task;
+                    application.Status = EApplicationStatus.Assigned;
+                }
+
+                if (application.Service == EService.PrivateLimitedCompany)
+                {
+                    if (application.Status == EApplicationStatus.Submitted)
+                    {
+                        application.ExaminationTask = task;
+                        application.Status = EApplicationStatus.Assigned;
+                    }
+                }
             }
         }
 
@@ -92,89 +104,109 @@ namespace TurnTable.InternalServices {
                 .ToListAsync();
         }
 
-        public async Task<AllocatedPrivateEntityTaskApplicationResponseDto> GetPrivateEntityTaskApplicationAsync(
-            int taskId)
+        public async Task<List<AllocatedPrivateEntityTaskApplicationResponseDto>>
+            GetPrivateEntityTaskApplicationAsync(int taskId)
         {
-            var applications = await _context.Applications
-                .Include(a => a.PrivateEntity)
-                .ThenInclude(p => p.Name)
-                .Where(a => a.TaskId.Equals(taskId)).ToListAsync();
+            var privateEntities = await _context.PrivateEntities
+                .Include(p => p.CurrentApplication)
+                .Include(p => p.MemorandumOfAssociation)
+                .ThenInclude(m => m.ShareClauses)
+                .Include(p => p.MemorandumOfAssociation)
+                .ThenInclude(m => m.MemorandumObjects)
+                .Include(p => p.ArticlesOfAssociation)
+                .ThenInclude(a => a.AmendedArticles)
+                .Include(p => p.Directors)
+                .ThenInclude(d => d.Country)
+                .Include(p => p.Secretary)
+                .ThenInclude(d => d.Country)
+                .Include(p => p.PersonHoldsSharesInPrivateEntities)
+                .ThenInclude(p => p.ShareHolder)
+                .ThenInclude(p => p.PersonRepresentsPersons)
+                .ThenInclude(p => p.Beneficiary)
+                .ThenInclude(b => b.PersonSubscriptions)
+                .ThenInclude(s => s.ShareClause)
+                .Include(p => p.PersonHoldsSharesInPrivateEntities)
+                .ThenInclude(p => p.ShareHolder)
+                .ThenInclude(p => p.PersonRepresentsForeignEntities)
+                .ThenInclude(p => p.Beneficiary)
+                .ThenInclude(b => b.ForeignEntitySubscriptions)
+                .ThenInclude(s => s.ShareClause)
+                .Include(p => p.PersonHoldsSharesInPrivateEntities)
+                .ThenInclude(p => p.ShareHolder)
+                .ThenInclude(p => p.PersonRepresentsPrivateEntities)
+                .ThenInclude(p => p.Beneficiary)
+                .ThenInclude(b => b.Name)
+                .Include(p => p.PersonHoldsSharesInPrivateEntities)
+                .ThenInclude(p => p.ShareHolder)
+                .ThenInclude(p => p.PersonRepresentsPrivateEntities)
+                .ThenInclude(p => p.Beneficiary)
+                .ThenInclude(b => b.PrivateEntitySubscriptions)
+                .ThenInclude(s => s.ShareClause)
+                .Where(p => p.CurrentApplication.TaskId == taskId)
+                .ToListAsync();
 
-            AllocatedPrivateEntityTaskApplicationResponseDto privateEntityApplication = null;
-            foreach (var application in applications)
+            List<AllocatedPrivateEntityTaskApplicationResponseDto> privateEntityApplications =
+                new List<AllocatedPrivateEntityTaskApplicationResponseDto>();
+
+            foreach (var privateEntity in privateEntities)
             {
-                privateEntityApplication =
-                    _mapper.Map<AllocatedPrivateEntityTaskApplicationResponseDto>(application);
+                var privateEntityApplication =
+                    _mapper.Map<AllocatedPrivateEntityTaskApplicationResponseDto>(privateEntity);
 
-                await _context.Entry(application.PrivateEntity).Reference(p => p.MemorandumOfAssociation)
-                    .Query()
-                    .Include(m => m.ShareClauses)
-                    .Include(m => m.MemorandumObjects)
-                    .LoadAsync();
+                foreach (var nominee in privateEntity.PersonHoldsSharesInPrivateEntities)
+                {
+                    var nomineeDto = _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(nominee.ShareHolder);
+                    foreach (var beneficiary in nominee.ShareHolder.PersonRepresentsPersons)
+                    {
+                        var benefactor = _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(beneficiary.Beneficiary);
+                        foreach (var subscription in beneficiary.Beneficiary.PersonSubscriptions)
+                        {
+                            var sub = _mapper.Map<TaskPrivateEntityShareholderSubscriptionResponseDto>(subscription);
+                            benefactor.Subscriptions.Add(sub);
+                        }
 
-                privateEntityApplication.PrivateEntity.MemorandumOfAssociation =
-                    _mapper.Map<TaskPrivateEntityMemorandumResponseDto>(application.PrivateEntity
-                        .MemorandumOfAssociation);
+                        nomineeDto.Beneficiaries.Add(benefactor);
+                    }
 
-                // await _context.Entry(application.PrivateEntity).Collection(p => p.Members).Query()
-                //     .Include(m => m.Member)
-                //     .ThenInclude(m => m.Subscriptions)
-                //     .ThenInclude(s => s.ShareClauseClass)
-                //     .LoadAsync();
-                //
-                // foreach (var member in application.PrivateEntity.Members)
-                // {
-                //     await _context.Entry(member.Member).Collection(m => m.Nominees).LoadAsync();
-                //     await _context.Entry(member.Member).Collection(m => m.ShareHoldingEntities).Query()
-                //         .Include(s => s.Entity).LoadAsync();
-                //     await _context.Entry(member.Member).Collection(m => m.RepresentedForeignEntities).Query()
-                //         .Include(s => s.ForeignEntity).ThenInclude(f => f.Country).LoadAsync();
-                //
-                //     if (member.Member.ShareHoldingEntities.Count > 0)
-                //     {
-                //         foreach (var shareHoldingEntity in member.Member.ShareHoldingEntities)
-                //         {
-                //             var nameApplication = await _context.Applications.Include(a => a.NameSearch)
-                //                 .ThenInclude(n => n.Names)
-                //                 .SingleAsync(a =>
-                //                     a.ApplicationId.Equals(shareHoldingEntity.Entity.NameSearchApplicationId));
-                //
-                //             var entityShareHolder = new TaskPrivateEntityLocalEntityShareHoldersRequestDto
-                //             {
-                //                 Name = nameApplication.NameSearch.Names.Single(n => n.Status.Equals(ENameStatus.Used))
-                //                     .Value,
-                //                 Reference = shareHoldingEntity.Entity.Reference
-                //             };
-                //             entityShareHolder.Nominees.Add(
-                //                 _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                //             privateEntityApplication.PrivateEntity.LocalEntityShareHolders.Add(entityShareHolder);
-                //         }
-                //     }
-                //     else if (member.Member.RepresentedForeignEntities.Count > 0)
-                //     {
-                //         foreach (var foreignEntity in member.Member.RepresentedForeignEntities)
-                //         {
-                //             await _context.Entry(foreignEntity.ForeignEntity).Collection(f => f.Subscriptions)
-                //                 .LoadAsync();
-                //             var foreignEntityDto =
-                //                 _mapper.Map<TaskPrivateEntityForeignEntityShareHoldersDto>(foreignEntity.ForeignEntity);
-                //             foreignEntityDto.Nominees.Add(
-                //                 _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                //             privateEntityApplication.PrivateEntity.ForeignEntityShareHolders.Add(foreignEntityDto);
-                //         }
-                //     }
-                //     else
-                //     {
-                //         privateEntityApplication.PrivateEntity.Members.Add(
-                //             _mapper.Map<TaskPrivateEntityShareHolderResponseDto>(member.Member));
-                //     }
-                // }
+                    foreach (var beneficiaryEntity in nominee.ShareHolder.PersonRepresentsPrivateEntities)
+                    {
+                        var entity = _mapper.Map<TaskShareHoldingEntityRequestDto>(beneficiaryEntity.Beneficiary);
+                        foreach (var entitySubscription in beneficiaryEntity.Beneficiary.PrivateEntitySubscriptions)
+                        {
+                            var sub =
+                                _mapper.Map<TaskPrivateEntityShareholderSubscriptionResponseDto>(entitySubscription);
+                            entity.Subscriptions.Add(sub);
+                        }
+
+                        nomineeDto.RepresentedEntities.Add(entity);
+                    }
+
+                    foreach (var beneficiaryEntity in nominee.ShareHolder.PersonRepresentsForeignEntities)
+                    {
+                        var entity = _mapper.Map<TaskShareHoldingEntityRequestDto>(beneficiaryEntity.Beneficiary);
+                        foreach (var entitySubscription in beneficiaryEntity.Beneficiary.ForeignEntitySubscriptions)
+                        {
+                            var sub =
+                                _mapper.Map<TaskPrivateEntityShareholderSubscriptionResponseDto>(entitySubscription);
+                            entity.Subscriptions.Add(sub);
+                        }
+
+                        nomineeDto.RepresentedEntities.Add(entity);
+                    }
+
+                    foreach (var subscription in nominee.ShareHolder.PersonSubscriptions)
+                    {
+                        var sub = _mapper.Map<TaskPrivateEntityShareholderSubscriptionResponseDto>(subscription);
+                        nomineeDto.Subscriptions.Add(sub);
+                    }
+
+                    privateEntityApplication.Members.Add(nomineeDto);
+                }
+
+                privateEntityApplications.Add(privateEntityApplication);
             }
 
-            return privateEntityApplication;
-
-            // return await _context.PrivateEntities.Include(p => p.CurrentApplication)
-            //     .SingleAsync(p => p.CurrentApplication.TaskId.Equals(taskId));
+            return privateEntityApplications;
         }
 
         public async Task<int> FinishTaskAsync(int taskId)
