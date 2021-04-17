@@ -7,17 +7,17 @@ using Task = System.Threading.Tasks.Task;
 namespace DanceFlow.Hubs {
     public class NameExaminationHub : Hub {
         private readonly ITaskApiClientService _taskApiClientService;
-        private readonly INameSearchApiService _nameSearchApiService;
+        private readonly INameSearchApiClientService _nameSearchApiClientService;
 
-        public NameExaminationHub(ITaskApiClientService taskApiClientService,INameSearchApiService nameSearchApiService)
+        public NameExaminationHub(ITaskApiClientService taskApiClientService,INameSearchApiClientService nameSearchApiClientService)
         {
             _taskApiClientService = taskApiClientService;
-            _nameSearchApiService = nameSearchApiService;
+            _nameSearchApiClientService = nameSearchApiClientService;
         }
 
         public async Task UpdateName(NameExaminedFromExaminerDto name)
         {
-            if (await _nameSearchApiService.ChangeNameStatusAsync(name.EntityNameId, name.Status))
+            if (await _nameSearchApiClientService.ChangeNameStatusAsync(name.EntityNameId, name.Status))
                 await Clients.Caller.SendAsync("ReceiveExaminationUpdate", name);
             
             
@@ -33,7 +33,7 @@ namespace DanceFlow.Hubs {
 
         public async Task Finish(int nameSearchId)
         {
-            if(await _nameSearchApiService.FinishNameSearchExaminationAsync(nameSearchId))
+            if(await _nameSearchApiClientService.FinishNameSearchExaminationAsync(nameSearchId))
                 await Clients.Caller.SendAsync("ReceiveApplicationUpdate", nameSearchId);
             // using (var client = new HttpClient())
             // {

@@ -128,11 +128,11 @@ namespace Fridge.Models {
         }
         public RaisedQuery(int step, string comment)
         {
-            Step = (EApplicationSteps) step;
+            Step = (EPrivateEntityApplicationSteps) step;
             Comment = comment;
         }
 
-        public EApplicationSteps Step { get; set; }
+        public EPrivateEntityApplicationSteps Step { get; set; }
         public string Comment { get; set; }
     }
 }

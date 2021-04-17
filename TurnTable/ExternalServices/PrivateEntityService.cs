@@ -241,6 +241,8 @@ namespace TurnTable.ExternalServices {
         public async Task<int> FinishApplicationAsync(Guid user, int applicationId)
         {
             var application = await GetPrivateEntityApplicationAsync(user, applicationId);
+            application.PrivateEntity.Reference = "PVT-LTD: " + application.PrivateEntity.PrivateEntityId;
+            //
             
             application.Status = EApplicationStatus.Submitted;
             return await _context.SaveChangesAsync();

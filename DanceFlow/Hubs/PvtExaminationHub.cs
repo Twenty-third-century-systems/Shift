@@ -1,20 +1,22 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Drinkers.ExternalClients.PrivateEntity;
+using Drinkers.InternalClients.PvtEntity;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DanceFlow.Hubs {
     public class PvtExaminationHub : Hub {
+        private readonly IPvtEntityApiClientService _privateEntityApiClientService;
+
+        public PvtExaminationHub(IPvtEntityApiClientService privateEntityApiClientService)
+        {
+            _privateEntityApiClientService = privateEntityApiClientService;
+        }
+
         public async Task Finish(int applicationId)
         {
-            using (var client = new HttpClient())
-            {
-                var response =
-                    await client.PatchAsync($"{ApiUrls.FinishPvtApplicationExamination}/{applicationId}", null);
-                if (response.IsSuccessStatusCode)
-                {
-                    await Clients.Caller.SendAsync("ReceivePvtExaminationUpdate", applicationId);
-                }
-            }
+            if (await _privateEntityApiClientService.FinishAsync(applicationId))
+                await Clients.Caller.SendAsync("ReceivePvtExaminationUpdate", applicationId);
         }
     }
 }

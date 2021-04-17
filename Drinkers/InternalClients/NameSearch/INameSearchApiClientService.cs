@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 
 namespace Drinkers.InternalClients.NameSearch {
-    public interface INameSearchApiService {
+    public interface INameSearchApiClientService {
         Task<bool> ChangeNameStatusAsync(int nameId, int status);
         Task<bool> FinishNameSearchExaminationAsync(int nameSearchId);
         Task<List<NameRequestDto>> GetNamesThatContainAsync(string suggestedName);

@@ -268,20 +268,20 @@ namespace IdentityServerHost.Quickstart.UI
                 var userCreationResult = await _userManager.CreateAsync(user, newUserInformation.Password);
                 if (userCreationResult.Succeeded)
                 {
-                    if (!await _roleManager.RoleExistsAsync("Examiner"))
+                    if (!await _roleManager.RoleExistsAsync("Registrar"))
                         await CreateRoles();
                     // Registrar
-                    await _userManager.AddToRoleAsync(user, "Examiner");
+                    await _userManager.AddToRoleAsync(user, "Registrar");
 
-                    var policy = _context.Policies.Where(p => p.Value.Equals("cannot sign")).FirstOrDefault();
-                    var savedUser = _context.Users.Where(u => u.UserName.Equals(user.UserName)).FirstOrDefault();
-                    savedUser.Policies.Add(new ApplicationUserPolicy
-                    {
-                        UserId = savedUser.Id,
-                        PolicyId = policy.Id,
-                        Policy = policy,
-                        User = savedUser
-                    });
+                    // var policy = _context.Policies.Where(p => p.Value.Equals("cannot sign")).FirstOrDefault();
+                    // var savedUser = _context.Users.Where(u => u.UserName.Equals(user.UserName)).FirstOrDefault();
+                    // savedUser.Policies.Add(new ApplicationUserPolicy
+                    // {
+                    //     UserId = savedUser.Id,
+                    //     PolicyId = policy.Id,
+                    //     Policy = policy,
+                    //     User = savedUser
+                    // });
                     _context.SaveChanges();
 
                     return Ok("Created");
@@ -462,6 +462,12 @@ namespace IdentityServerHost.Quickstart.UI
                     Name = "Examiner",
                 });
 
+            roles.Add(
+                new IdentityRole
+                {
+                    Name = "Principal",
+                });
+            
             roles.Add(
                 new IdentityRole
                 {

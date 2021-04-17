@@ -26,7 +26,7 @@ namespace DJ.Controllers {
         }
 
         [AllowAnonymous]
-        [HttpPatch("q")]
+        [HttpPost("q")]
         public async Task<IActionResult> RaiseQuery([FromBody] RaisedQueryRequestDto dto)
         {
             if (await _privateEntityExaminationService.RaiseQueryAsync(dto) > 0)

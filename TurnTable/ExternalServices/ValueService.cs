@@ -39,7 +39,10 @@ namespace TurnTable.ExternalServices {
             var applicationsByUser = await _mapper
                 .ProjectTo<SubmittedApplicationSummaryResponseDto>(
                     _context.Applications
-                        .Where(a => !a.Status.Equals(EApplicationStatus.Incomplete) && a.User == user))
+                        .Include(a => a.PrivateEntity)
+                        .Where(a => a.Status != EApplicationStatus.Incomplete && a.User == user)
+                        .OrderBy(a => a.DateSubmitted)
+                        .Take(10))
                 .ToListAsync();
 
             if (applicationsByUser.Count > 0)
@@ -53,20 +56,46 @@ namespace TurnTable.ExternalServices {
                 dto.RecentActivity = applicationsByUser.Take(10);
 
                 // Approved applications
-                var approvedNameSearches = await _mapper
-                    .ProjectTo<SubmittedApplicationSummaryResponseDto>(_context.Applications
-                        .Include(a => a.NameSearch)
-                        .ThenInclude(n => n.Names)
-                        .Where(a => a.Service.Equals(EService.NameSearch))).ToListAsync();
+                // var examinedNameSearches = await _mapper
+                //     .ProjectTo<SubmittedApplicationSummaryResponseDto>(_context.Applications
+                //         .Include(a => a.NameSearch)
+                //         .ThenInclude(n => n.Names)
+                //         .Where(a => a.Service.Equals(EService.NameSearch) && a.Status == EApplicationStatus.Examined)).ToListAsync();
+
+                var examinedNameSearches = await _context.Applications
+                    .Include(a => a.NameSearch)
+                    .ThenInclude(n => n.Names)
+                    .Where(a => a.Service.Equals(EService.NameSearch) && a.Status == EApplicationStatus.Examined)
+                    .ToListAsync();
+
+                var approvedNamesSearches = new List<SubmittedApplicationSummaryResponseDto>();
+                foreach (var examinedNameSearch in examinedNameSearches)
+                {
+                    try
+                    {
+                        var approvedName =
+                            examinedNameSearch.NameSearch.Names.Single(n =>
+                                n.Status == ENameStatus.Reserved || n.Status == ENameStatus.Used);
+                        if (approvedName != null)
+                            approvedNamesSearches.Add(
+                                _mapper.Map<SubmittedApplicationSummaryResponseDto>(examinedNameSearch));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        // throw;
+                    }
+                }
 
                 var approvedEntities = await _mapper
                     .ProjectTo<SubmittedApplicationSummaryResponseDto>(_context.Applications
                         .Include(a => a.PrivateEntity)
-                        .Where(a => !a.DateExamined.Equals(null) && !string.IsNullOrEmpty(a.PrivateEntity.Reference)))
+                        .Where(a => a.Service == EService.PrivateLimitedCompany &&
+                                    a.Status == EApplicationStatus.Approved))
                     .ToListAsync();
 
 
-                dto.ApprovedApplications = approvedNameSearches.Concat(approvedEntities);
+                dto.ApprovedApplications = approvedNamesSearches.Concat(approvedEntities);
                 dto.ApprovedApplications = dto.ApprovedApplications.OrderBy(a => a.DateSubmitted);
 
                 // Registered Entities count

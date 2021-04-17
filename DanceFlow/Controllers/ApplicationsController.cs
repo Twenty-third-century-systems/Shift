@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 using DanceFlow.Models;
+using Drinkers.InternalClients.Applications;
 using Drinkers.InternalClients.Task;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,13 @@ namespace DanceFlow.Controllers {
     [Route("applications")]
     public class ApplicationsController : Controller {
         private readonly ITaskApiClientService _taskApiClientService;
+        private readonly IApplicationsApiClientService _applicationsApiClientService;
 
-        public ApplicationsController(ITaskApiClientService taskApiClientService)
+        public ApplicationsController(ITaskApiClientService taskApiClientService,
+            IApplicationsApiClientService applicationsApiClientService)
         {
             _taskApiClientService = taskApiClientService;
+            _applicationsApiClientService = applicationsApiClientService;
         }
 
         [HttpGet("")]
@@ -38,11 +42,13 @@ namespace DanceFlow.Controllers {
                 ViewBag.Examiners = examiners;
             }
 
-            var unallocatedApplications = await _taskApiClientService.GetAllUnallocatedApplicationsAsync(Int32.Parse(office.Value));
+            var unallocatedApplications =
+                await _taskApiClientService.GetAllUnallocatedApplicationsAsync(Int32.Parse(office.Value));
             if (unallocatedApplications != null)
-            {                
+            {
                 ViewBag.NameSearchCount = unallocatedApplications.Count(a => a.Service.Equals("NameSearch"));
-                ViewBag.PrivateEntitiesCount = unallocatedApplications.Count(a => a.Service.Equals("PrivateLimitedCompany"));
+                ViewBag.PrivateEntitiesCount =
+                    unallocatedApplications.Count(a => a.Service.Equals("PrivateLimitedCompany"));
             }
             else
             {
@@ -127,6 +133,29 @@ namespace DanceFlow.Controllers {
             //     TaskFromPrincipalDto savedTask = JsonConvert.DeserializeObject<TaskFromPrincipalDto>(response);
             //     return Created("", savedTask);
             // }
+        }
+
+        [HttpGet("approval/pending")]
+        public IActionResult PendingApprovals()
+        {
+            var office = User.Claims
+                .FirstOrDefault(c => c.Type.Equals("office") && c.Issuer.Equals("https://localhost:5002"));
+            if (office != null) ViewBag.SortingOffice = Convert.ToInt32(office.Value);
+            return View();
+        }
+
+        [HttpGet("approval/{sortingOffice}/pending/applications")]
+        public async Task<IActionResult> PendingApprovalApplications(int sortingOffice)
+        {
+            return Ok(await _applicationsApiClientService.ApplicationsPendingApproval(sortingOffice));
+        }
+
+        [HttpPost("approval/{applicationId}/approve")]
+        public async Task<IActionResult> ApproveApplication(int applicationId)
+        {
+            if (await _applicationsApiClientService.Approve(applicationId))
+                return Ok();
+            return BadRequest();
         }
     }
 }

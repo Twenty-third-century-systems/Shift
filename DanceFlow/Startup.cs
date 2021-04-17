@@ -2,7 +2,9 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using DanceFlow.Hubs;
+using Drinkers.InternalClients.Applications;
 using Drinkers.InternalClients.NameSearch;
+using Drinkers.InternalClients.PvtEntity;
 using Drinkers.InternalClients.Task;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -61,8 +63,8 @@ namespace DanceFlow {
                     p.RequireRole("Examiner"));
                 options.AddPolicy("IsRegistrar", p => 
                     p.RequireRole("Registrar"));
-                options.AddPolicy("CanSign", p => 
-                    p.RequireClaim("Policy", "can sign"));
+                options.AddPolicy("IsPrincipal", p => 
+                    p.RequireRole("Principal"));
             });            
 
             services.AddHttpContextAccessor();
@@ -82,7 +84,7 @@ namespace DanceFlow {
                         TimeSpan.FromSeconds(1)
                     }));
             
-            services.AddHttpClient<INameSearchApiService, NameSearchApiService>(
+            services.AddHttpClient<INameSearchApiClientService, NameSearchApiClientService>(
                     async (serviceProvider, client) =>
                     {
                         var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
@@ -97,6 +99,40 @@ namespace DanceFlow {
                         TimeSpan.FromMilliseconds(500),
                         TimeSpan.FromSeconds(1)
                     }));
+            
+            services.AddHttpClient<IPvtEntityApiClientService, PvtEntityApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri(Configuration["Api"]);
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
+            
+            services.AddHttpClient<IApplicationsApiClientService, ApplicationsApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri(Configuration["Api"]);
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
+            
+            services.AddAutoMapper(typeof(Program));
 
             services.AddControllersWithViews();
 

@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 
 namespace Drinkers.InternalClients.NameSearch {
-    public class NameSearchApiService : INameSearchApiService {
+    public class NameSearchApiClientService : INameSearchApiClientService {
         private readonly HttpClient _client;
 
-        public NameSearchApiService(HttpClient client)
+        public NameSearchApiClientService(HttpClient client)
         {
             _client = client;
         }

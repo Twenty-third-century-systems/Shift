@@ -23,10 +23,13 @@ namespace DJ.Controllers {
         private EachDB _eachDb;
         private PoleDB _poleDb;
         private ITaskService _taskService;
+        private readonly IApplicationsService _applicationsService;
 
-        public ApplicationsController(EachDB eachDb, PoleDB poleDb, ITaskService taskService)
+        public ApplicationsController(EachDB eachDb, PoleDB poleDb, ITaskService taskService,
+            IApplicationsService applicationsService)
         {
             _taskService = taskService;
+            _applicationsService = applicationsService;
             _eachDb = eachDb;
             _poleDb = poleDb;
         }
@@ -170,8 +173,23 @@ namespace DJ.Controllers {
             //     }
             // }
 
-            return Created("",await _taskService.AllocateTasksAsync(dto));
+            return Created("", await _taskService.AllocateTasksAsync(dto));
             return BadRequest("Something went wrong");
+        }
+
+        [HttpGet("{sortingOffice}/pending/approval")]
+        public async Task<IActionResult> ApplicationsPendingApproval(int sortingOffice)
+        {
+            return Ok( await _applicationsService.GetApplicationsPendingApproval(sortingOffice));
+        }
+
+
+        [HttpPatch("{applicationId}/approve")]
+        public async Task<IActionResult> ApproveApplication(int applicationId)
+        {
+            if (await _applicationsService.ApprovePrivateEntityApplication(applicationId) > 0)
+                return NoContent();
+            return BadRequest();
         }
     }
 }

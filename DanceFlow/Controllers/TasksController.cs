@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
+using Cabinet.Dtos.Internal.Request;
 using DanceFlow.Dtos;
 using Drinkers.InternalClients.NameSearch;
+using Drinkers.InternalClients.PvtEntity;
 using Drinkers.InternalClients.Task;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +18,17 @@ namespace DanceFlow.Controllers {
     [Route("tasks")]
     public class TasksController : Controller {
         private readonly ITaskApiClientService _taskApiClientService;
-        private readonly INameSearchApiService _nameSearchApiService;
+        private readonly INameSearchApiClientService _nameSearchApiClientService;
+        private readonly IMapper _mapper;
+        private readonly IPvtEntityApiClientService _pvtEntityApiClientService;
 
-        public TasksController(ITaskApiClientService taskApiClientService, INameSearchApiService nameSearchApiService)
+        public TasksController(ITaskApiClientService taskApiClientService, INameSearchApiClientService nameSearchApiClientService,
+            IMapper mapper, IPvtEntityApiClientService pvtEntityApiClientService)
         {
             _taskApiClientService = taskApiClientService;
-            _nameSearchApiService = nameSearchApiService;
+            _nameSearchApiClientService = nameSearchApiClientService;
+            _mapper = mapper;
+            _pvtEntityApiClientService = pvtEntityApiClientService;
         }
 
         [HttpGet("allocated")]
@@ -115,7 +123,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/contain")]
         public async Task<IActionResult> NamesThatContain(string suggestedName)
         {
-            return Ok(await _nameSearchApiService.GetNamesThatContainAsync(suggestedName));
+            return Ok(await _nameSearchApiClientService.GetNamesThatContainAsync(suggestedName));
             // using (var client = new HttpClient())
             // {
             //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
@@ -134,7 +142,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/starts")]
         public async Task<IActionResult> NamesThatStartWith(string suggestedName)
         {
-            return Ok(await _nameSearchApiService.GetNamesThatStartWithAsync(suggestedName));
+            return Ok(await _nameSearchApiClientService.GetNamesThatStartWithAsync(suggestedName));
             // using (var client = new HttpClient())
             // {
             //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
@@ -152,7 +160,15 @@ namespace DanceFlow.Controllers {
         [HttpGet("examination/{suggestedName}/ends")]
         public async Task<IActionResult> NamesThatEndWith(string suggestedName)
         {
-            return Ok(await _nameSearchApiService.GetNamesThatEndWithAsync(suggestedName));
+            return Ok(await _nameSearchApiClientService.GetNamesThatEndWithAsync(suggestedName));
+        }
+
+        [HttpPost("examination/query/pvt-entity")]
+        public async Task<IActionResult> PrivateEntityQuery(QueryRequestDto dto)
+        {
+            if (await _pvtEntityApiClientService.Query(_mapper.Map<RaisedQueryRequestDto>(dto)))
+                return Ok();
+            return BadRequest();
         }
 
         [HttpGet("finish/{taskId}")]

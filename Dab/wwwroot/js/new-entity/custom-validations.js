@@ -194,8 +194,7 @@
                 url: '/entity/table',
                 data: {
                     applicationId: $('#applicationId').val(),
-                    pvtEntityId: $('#pvtEntityId').val(),
-                    table: $(form).serializeToJSON()
+                    tableOfArticles: $(form).serializeToJSON()
                 },
                 success: function (data) {
                     toastr.success("Table of articles saved.");

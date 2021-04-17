@@ -4,6 +4,6 @@
         public string DateSubmitted { get; set; }
         public string Status { get; set; }
         public NameSearchResponseDto NameSearch { get; set; }
-        public PrivateEntityResponseDto Entity { get; set; }
+        public PrivateEntityResponseDto PrivateEntity { get; set; }
     }
 }

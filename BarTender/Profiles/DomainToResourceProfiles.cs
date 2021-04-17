@@ -9,7 +9,9 @@ namespace BarTender.Profiles {
             // Application => SubmittedApplicationRequestDto
             CreateMap<Application, SubmittedApplicationSummaryResponseDto>()
                 .ForMember(dest => dest.Status, op =>
-                    op.MapFrom(src => src.Status.ToString()));
+                    op.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest=>dest.DateSubmitted, op=>
+                    op.MapFrom(src=>src.DateSubmitted.ToString("d")));
 
 
             // NameSearch => NameSearchResponseDto

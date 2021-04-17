@@ -1,22 +1,24 @@
-﻿@{
-    ViewBag.Title = "Tasks";
+﻿@model object
+
+@{
+    ViewBag.Title = "Pending Approval";
     Layout = "_Layout";
 }
 
-<input type="hidden" id="task-id" value="@ViewBag.TaskId"/>
 <input type="hidden" id="applicationId"/>
+<input type="hidden" id="sortingOffice" value="@ViewBag.SortingOffice">
 
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluId">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">Task <small>#@ViewBag.TaskId</small></h1>
+                <h1 class="m-0 text-dark">Approve applications</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">
-                        <a href="#">Tasks / <span class="text-muted">Task</span></a>
+                        <a href="#">Applications / <span class="text-muted">Pending approval</span></a>
                     </li>
                     @* <li class="breadcrumb-item active">Starter Page</li> *@
                 </ol>
@@ -68,25 +70,6 @@
         <!-- /.card-body -->
     </div>
     <!-- /.card -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Completed</h3>
-
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body p-0">
-            <ul class="nav nav-pills flex-column" id="completed">
-            </ul>
-        </div>
-        <!-- /.card-body -->
-    </div>
-    <!-- /.card -->
-    <a href="/tasks/finish/@ViewBag.TaskId" class="btn btn-info btn-block mb-3">Finish</a>
 </div>
 <!-- /.col -->
 
@@ -604,11 +587,11 @@
     <!-- SignalR -->
     <script type="text/javascript" src="~/lib/signalr/dist/browser/signalr.min.js"></script>
     <!-- custom smart-wizard configuration -->
-    <script type="text/javascript" src="~/js/pvt-entities/step-wizard-conf.js"></script>
+    <script type="text/javascript" src="~/js/all-applications/step-wizard-conf.js"></script>
     <!-- custom data-tables configuration -->
     <script type="text/javascript" src="~/js/pvt-entities/data-tables-conf.js"></script>
     <!-- pvt-entities script -->
-    <script type="text/javascript" src="~/js/pvt-entities/pvt-entities.js"></script>
+    <script type="text/javascript" src="~/js/all-applications/pending-approvals.js"></script>
     <!-- signal-r configuration -->
     <script type="text/javascript" src="~/js/pvt-entities/signal-r-config.js"></script>
     <!-- Form to JSON serializer-->

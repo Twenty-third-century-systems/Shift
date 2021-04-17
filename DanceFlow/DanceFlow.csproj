@@ -9,6 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
       <PackageReference Include="IdentityModel" Version="4.3.0" />
       <PackageReference Include="linq2db.AspNet" Version="3.1.0" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />

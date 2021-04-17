@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Dashboard";
     var isRegistrarAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsRegistrar");
+    var isPrincipalAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsPrincipal");
     var isExaminerAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "IsExaminer");
-    var canSignAuthorizationResult = await AuthorizationService.AuthorizeAsync(User, "CanSign");
 }
 
 <!-- Content Header (Page header) -->

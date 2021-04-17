@@ -100,6 +100,7 @@ namespace DJ {
             services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<INameSearchExaminationService, NameSearchExaminationService>();
             services.AddTransient<IPrivateEntityExaminationService, PrivateEntityExaminationService>();
+            services.AddTransient<IApplicationsService, ApplicationsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
