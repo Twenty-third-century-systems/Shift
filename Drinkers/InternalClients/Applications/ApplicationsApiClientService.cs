@@ -23,7 +23,7 @@ namespace Drinkers.InternalClients.Applications {
 
         public async Task<bool> Approve(int applicationId)
         {
-            var response = await _client.GetAsync($"applications/{applicationId}/approve");
+            var response = await _client.PatchAsync($"applications/{applicationId}/approve",null);
             if (response.IsSuccessStatusCode)
                 return true;
             return false;

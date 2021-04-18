@@ -175,19 +175,19 @@
                                             <strong class="d-block text-gray-dark">
                                                 Name search<span class="float-right">@approvedApplication.DateSubmitted</span>
                                             </strong>
-                                            <a href="/Outputs/ns/sum/@approvedApplication.ApplicationId">
+                                            <a href="/outputs/ns/sum/@approvedApplication.ApplicationId">
                                                 <i class="text-gray">Name search summary</i>
                                             </a>
                                         }
-                                        else if (approvedApplication.Entity != null)
+                                        else if (approvedApplication.PrivateEntity != null)
                                         {
                                             <strong class="d-block text-gray-dark">
                                                 Private entity<span class="float-right">@approvedApplication.DateSubmitted</span>
                                             </strong>
-                                            <a href="/Outputs/ns/sum/@approvedApplication.ApplicationId">
+                                            <a href="/outputs/pvt/sum/@approvedApplication.ApplicationId/ns">
                                                 <i class="text-gray">Name search summary | </i>
                                             </a>
-                                            <a href="/Outputs/pvt/sum/@approvedApplication.ApplicationId">
+                                            <a href="/outputs/pvt/sum/@approvedApplication.ApplicationId">
                                                 <i class="text-gray">Summary document | </i>
                                             </a>
                                             <a href="/Outputs/pvt/cert/@approvedApplication.ApplicationId">

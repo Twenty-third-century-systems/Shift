@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TurnTable.ExternalServices;
+using TurnTable.ExternalServices.PrivateEntity;
 using Gender = BarTender.Models.Gender;
 using Office = BarTender.Models.Office;
 

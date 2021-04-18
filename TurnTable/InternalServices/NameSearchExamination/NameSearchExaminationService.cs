@@ -6,10 +6,9 @@ using AutoMapper;
 using Cabinet.Dtos.Internal.Request;
 using Fridge.Constants;
 using Fridge.Contexts;
-using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.NameSearchExamination {
     public class NameSearchExaminationService : INameSearchExaminationService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.MutualExclusion {
 
     public class NameSearchMutualExclusionService : INameSearchMutualExclusionService {
         private static Mutex _key;

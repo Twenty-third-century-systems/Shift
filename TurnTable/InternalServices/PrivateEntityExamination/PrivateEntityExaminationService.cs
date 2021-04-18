@@ -6,7 +6,7 @@ using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.PrivateEntityExamination {
     public class PrivateEntityExaminationService : IPrivateEntityExaminationService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;

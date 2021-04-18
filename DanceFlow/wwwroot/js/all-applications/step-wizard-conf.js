@@ -9,7 +9,7 @@ var btnDone = $('<button id="btn-done" ></button>').text('Done')
         let applicationId = $('#applicationId').val();
         if (applicationId > 0)
             $.ajax({
-                type: 'Get',
+                type: 'Post',
                 url: '/applications/approval/' + applicationId + '/approve',
                 success: function (data) {
                     console.log(data);
@@ -17,7 +17,7 @@ var btnDone = $('<button id="btn-done" ></button>').text('Done')
                     displayPage();
                 },
                 error: function () {
-                    alert('Error');
+                    toastr.error("Could not approve application. Please try again.")
                 },
             });
         else

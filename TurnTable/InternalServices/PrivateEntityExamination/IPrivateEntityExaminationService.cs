@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.PrivateEntityExamination {
     
     public interface IPrivateEntityExaminationService {
         Task<int> FinishExaminationAsync(int applicationId);

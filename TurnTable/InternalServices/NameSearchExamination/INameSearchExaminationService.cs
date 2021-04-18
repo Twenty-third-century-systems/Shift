@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cabinet.Dtos.Internal.Request;
-using Fridge.Models;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.NameSearchExamination {
     
     public interface INameSearchExaminationService {
         Task<int> ChangeNameStatusAsync(int nameId, int status);

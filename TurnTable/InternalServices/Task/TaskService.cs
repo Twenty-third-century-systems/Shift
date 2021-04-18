@@ -10,7 +10,7 @@ using Fridge.Contexts;
 using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.Task {
     public class TaskService : ITaskService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;
@@ -47,7 +47,7 @@ namespace TurnTable.InternalServices {
                 a.Service.Equals(dto.Service) && a.CityId.Equals(dto.SortingOffice) && a.TaskId.Equals(null));
         }
 
-        private async Task AllocateMultipleApplicationsAsync(NewTaskAllocationRequestDto dto)
+        private async System.Threading.Tasks.Task AllocateMultipleApplicationsAsync(NewTaskAllocationRequestDto dto)
         {
             var dtoService = (EService) dto.Service;
             var applications = await _context.Applications.Where(a =>
@@ -78,7 +78,7 @@ namespace TurnTable.InternalServices {
             }
         }
 
-        private async Task AllocateSingleApplicationAsync(NewTaskAllocationRequestDto dto)
+        private async System.Threading.Tasks.Task AllocateSingleApplicationAsync(NewTaskAllocationRequestDto dto)
         {
             var application = await _context.Applications.SingleAsync(a =>
                 a.ApplicationId.Equals(dto.ApplicationId) &&

@@ -8,8 +8,10 @@ using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
+using TurnTable.ExternalServices.MutualExclusion;
+using TurnTable.ExternalServices.Payments;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.NameSearch {
     public class NameSearchService : INameSearchService {
         private readonly IMapper _mapper;
         private MainDatabaseContext _context;
@@ -60,7 +62,7 @@ namespace TurnTable.ExternalServices {
                 new Application(user, EService.NameSearch, EApplicationStatus.Submitted, dto.SortingOffice);
 
             // Initialize a NameSearch fro mapper
-            var nameSearch = _mapper.Map<NewNameSearchRequestDto, NameSearch>(dto);
+            var nameSearch = _mapper.Map<NewNameSearchRequestDto, Fridge.Models.NameSearch>(dto);
 
             // Create NameSearch Reference
             nameSearch.Reference = NewNameSearchReference(dto.SortingOffice);

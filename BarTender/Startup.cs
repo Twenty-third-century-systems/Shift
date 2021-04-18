@@ -19,6 +19,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TurnTable.ExternalServices;
+using TurnTable.ExternalServices.MutualExclusion;
+using TurnTable.ExternalServices.NameSearch;
+using TurnTable.ExternalServices.Outputs;
+using TurnTable.ExternalServices.Payments;
+using TurnTable.ExternalServices.Paynow;
+using TurnTable.ExternalServices.PrivateEntity;
+using TurnTable.ExternalServices.Values;
 
 namespace BarTender {
     public class Startup {
@@ -130,6 +137,8 @@ namespace BarTender {
             services.AddTransient<IPrivateEntityService, PrivateEntityService>();
 
             services.AddScoped<IPayNowService, PayNowService>();
+            
+            services.AddScoped<IOutputsService, OutputsService>();
 
             services.AddHostedService<CheckPaymentStatusService>();
         }

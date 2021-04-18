@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TurnTable.ExternalServices;
 using TurnTable.InternalServices;
+using TurnTable.InternalServices.NameSearchExamination;
 
 namespace DJ.Controllers {
     [Route("api/ex/name")]

@@ -6,10 +6,10 @@ using AutoMapper;
 using Cabinet.Dtos.External.Response;
 using Fridge.Constants;
 using Fridge.Contexts;
-using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
+using TurnTable.ExternalServices.Payments;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.Values {
     public class ValueService : IValueService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;
@@ -41,7 +41,7 @@ namespace TurnTable.ExternalServices {
                     _context.Applications
                         .Include(a => a.PrivateEntity)
                         .Where(a => a.Status != EApplicationStatus.Incomplete && a.User == user)
-                        .OrderBy(a => a.DateSubmitted)
+                        .OrderByDescending(a => a.DateSubmitted)
                         .Take(10))
                 .ToListAsync();
 
@@ -66,6 +66,7 @@ namespace TurnTable.ExternalServices {
                     .Include(a => a.NameSearch)
                     .ThenInclude(n => n.Names)
                     .Where(a => a.Service.Equals(EService.NameSearch) && a.Status == EApplicationStatus.Examined)
+                    .OrderByDescending(a => a.DateSubmitted)
                     .ToListAsync();
 
                 var approvedNamesSearches = new List<SubmittedApplicationSummaryResponseDto>();

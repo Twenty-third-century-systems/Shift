@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace DanceFlow.Controllers {
-    [Authorize(Policy = "IsRegistrar")]
     [Route("applications")]
     public class ApplicationsController : Controller {
         private readonly ITaskApiClientService _taskApiClientService;
@@ -25,6 +24,8 @@ namespace DanceFlow.Controllers {
             _applicationsApiClientService = applicationsApiClientService;
         }
 
+        
+        [Authorize(Policy = "IsPrincipal")]
         [HttpGet("")]
         public async Task<IActionResult> AllocateTasks()
         {

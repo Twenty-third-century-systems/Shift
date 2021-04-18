@@ -9,8 +9,9 @@ using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
+using TurnTable.ExternalServices.Paynow;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.Payments {
     public class PaymentService : IPaymentService {
         private IPayNowService _payNowService;
         private MainDatabaseContext _context;

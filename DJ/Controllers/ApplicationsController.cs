@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TurnTable.InternalServices;
+using TurnTable.InternalServices.Applications;
+using TurnTable.InternalServices.Task;
 using Application = DJ.Models.Application;
 
 namespace DJ.Controllers {

@@ -1,19 +1,17 @@
-﻿using System;
-using Fridge.Constants;
+﻿using Fridge.Constants;
 using Fridge.Models;
 using Webdev.Core;
-using Webdev.Payments;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.Paynow {
 
     public class PayNowService : IPayNowService {
-        private Paynow _paynow;
+        private Webdev.Payments.Paynow _paynow;
         private InitResponse _paymentResponse;
         private StatusResponse _statusResponse;
 
         public PayNowService()
         {
-            _paynow = new Paynow("9945", "1a42766b-1fea-48f6-ac39-1484dddfeb62");
+            _paynow = new Webdev.Payments.Paynow("9945", "1a42766b-1fea-48f6-ac39-1484dddfeb62");
             _paynow.ResultUrl = "https://localhost:44313/Payments/Result";
             _paynow.ReturnUrl = "https://localhost:44313";
         }

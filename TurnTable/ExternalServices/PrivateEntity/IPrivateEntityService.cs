@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cabinet.Dtos.External.Request;
 using Cabinet.Dtos.External.Response;
-using Cabinet.Dtos.Internal.Request;
-using Fridge.Models;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.PrivateEntity {
     public interface IPrivateEntityService {
         Task<List<RegisteredNameResponseDto>> GetRegisteredNamesAsync(Guid user);
         Task<ApplicationResponseDto> CreateApplicationAsync(Guid user, int nameId);

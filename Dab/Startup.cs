@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using Drinkers.ExternalClients.NameSearch;
+using Drinkers.ExternalClients.Outputs;
 using Drinkers.ExternalClients.PrivateEntity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -71,6 +72,22 @@ namespace Dab {
                     }));
             
             services.AddHttpClient<IPrivateEntityApiClientService, PrivateEntityApiClientService>(
+                    async (serviceProvider, client) =>
+                    {
+                        var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+                        var token = await accessor.HttpContext.GetTokenAsync("access_token");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                        client.BaseAddress = new Uri(Configuration["Api"]);
+                    })
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[]
+                    {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromMilliseconds(500),
+                        TimeSpan.FromSeconds(1)
+                    }));
+            
+            services.AddHttpClient<IOutputsApiService, OutputsApiService>(
                     async (serviceProvider, client) =>
                     {
                         var accessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();

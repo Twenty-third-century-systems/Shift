@@ -64,7 +64,7 @@ namespace DanceFlow {
                 options.AddPolicy("IsRegistrar", p => 
                     p.RequireRole("Registrar"));
                 options.AddPolicy("IsPrincipal", p => 
-                    p.RequireRole("Principal"));
+                    p.RequireRole("Principal","Registrar"));
             });            
 
             services.AddHttpContextAccessor();

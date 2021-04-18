@@ -10,7 +10,7 @@ using Fridge.Contexts;
 using Fridge.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace TurnTable.ExternalServices {
+namespace TurnTable.ExternalServices.PrivateEntity {
     public class PrivateEntityService : IPrivateEntityService {
         private MainDatabaseContext _context;
         private IMapper _mapper;
@@ -49,7 +49,7 @@ namespace TurnTable.ExternalServices {
                     name.NameSearch.Application.SortingOffice.CityId);
 
             // Constructing a new Private entity and associating with the application
-            var privateEntity = new PrivateEntity(name);
+            var privateEntity = new Fridge.Models.PrivateEntity(name);
             privateEntity.MemorandumOfAssociation = new MemorandumOfAssociation();
             application.PrivateEntity = privateEntity;
 

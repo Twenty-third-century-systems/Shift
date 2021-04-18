@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TurnTable.ExternalServices;
+using TurnTable.ExternalServices.NameSearch;
+using TurnTable.ExternalServices.Values;
 
 namespace BarTender.Controllers {
     [Route("api/name")]

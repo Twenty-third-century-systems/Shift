@@ -13,6 +13,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TurnTable.InternalServices;
+using TurnTable.InternalServices.Applications;
+using TurnTable.InternalServices.NameSearchExamination;
+using TurnTable.InternalServices.PrivateEntityExamination;
+using TurnTable.InternalServices.Task;
 
 namespace DJ {
     public class Startup {

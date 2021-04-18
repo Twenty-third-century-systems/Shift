@@ -7,6 +7,7 @@ using LinqToDB;
 using LinqToDB.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TurnTable.ExternalServices.Paynow;
 
 namespace BarTender.Background {
     public class CheckPaymentStatusService : BackgroundService {

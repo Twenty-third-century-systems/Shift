@@ -7,7 +7,7 @@ using Fridge.Constants;
 using Fridge.Contexts;
 using Microsoft.EntityFrameworkCore;
 
-namespace TurnTable.InternalServices {
+namespace TurnTable.InternalServices.Applications {
     public class ApplicationsService : IApplicationsService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;

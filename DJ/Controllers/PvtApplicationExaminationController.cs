@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TurnTable.ExternalServices;
 using TurnTable.InternalServices;
+using TurnTable.InternalServices.PrivateEntityExamination;
 
 namespace DJ.Controllers {
     [Route("api/ex/pvt")]
