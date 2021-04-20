@@ -8,6 +8,7 @@ using Cabinet.Dtos.Internal.Response;
 using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
+using Fridge.Models.Main;
 using Microsoft.EntityFrameworkCore;
 
 namespace TurnTable.InternalServices.Task {

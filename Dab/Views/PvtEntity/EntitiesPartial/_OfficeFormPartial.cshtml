@@ -1,99 +1,103 @@
-﻿<!-- office egistration -->
-<div class="card card-widget">
-    <div class="card-header">
-        <h3 class="card-title">
-            <small>Enter industry sector and office details.</small>
-        </h3>
-    </div>
-    <!-- /.card-header -->
-    <!-- form start -->
-    <form role="form" id="officeForm">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="industrySector">Industry sector</label>
-                        <input type="text" name="industrySector" class="form-control" id="industrySector" required>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    @* <div class="form-group"> *@
-                    @*     <label for="physicalAddress">Physical address</label> *@
-                    @*     <input type="text" name="physicalAddress" class="form-control" id="physicalAddress" required> *@
-                    @* </div> *@
-                </div>
-                <hr class="w-100"/>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label>With effect from</label>
-                        <input type="date" class="form-control" name="effectiveFrom">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="physicalAddress">Physical address</label>
-                        <input type="text" name="physicalAddress" class="form-control" id="physicalAddress" required>
-                    </div>
-                </div>
+﻿<div class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+    <div class="card card-info card-outline card-outline-tabs shadow-none">
+        <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="industry-office-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="industry-tab" data-toggle="pill" href="#industry-tab-content" role="tab" aria-controls="industry-tab-content" aria-selected="true">Industry sector</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="office-tab" data-toggle="pill" href="#office-tab-content" role="tab" aria-controls="office-tab-content" aria-selected="false">Office</a>
+                </li>
+            </ul>
+        </div>
 
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="officeCity">City</label>
-                        <input type="text" name="cityTown" class="form-control" id="officeCity">
-                        @* @foreach (var value in ViewBag.Cities) *@
-                        @* { *@
-                        @*     if (value.Name.Equals("Harare")) *@
-                        @*     { *@
-                        @*         <option selected value="@value.Id">@value.Name</option> *@
-                        @*     } *@
-                        @*     else *@
-                        @*     { *@
-                        @*         <option value="@value.Id">@value.Name</option> *@
-                        @*     } *@
-                        @* } *@
-                        @* </input> *@
-                    </div>
+        <div class="card-body">
+            <div class="tab-content" id="industry-office-tabContent">
+                <div class="tab-pane fade show active" id="industry-tab-content" role="tabpanel" aria-labelledby="memorandum-home-tab">
+                    <form>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="industrySector">Industry sector</label>
+                                    <input type="text" name="industrySector" class="form-control" id="industrySector" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="postalAddress">Postal address</label>
-                        <input type="text" name="postalAddress" class="form-control" id="postalAddress">
+                <div class="tab-pane fade" id="office-tab-content" role="tabpanel" aria-labelledby="memorandum-profile-tab">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>With effect from</label>
+                                <input type="date" class="form-control" name="effectiveFrom" id="effectiveFrom" readonly>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="emailAddress">Email address</label>
-                        <input type="email" name="emailAddress" class="form-control" id="emailAddress">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="physicalAddress">Physical address</label>
+                                <input type="text" name="physicalAddress" class="form-control" id="physicalAddress" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="officeCity">City</label>
+                                <input type="text" name="cityTown" class="form-control" id="officeCity" readonly>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="telNumber">Telephone number</label>
-                        <input type="tel" name="telephoneNumber" class="form-control" id="telNumber">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="postalAddress">Postal address</label>
+                                <input type="text" name="postalAddress" class="form-control" id="postalAddress" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="emailAddress">Email address</label>
+                                <input type="email" name="emailAddress" class="form-control" id="emailAddress" readonly>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label for="mobileNumber">Mobile number</label>
-                        <input type="tel" name="mobileNumber" class="form-control" id="mobileNumber">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="telNumber">Telephone number</label>
+                                <input type="tel" name="telephoneNumber" class="form-control" id="telNumber" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="mobileNumber">Mobile number</label>
+                                <input type="tel" name="mobileNumber" class="form-control" id="mobileNumber" readonly>
+                            </div>
+                        </div>
                     </div>
+
+                    <form id="officeQuery">
+                        <hr class="w-100 mt-3"/>
+                        <input type="hidden" value="1" name="step">
+                        <div class="form-group">
+                            <label for="comment">Query</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" name="comment" id="comment">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-danger">Submit</button>
+                                </div>
+                                <!-- /btn-group -->
+                            </div>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
-        <!-- /.card-body -->
-        <div class="card-footer">
-            <button type="submit" class="btn btn-default btn-sm float-right"><i class="fas fa-clipboard-list"></i> Save</button>
-            <!-- /.submit button-->
-        </div>
-        <!-- /.card-footer -->
-    </form>
+        <!-- /.card -->
+    </div>
 </div>
-<!-- /.card -->

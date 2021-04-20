@@ -2,33 +2,29 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Dab.Dtos;
-using Drinkers.ExternalClients.Outputs;
-using IdentityModel.Client;
+using Drinkers.ExternalApiClients.Outputs;
 using IronPdf;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Dab.Controllers {
     [Route("outputs")]
     public class OutputsController : Controller {
         private readonly IOutputsApiService _outputsApiService;
+        private readonly IConfiguration _configuration;
 
-        public OutputsController(IOutputsApiService outputsApiService)
+        public OutputsController(IOutputsApiService outputsApiService,IConfiguration configuration)
         {
             _outputsApiService = outputsApiService;
+            _configuration = configuration;
+            License.LicenseKey = _configuration["IronPdfLicenseKey"];
         }
 
         [HttpGet("ns/sum/{applicationId}")]
         public async Task<IActionResult> NameSearchSummary(int applicationId)
         {
-            /////////////////////////////////////////////////////////////////////////
-            //Get application data
-
-            var dto = await _outputsApiService.GetNameSearchInfoForDoc(applicationId);
+            var dto = await _outputsApiService.GetNameSearchInfoForDocAsync(applicationId);
             if (dto != null)
             {
                 var renderer = new HtmlToPdf();
@@ -93,14 +89,13 @@ namespace Dab.Controllers {
                 return new FileContentResult(byteArray, "application/pdf");
             }
 
-
             return BadRequest();
         }
 
         [HttpGet("pvt/sum/{applicationId}/ns")]
         public async Task<IActionResult> PrivateEntitySummary(string applicationId)
         {
-            var nameSearchId = await _outputsApiService.PrivateEntityNameSearchSummary(applicationId);
+            var nameSearchId = await _outputsApiService.PrivateEntityNameSearchSummaryAsync(applicationId);
             if (nameSearchId > 0)
                 return RedirectToAction("NameSearchSummary", new {applicationId = nameSearchId});
             return NotFound();
@@ -109,7 +104,7 @@ namespace Dab.Controllers {
         [HttpGet("pvt/sum/{applicationId}")]
         public async Task<IActionResult> PvtSummaryDoc(int applicationId)
         {
-            var dto = await _outputsApiService.PrivateEntitySummary(applicationId);
+            var dto = await _outputsApiService.PrivateEntitySummaryAsync(applicationId);
             if (dto != null)
             {
                 var htmlList = new List<string>();
@@ -364,7 +359,7 @@ namespace Dab.Controllers {
                     "</html>";
                 htmlList.Add(members);
 
-                return await ConstructSummaryDocAndSend(htmlList);
+                return ConstructSummaryDocAndSend(htmlList);
             }
 
             return NotFound();
@@ -373,7 +368,7 @@ namespace Dab.Controllers {
         [HttpGet("pvt/cert/{applicationId}")]
         public async Task<IActionResult> PvtCertificate(int applicationId)
         {
-            var dto = await _outputsApiService.RegisteredPrivateEntity(applicationId);
+            var dto = await _outputsApiService.RegisteredPrivateEntityAsync(applicationId);
             if (dto != null)
             {
                 var htmlStamps = new List<HtmlStamp>();
@@ -428,25 +423,26 @@ namespace Dab.Controllers {
                     ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
                 });
 
-                htmlStamps.Add(new HtmlStamp
-                {
-                    Html =
-                        $"<h5 style='color:black;font-size:16px'>Given under my hand this {dto.DateRegistered.Day}" +
-                        $"<sup>{GetDaySuffix(dto.DateRegistered.Day)}</sup> day of " +
-                        $"{DateTimeFormatInfo.CurrentInfo.GetMonthName(dto.DateRegistered.Month)} " +
-                        $"{dto.DateRegistered.Year}</h5>",
-                    Top = 455,
-                    Rotation = 0,
-                    Width = 505,
-                    ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
-                });
+                if (DateTimeFormatInfo.CurrentInfo != null)
+                    htmlStamps.Add(new HtmlStamp
+                    {
+                        Html =
+                            $"<h5 style='color:black;font-size:16px'>Given under my hand this {dto.DateRegistered.Day}" +
+                            $"<sup>{GetDaySuffix(dto.DateRegistered.Day)}</sup> day of " +
+                            $"{DateTimeFormatInfo.CurrentInfo.GetMonthName(dto.DateRegistered.Month)} " +
+                            $"{dto.DateRegistered.Year}</h5>",
+                        Top = 455,
+                        Rotation = 0,
+                        Width = 505,
+                        ZIndex = HtmlStamp.StampLayer.OnTopOfExistingPDFContent
+                    });
 
                 htmlStamps.Add(new HtmlStamp
                 {
                     Html = $"<h5 style='color:black;font-size:11px'>" +
                            $"<b>To see the full details of this entity scan QR Code <br>or visit " +
                            $"<a style='color:blue;'>www.dcip.co.zw/verifycompanydetails</a>." +
-                           $"<br>This Certificate was generated on {DateTime.Now.ToString("f")}</b></h5>",
+                           $"<br>This Certificate was generated on {DateTime.Now:D}</b></h5>",
                     Bottom = 35,
                     Left = 370,
                     Rotation = 0,
@@ -476,8 +472,6 @@ namespace Dab.Controllers {
                 default:
                     return "th";
             }
-
-            return String.Empty;
         }
 
         private FileContentResult ConstructCertificateAndSend(List<HtmlStamp> htmlStamps)
@@ -494,12 +488,12 @@ namespace Dab.Controllers {
             return new FileContentResult(byteArray, "application/pdf");
         }
 
-        private async Task<IActionResult> ConstructSummaryDocAndSend(List<string> htmlList)
+        private IActionResult ConstructSummaryDocAndSend(List<string> htmlList)
         {
             var renderer = new HtmlToPdf();
             string finalhtml = string.Concat(htmlList.ToArray());
 
-            string DocPath = @"C:/EOnline docs/" + $"generated_summary.pdf";
+            string docPath = @"C:/EOnline docs/" + $"generated_summary.pdf";
             renderer.PrintOptions.PaperSize = PdfPrintOptions.PdfPaperSize.A4;
             renderer.PrintOptions.PaperOrientation = PdfPrintOptions.PdfPaperOrientation.Portrait;
 
@@ -514,12 +508,12 @@ namespace Dab.Controllers {
 
             var bg = renderer.RenderHtmlAsPdf(finalhtml);
             bg.AddBackgroundPdf(@"C:\\EOnline docs\\summary_bg.pdf");
-            bg.SaveAs(DocPath);
+            bg.SaveAs(docPath);
 
-            var pdf = PdfDocument.FromFile(DocPath);
+            PdfDocument.FromFile(docPath); // var pdf=
 
-            System.Net.WebClient client = new System.Net.WebClient();
-            Byte[] byteArray = client.DownloadData(DocPath);
+            WebClient client = new WebClient();
+            Byte[] byteArray = client.DownloadData(docPath);
 
             return new FileContentResult(byteArray, "application/pdf");
         }

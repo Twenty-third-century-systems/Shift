@@ -5,45 +5,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Till.Models;
-using Till.Services;
+using TurnTable.ExternalServices.Payments;
 
 namespace Till.Controllers {
     [Authorize]
     public class HomeController : Controller {
-        private readonly ILogger<HomeController> _logger;
-        private ICounterService _counterService;
+        private readonly IPaymentsService _paymentsService;
 
-        public HomeController(ILogger<HomeController> logger,ICounterService counterService)
+        public HomeController(IPaymentsService paymentsService)
         {
-            _counterService = counterService;
-            _logger = logger;
+            _paymentsService = paymentsService;
         }
 
         public async Task<IActionResult> Index()
         {
             var userIdClaim = User
                 .Claims
-                .FirstOrDefault(c => c.Type.Equals("sub")&& c.Issuer.Equals("https://localhost:5001"));
+                .FirstOrDefault(c => c.Type.Equals("sub") && c.Issuer.Equals("https://localhost:5001"));
 
-            if (userIdClaim == null)
-                return Unauthorized();
-            
-            await _counterService.ReconcileAccountsAsync(Guid.Parse(userIdClaim.Value));
-            var accountHistAndBalanceAsync = 
-                await _counterService.GetAccountHistAndBalanceAsync(Guid.Parse(userIdClaim.Value));
-            accountHistAndBalanceAsync.Transactions =
-                accountHistAndBalanceAsync.Transactions.OrderByDescending(p => p.Date)
-                    .ToList();
-            
             var nameClaim = User
                 .Claims
-                .FirstOrDefault(c => c.Type.Equals("name")&& c.Issuer.Equals("https://localhost:5001"));
+                .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
+
+            if (userIdClaim == null && nameClaim != null)
+                return Unauthorized();
+
+            var user = Guid.Parse(userIdClaim.Value);
+            var history =
+                await _paymentsService.GetTransactionHistoryAsync(user);
+            history =
+                history.OrderByDescending(t => t.Date)
+                    .ToList();
+
             ViewBag.User = nameClaim.Value;
-            ViewBag.ReconsiledAcount = accountHistAndBalanceAsync;
-            return View();            
-        }       
+            ViewBag.AccountHistory = history;
+            ViewBag.AccountBalance =
+                await _paymentsService.GetBalanceAsync(user);
+            return View();
+        }
 
         public IActionResult Privacy()
         {

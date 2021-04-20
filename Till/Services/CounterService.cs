@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Cabinet.Dtos.External.Request;
+using Cabinet.Dtos.External.Response;
 using Till.Dtos;
 using Till.Models;
 using Till.Repositories;
@@ -96,10 +98,10 @@ namespace Till.Services {
             return (null);
         }
 
-        public async Task<IEnumerable<PriceListItemDto>> GetPricesAsync()
+        public async Task<IEnumerable<PriceListItemRequestDto>> GetPricesAsync()
         {
             var allAsync = await _unitOfWork.PriceList.GetAllAsync();
-            return _mapper.Map<IEnumerable<PriceList>, IEnumerable<PriceListItemDto>>(allAsync);
+            return _mapper.Map<IEnumerable<PriceList>, IEnumerable<PriceListItemRequestDto>>(allAsync);
         }
 
         private async Task<bool> CanPayAsync(Guid paymentUserId, double amount)

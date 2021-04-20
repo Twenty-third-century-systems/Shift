@@ -6,10 +6,10 @@
                 required: true,
                 email: true,
             },
-            mode: {
+            walletProvider: {
                 required: true,
             },
-            pNumber: {
+            phoneNumber: {
                 required: true,
                 minlength: 3
             },
@@ -22,10 +22,10 @@
                 required: 'This information is required.',
                 email: 'This is not a valid email.'
             },
-            mode: {
+            walletProvider: {
                 required: 'This information is required.',
             },
-            pNumber: {
+            phoneNumber: {
                 required: 'This information is required.',
                 minlength: 'Must be at least 3 characters long'
             },
@@ -38,18 +38,14 @@
             $.ajax({
                 type: 'Post',
                 url: '/api/Payments/Topup',
-                data: {
-                    topupData: $(form).serializeToJSON()
-                },
+                data: $(form).serializeToJSON(),
                 success: function (data) {
                     $('#busy').hide();
                     let instructionsAlertElement = '' +
                         '<div class="alert alert-info">\n' +
                         '        <p id="Instructions">Please attend to a prompt displayed on your handset<br>' +
                         'If nothing is displayed follow these steps:<br>' + 
-                        data + 
-                        '<br> Click the <i class="fas fa-sync-alt text-white"></i> on your top right corner when done.</p>\n' +
-                        '    </div>';
+                        data;
                     $('#instructionContainer').append(instructionsAlertElement);
                     $('#modal-lg').modal('toggle');
                     $('#paymentForm').trigger('reset');

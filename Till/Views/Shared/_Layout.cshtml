@@ -11,15 +11,15 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css">
 </head>
-<body>
+<body class="text-sm">
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
             <a class="navbar-brand">
-                @if (ViewBag.ReconsiledAcount != null)
+                @if (ViewBag.AccountBalance != null)
                 {
                     <small>ZWL</small>
-                    <strong>@ViewBag.ReconsiledAcount.Balance</strong>
+                    <strong>@ViewBag.AccountBalance</strong>
                 }
                 else
                 {
@@ -27,7 +27,7 @@
                 }
             </a>
             <div>
-                @if (ViewBag.ReconsiledAcount != null)
+                @if (ViewBag.AccountBalance != null)
                 {
 @*                     <a id="busy"> *@
 @*                         <i class="fas fa-wifi text-primary ml-3" *@
@@ -55,11 +55,11 @@
                         </i>
                     </a>
                     <a href="/">
-                        <i class="fas fa-sync-alt text-gray-dark ml-3 mr-3"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           title="Sync">
-                        </i>
+                        @* <i class="fas fa-sync-alt text-gray-dark ml-3 mr-3" *@
+                        @*    data-toggle="tooltip" *@
+                        @*    data-placement="bottom" *@
+                        @*    title="Sync"> *@
+                        @* </i> *@
                     </a>
                 }
 

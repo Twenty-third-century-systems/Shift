@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Fridge.Contexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,7 +15,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Till.Contexts;
 using Till.Repositories;
-using Till.Services;
+using TurnTable.ExternalServices.Paynow;
+using TurnTable.ExternalServices.Payments;
 
 namespace Till {
     public class Startup {
@@ -39,42 +41,49 @@ namespace Till {
                 .AddOpenIdConnect("EOnlinePaymentOidc", options =>
                 {
                     options.Authority = "https://localhost:5001";
-
+            
                     options.ClientId = "f4cc9d9a-e9fd-4c16-ab32-50c19e29492c";
                     options.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
-
+            
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("scope1");
                     options.Scope.Add("offline_access");
-
+            
                     options.ResponseType = "code";
                     options.ResponseMode = "form_post";
-
+            
                     options.SaveTokens = true;
                     options.UsePkce = true;
                 })
                 .AddJwtBearer("Bearer", options =>
                 {
                     options.Authority = "https://localhost:5001";
-
+            
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = false
                     };
                 });
             
-            services.AddDbContext<DatabaseContext>(o =>
-            {
-                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });
+            // services.AddDbContext<DatabaseContext>(o =>
+            // {
+            //     o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            // });
 
             //CUSTOM SERVICES
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            // services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddTransient<ICounterService, CounterService>();
-
-            services.AddSingleton<IPaynowService, PaynowService>();
+            // services.AddTransient<ICounterService, CounterService>();
+            //
+            services.AddDbContext<PaymentsDatabaseContext>(o =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("pytDb"));
+            });
+            
+            services.AddTransient<IPaymentsService, PaymentsService>();
+            
+            services.AddTransient<IPayNowService, PayNowService>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -2,7 +2,7 @@
 using AutoMapper;
 using BarTender.Models;
 using Cabinet.Dtos.External.Request;
-using Drinkers.ExternalClients.NameSearch;
+using Drinkers.ExternalApiClients.NameSearch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dab.Controllers {
@@ -20,30 +20,10 @@ namespace Dab.Controllers {
         [HttpGet("new")]
         public async Task<IActionResult> NewNameSearch()
         {
-            // using (var client = new HttpClient())
-            // {
-            //     try
-            //     {
-            //         var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //         client.SetBearerToken(accessToken);
-            //         var apiResponse = await client.GetAsync(ApiUrls.NameSearchDefaultsUrl).Result.Content
-            //             .ReadAsStringAsync();
-            // var nameSearchDefaults = JsonConvert.DeserializeObject<NameSearchDefaultsDto>(apiResponse);
-            //         var nameClaim = User.Claims
-            //             .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
-            //         ViewBag.User = nameClaim.Value;
-            //         ViewBag.Defaults = nameSearchDefaults;
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            //     }
-            // }
             ViewBag.Defaults = await _nameSearchApiClientService.GetNameSearchDefaultsAsync();
             return View();
         }
 
-        // POST
         [HttpPost("submission")]
         public async Task<IActionResult> NewSubmission(NewNameSearchFormRequestDto dto)
         {
@@ -53,12 +33,12 @@ namespace Dab.Controllers {
             {
                 Value = dto.Name1.ToUpper()
             });
-            
+
             newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
             {
                 Value = dto.Name2.ToUpper()
             });
-            
+
             if (!string.IsNullOrEmpty(dto.Name3))
                 newNameSearchRequestDto.Names.Add(new SuggestedEntityNameRequestDto
                 {
@@ -82,16 +62,14 @@ namespace Dab.Controllers {
             {
                 return Ok(submittedNameSearch);
             }
-            else
-            {
-                return BadRequest("Insufficient funds");
-            }
+
+            return BadRequest("Insufficient funds");
         }
 
         [HttpGet("availability/name")]
         public async Task<IActionResult> NameAvailability(Names name)
         {
-            var nameToSend = "";
+            string nameToSend;
             if (!string.IsNullOrEmpty(name.name1))
                 nameToSend = name.name1;
             else if (!string.IsNullOrEmpty(name.name2))

@@ -3,6 +3,8 @@ using AutoMapper;
 using Cabinet.Dtos.External.Response;
 using Fridge.Constants;
 using Fridge.Models;
+using Fridge.Models.Main;
+using Fridge.Models.Payments;
 
 namespace BarTender.Profiles {
     public class DomainToResourceProfiles : Profile {

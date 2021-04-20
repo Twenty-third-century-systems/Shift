@@ -1,33 +1,24 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Till.Services;
+using TurnTable.ExternalServices.Payments;
 
 namespace Till.Controllers {
-    [Route("[controller]")]
+    [Authorize]
+    [Route("information")]
     public class InformationController : Controller {
-        private ICounterService _counterService;
+        private readonly IPaymentsService _paymentsService;
 
-        public InformationController(ICounterService counterService)
+        public InformationController(IPaymentsService paymentsService)
         {
-            _counterService = counterService;
+            _paymentsService = paymentsService;
         }
 
         [HttpGet("PriceList")]
         public async Task<IActionResult> PriceList()
         {
-            var priceListItemDtos = await _counterService.GetPricesAsync();
-            ViewBag.PriceList = priceListItemDtos.ToList();
+            ViewBag.PriceList = await _paymentsService.GetPriceListAsync();
             return View();
-        }
-
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetAccountInformation(Guid userId)
-        {
-            var accountHistAndBalanceAsync =
-                await _counterService.GetAccountHistAndBalanceAsync(userId);
-            return Ok(accountHistAndBalanceAsync.Balance);
         }
     }
 }

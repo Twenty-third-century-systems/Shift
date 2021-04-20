@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using Cabinet.Dtos.Internal.Request;
-using DanceFlow.Dtos;
-using Drinkers.InternalClients.NameSearch;
-using Drinkers.InternalClients.PvtEntity;
-using Drinkers.InternalClients.Task;
+using Drinkers.InternalApiClients.NameSearch;
+using Drinkers.InternalApiClients.PvtEntity;
+using Drinkers.InternalApiClients.Task;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace DanceFlow.Controllers {
     [Authorize(Policy = "IsExaminer")]
@@ -39,7 +35,7 @@ namespace DanceFlow.Controllers {
 
 
         [HttpGet("pending")]
-        public async Task<IActionResult> Task(int task)
+        public async Task<IActionResult> AllocatedTasks()
         {
             var user = User.Claims.FirstOrDefault(c =>
                 c.Type.Equals("sub") && c.Issuer.Equals("https://localhost:5002"));
@@ -52,21 +48,6 @@ namespace DanceFlow.Controllers {
             }
 
             return NotFound();
-
-            // using (var client = new HttpClient())
-            // {
-            // var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{user.Value}").Result.Content
-            //     .ReadAsStringAsync();
-            // try
-            // {
-            //     TasksForExaminerDto tasks = JsonConvert.DeserializeObject<TasksForExaminerDto>(response);
-            //     return Ok(tasks);
-            // }
-            // catch (JsonReaderException ex)
-            // {
-            //     return NoContent();
-            // }
-            // }
         }
 
 
@@ -82,14 +63,6 @@ namespace DanceFlow.Controllers {
         public async Task<IActionResult> NameSearchTaskApplications(int taskId)
         {
             return Ok(await _taskApiClientService.GetAllocatedNameSearchTaskApplicationsAsync(taskId));
-            // using (var client = new HttpClient())
-            // {
-            //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/ns").Result.Content
-            //         .ReadAsStringAsync();
-            //     List<NameSearchTaskApplicationsDto> taskApplications =
-            //         JsonConvert.DeserializeObject<List<NameSearchTaskApplicationsDto>>(response);
-            //     return Ok(taskApplications);
-            // }
         }
 
 
@@ -104,16 +77,7 @@ namespace DanceFlow.Controllers {
         [HttpGet("pvt-entity/{task}/applications")]
         public async Task<IActionResult> PvtEntityTaskApplications(int task)
         {
-            // using (var client = new HttpClient())
-            // {
-            //     var response = await client.GetAsync($"{ApiUrls.AllAllocatedTasks}/{task}/pla").Result.Content
-            //         .ReadAsStringAsync();
-            //     List<PvtApplicationTaskDto> taskApplications =
-            //         JsonConvert.DeserializeObject<List<PvtApplicationTaskDto>>(response);
-            //     return Ok(taskApplications);
-            // }
-
-            var taskPrivateEntityApplications = await _taskApiClientService.GetPvtEntityTaskApplication(task);
+            var taskPrivateEntityApplications = await _taskApiClientService.GetPvtEntityTaskApplicationAsync(task);
             if (taskPrivateEntityApplications != null)
                 return Ok(taskPrivateEntityApplications);
             return NotFound();
@@ -124,18 +88,6 @@ namespace DanceFlow.Controllers {
         public async Task<IActionResult> NamesThatContain(string suggestedName)
         {
             return Ok(await _nameSearchApiClientService.GetNamesThatContainAsync(suggestedName));
-            // using (var client = new HttpClient())
-            // {
-            //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
-            //     var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/contain").Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         var strResp = await response.Content.ReadAsStringAsync();
-            //         namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
-            //     }
-            //
-            //     return Ok(namesToExaminer);
-            // }
         }
 
 
@@ -143,18 +95,6 @@ namespace DanceFlow.Controllers {
         public async Task<IActionResult> NamesThatStartWith(string suggestedName)
         {
             return Ok(await _nameSearchApiClientService.GetNamesThatStartWithAsync(suggestedName));
-            // using (var client = new HttpClient())
-            // {
-            //     var namesToExaminer = new List<NameUnderExaminationResultDto>();
-            //     var response = client.GetAsync($"{ApiUrls.AllNamesExamination}/{name}/{id}/starts").Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         var strResp = await response.Content.ReadAsStringAsync();
-            //         namesToExaminer = JsonConvert.DeserializeObject<List<NameUnderExaminationResultDto>>(strResp);
-            //     }
-            //
-            //     return Ok(namesToExaminer);
-            // }
         }
 
         [HttpGet("examination/{suggestedName}/ends")]
@@ -166,7 +106,7 @@ namespace DanceFlow.Controllers {
         [HttpPost("examination/query/pvt-entity")]
         public async Task<IActionResult> PrivateEntityQuery(QueryRequestDto dto)
         {
-            if (await _pvtEntityApiClientService.Query(_mapper.Map<RaisedQueryRequestDto>(dto)))
+            if (await _pvtEntityApiClientService.RaiseQueryAsync(_mapper.Map<RaisedQueryRequestDto>(dto)))
                 return Ok();
             return BadRequest();
         }

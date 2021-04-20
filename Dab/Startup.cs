@@ -1,9 +1,9 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
-using Drinkers.ExternalClients.NameSearch;
-using Drinkers.ExternalClients.Outputs;
-using Drinkers.ExternalClients.PrivateEntity;
+using Drinkers.ExternalApiClients.NameSearch;
+using Drinkers.ExternalApiClients.Outputs;
+using Drinkers.ExternalApiClients.PrivateEntity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

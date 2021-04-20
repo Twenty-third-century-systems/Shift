@@ -1,6 +1,7 @@
 ﻿using System;
 using Fridge.Constants;
 using Fridge.Models;
+using Fridge.Models.Main;
 using Microsoft.EntityFrameworkCore;
 
 #nullable disable
@@ -35,8 +36,6 @@ namespace Fridge.Contexts {
         public DbSet<ShareClause> ShareClasses { get; set; }
         public DbSet<MemorandumOfAssociation> MemorandumOfAssociations { get; set; }
         public DbSet<MemorandumOfAssociationObject> MemorandumOfAssociationObjects { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<PriceItem> PriceItems { get; set; }
         public DbSet<ShareHolder> PrivateEntitySubscribers { get; set; }
         public DbSet<PersonHoldsSharesInPrivateEntity> PeopleHoldingSharesInPrivateEntities { get; set; }
         public DbSet<PersonRepresentsPerson> PeopleRepresentingPeople { get; set; }
@@ -110,6 +109,8 @@ namespace Fridge.Contexts {
                     .HasConversion(c => c.ToString(), c => Enum.Parse<EService>(c));
 
                 entity.Property(e => e.DateSubmitted).HasColumnName("submitted_on");
+
+                entity.Property(e => e.Payment).HasColumnName("payment");
 
                 entity.Property(e => e.DateExamined).HasColumnName("examined_on");
 
@@ -484,44 +485,6 @@ namespace Fridge.Contexts {
                 entity.HasOne(d => d.MemorandumOfAssociation)
                     .WithMany(p => p.ShareClauses)
                     .HasForeignKey(d => d.MemorandumId);
-            });
-
-            modelBuilder.Entity<Transaction>(entity =>
-            {
-                entity.ToTable("payments");
-
-                entity.Property(e => e.TransactionId).HasColumnName("Reference");
-
-                entity.Property(e => e.User).HasColumnName("user");
-
-                entity.Property(e => e.Date).HasColumnName("date");
-
-                entity.Property(e => e.WalletProvider).HasColumnName("wallet_provider");
-
-                entity.Property(e => e.PollUrl).HasColumnName("url");
-
-                entity.Property(e => e.Email).HasColumnName("email");
-
-                entity.Property(e => e.PhoneNumber).HasColumnName("phone");
-
-                entity.Property(e => e.PayNowReference).HasColumnName("paynow_ref");
-
-                entity.Property(e => e.Description).HasColumnName("description");
-
-                entity.Property(e => e.CreditAmount).HasColumnName("cr");
-
-                entity.Property(e => e.DebitAmount).HasColumnName("dr");
-            });
-
-            modelBuilder.Entity<PriceItem>(entity =>
-            {
-                entity.ToTable("prices");
-
-                entity.Property(e => e.PriceItemId).HasColumnName("id");
-
-                entity.Property(e => e.Service).HasColumnName("for");
-
-                entity.Property(e => e.Price).HasColumnName("amount");
             });
 
             modelBuilder.Entity<PersonSubscription>(entity =>

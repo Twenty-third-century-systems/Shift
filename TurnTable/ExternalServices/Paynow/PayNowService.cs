@@ -1,9 +1,9 @@
 ﻿using Fridge.Constants;
 using Fridge.Models;
+using Fridge.Models.Payments;
 using Webdev.Core;
 
 namespace TurnTable.ExternalServices.Paynow {
-
     public class PayNowService : IPayNowService {
         private Webdev.Payments.Paynow _paynow;
         private InitResponse _paymentResponse;
@@ -22,11 +22,17 @@ namespace TurnTable.ExternalServices.Paynow {
             {
                 var payment = _paynow.CreatePayment(transaction.TransactionId.ToString(), transaction.Email);
                 payment.Add(transaction.Description, transaction.GetAmount());
-                _paymentResponse = _paynow.SendMobile(payment, transaction.PhoneNumber, EWalletProviders.Ecocash.ToString());
+                _paymentResponse = _paynow.SendMobile(payment, transaction.PhoneNumber,
+                    transaction.WalletProvider.ToString().ToLower());
                 return _paymentResponse.Success();
             }
 
             return false;
+        }
+
+        public string GetInstructions()
+        {
+            return _paymentResponse?.Instructions();
         }
 
         public string GetPollUrl()

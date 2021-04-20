@@ -3,7 +3,7 @@
     Layout = "_Layout";
 }
 
-<input type="hidden" id="applicationId" value="@ViewBag.Application.Id"/>
+@* <input type="hidden" id="applicationId" value="@ViewBag.Application.Id"/> *@
 @* <input type="hidden" id="pvtEntityId" value="@ViewBag.PvtEntityApplication"/> *@
 
 <!-- Content Header (Page header) -->
@@ -11,7 +11,10 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">New Entity: <small>@ViewBag.EntityName</small></h1>
+                <h1 class="m-0 text-dark">
+                    New Entity:
+                    @* <small>@ViewBag.EntityName</small> *@
+                </h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -31,50 +34,59 @@
     <ul class="nav">
         <li class="nav-item">
             <a class="nav-link" href="#step-1">
-                <strong>Industry sector and Office</strong>
+                <strong>Name</strong>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#step-2">
-                <strong>Directors and Secretary</strong>
+                <strong>Industry sector and Office</strong>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#step-3">
-                <strong>Memorandum of Association</strong>
+                <strong>Directors and Secretary</strong>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#step-4">
+                <strong>Memorandum of Association</strong>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#step-5">
                 <strong>Share subscribers</strong>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link " href="#step-5">
+            <a class="nav-link " href="#step-6">
                 <strong>Ariticles of association</strong>
             </a>
         </li>
     </ul>
 
-    <div class="tab-content container-fluid">
+    <div class="tab-content">
 
         <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+            <partial name="EntitiesPartial/_NameSelectionPartial"/>
+        </div>
+
+        <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
             <partial name="EntitiesPartial/_OfficeFormPartial"/>
         </div>
 
-        <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+        <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
             <partial name="EntitiesPartial/_DirectorSecretaryPartial"/>
         </div>
 
-        <div id="step-3" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
+        <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-3">
             <partial name="EntitiesPartial/_MemorandumOfAssociationPartial"/>
         </div>
 
-        <div id="step-4" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
+        <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
             <partial name="EntitiesPartial/_ShareholdersPartial"/>
         </div>
 
-        <div id="step-5" class="tab-pane" role="tabpanel" aria-labelledby="step-4">            
+        <div id="step-6" class="tab-pane" role="tabpanel" aria-labelledby="step-4">
             <partial name="EntitiesPartial/_ArticlesOfAssociationPartial"/>
         </div>
 
@@ -109,7 +121,7 @@
     <!-- director-form-validation -->
     <script type="text/javascript" src="~/js/new-entity/director-form-custom-validation.js"></script>
     <!-- share-clause-form-validation -->
-    <script type="text/javascript" src="~/js/new-entity/share-clause-form-custom-validation.js"></script>    
+    <script type="text/javascript" src="~/js/new-entity/share-clause-form-custom-validation.js"></script>
     <!-- share-holders-form-validation -->
     <script type="text/javascript" src="~/js/new-entity/share-holders-form-custom-validation.js"></script>
     <!-- custom smart-wizard configuration -->

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Cabinet.Dtos.External.Request;
 using Fridge.Models;
+using Fridge.Models.Main;
 
 namespace BarTender.Profiles {
     public class ResourceToDomainProfile : Profile {

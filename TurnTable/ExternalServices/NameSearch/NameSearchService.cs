@@ -6,32 +6,23 @@ using Cabinet.Dtos.External.Request;
 using Cabinet.Dtos.External.Response;
 using Fridge.Constants;
 using Fridge.Contexts;
-using Fridge.Models;
+using Fridge.Models.Main;
 using Microsoft.EntityFrameworkCore;
-using TurnTable.ExternalServices.MutualExclusion;
 using TurnTable.ExternalServices.Payments;
 
 namespace TurnTable.ExternalServices.NameSearch {
     public class NameSearchService : INameSearchService {
         private readonly IMapper _mapper;
-        private MainDatabaseContext _context;
-        private IPaymentService _paymentService;
-        private INameSearchMutualExclusionService _nameSearchMutualExclusionService;
+        private readonly MainDatabaseContext _context;
+        private readonly IPaymentsService _paymentsService;
 
-        public NameSearchService(IMapper mapper, MainDatabaseContext context, IPaymentService paymentService,
-            INameSearchMutualExclusionService nameSearchMutualExclusionService)
+        public NameSearchService(IMapper mapper, MainDatabaseContext context, IPaymentsService paymentsService)
         {
-            _nameSearchMutualExclusionService = nameSearchMutualExclusionService;
-            _paymentService = paymentService;
+            _paymentsService = paymentsService;
             _context = context;
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Checks if suggested name can be applied for
-        /// </summary>
-        /// <param name="suggestedName"></param>
-        /// <returns></returns>
         public bool NameIsAvailable(string suggestedName)
         {
             // TODO: test this logic
@@ -46,53 +37,41 @@ namespace TurnTable.ExternalServices.NameSearch {
             return entityNames.Count == 0;
         }
 
-        /// <summary>
-        /// Submits a name search
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="dto"></param>
-        /// <returns>
-        /// SubmittedNameSearchResponseDto
-        /// </returns>
         public async Task<SubmittedNameSearchResponseDto> CreateNewNameSearchAsync(Guid user,
             NewNameSearchRequestDto dto)
         {
-            // Initialize a new Application
             var application =
                 new Application(user, EService.NameSearch, EApplicationStatus.Submitted, dto.SortingOffice);
-
-            // Initialize a NameSearch fro mapper
-            var nameSearch = _mapper.Map<NewNameSearchRequestDto, Fridge.Models.NameSearch>(dto);
-
-            // Create NameSearch Reference
-            nameSearch.Reference = NewNameSearchReference(dto.SortingOffice);
-
-            // Associate NameSearch with Application
+            var nameSearch = _mapper.Map<NewNameSearchRequestDto, Fridge.Models.Main.NameSearch>(dto);
             application.NameSearch = nameSearch;
             var transaction = await _context.Database.BeginTransactionAsync();
-            // _nameSearchMutualExclusionService.Lock();
             try
-            {
-                // BillAsync for service and commit
-                // await _paymentService.BillAsync(EService.NameSearch, user, nameSearch.Reference);
-
-                // Mark for insertion and commit
+            {                
                 await _context.AddAsync(application);
                 await _context.SaveChangesAsync();
-                transaction.Commit();
+                application.NameSearch.Reference = $"NS/{nameSearch.NameSearchId}";
+                
+                Guid payment;
+                try
+                {
+                    payment = await _paymentsService.BillAsync(EService.NameSearch, user, nameSearch.Reference);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+
+                application.Payment = payment;
+                await _context.SaveChangesAsync();                
+                await transaction.CommitAsync();
             }
             catch (Exception e)
             {
-                transaction.Rollback();
-                throw e;
-            }
-            finally
-            {
-                // _nameSearchMutualExclusionService.UnLock();
+                await transaction.RollbackAsync();
+                throw;
             }
 
-
-            // Creation and return of resource
             // TODO: verify if SaveChangesSuccessful
             return new SubmittedNameSearchResponseDto
             {
@@ -135,19 +114,8 @@ namespace TurnTable.ExternalServices.NameSearch {
                 return await _context.SaveChangesAsync();
                 // TODO: send email and/or sms
             }
-            else throw new Exception("The name is no longer available for further reservation.");
-        }
 
-        /// <summary>
-        /// Creates a new NameSearch.Reference
-        /// By joining few info together
-        /// </summary>
-        /// <param name="sortingOffice"></param>
-        /// <returns>string</returns>
-        private static string NewNameSearchReference(int sortingOffice)
-        {
-            return "NS/" + DateTime.Now.Year.ToString() + sortingOffice.ToString() + "/" +
-                   Guid.NewGuid().ToString();
+            throw new Exception("The name is no longer available for further reservation.");
         }
     }
 }

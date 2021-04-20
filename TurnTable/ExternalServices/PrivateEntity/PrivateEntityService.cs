@@ -8,16 +8,20 @@ using Cabinet.Dtos.External.Response;
 using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
+using Fridge.Models.Main;
 using Microsoft.EntityFrameworkCore;
+using TurnTable.ExternalServices.Payments;
 
 namespace TurnTable.ExternalServices.PrivateEntity {
     public class PrivateEntityService : IPrivateEntityService {
         private MainDatabaseContext _context;
         private IMapper _mapper;
+        private readonly IPaymentsService _paymentsService;
 
-        public PrivateEntityService(MainDatabaseContext context, IMapper mapper)
+        public PrivateEntityService(MainDatabaseContext context, IMapper mapper, IPaymentsService paymentsService)
         {
             _mapper = mapper;
+            _paymentsService = paymentsService;
             _context = context;
         }
 
@@ -49,7 +53,7 @@ namespace TurnTable.ExternalServices.PrivateEntity {
                     name.NameSearch.Application.SortingOffice.CityId);
 
             // Constructing a new Private entity and associating with the application
-            var privateEntity = new Fridge.Models.PrivateEntity(name);
+            var privateEntity = new Fridge.Models.Main.PrivateEntity(name);
             privateEntity.MemorandumOfAssociation = new MemorandumOfAssociation();
             application.PrivateEntity = privateEntity;
 
@@ -131,14 +135,14 @@ namespace TurnTable.ExternalServices.PrivateEntity {
 
         public async Task<ApplicationResponseDto> InsertDirectors(Guid user, NewDirectorsRequestDto dto)
         {
-            var application = await GetPrivateEntityApplicationAsync(user,dto.ApplicationId);
+            var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
             application.PrivateEntity.Directors = _mapper.Map<List<Director>>(dto.Directors);
             return await ReturnApplicationResponse(application);
         }
 
         public async Task<ApplicationResponseDto> InsertSecretary(Guid user, NewSecretaryRequestDto dto)
         {
-            var application = await GetPrivateEntityApplicationAsync(user,dto.ApplicationId);
+            var application = await GetPrivateEntityApplicationAsync(user, dto.ApplicationId);
             application.PrivateEntity.Secretary = _mapper.Map<Secretary>(dto.Secretary);
             return await ReturnApplicationResponse(application);
         }
@@ -177,7 +181,8 @@ namespace TurnTable.ExternalServices.PrivateEntity {
                         await _context.AddAsync(beneficiary);
                         person.PersonRepresentsPersonss.Add(new PersonRepresentsPerson(person,
                             beneficiary));
-                    }                
+                    }
+
                 AddPrivateEntityMember(application, person);
             }
 
@@ -235,15 +240,29 @@ namespace TurnTable.ExternalServices.PrivateEntity {
                 }
                 else throw new Exception("One of the shareholding entities is not represented.");
             }
+
             return await ReturnApplicationResponse(application);
         }
 
         public async Task<int> FinishApplicationAsync(Guid user, int applicationId)
         {
             var application = await GetPrivateEntityApplicationAsync(user, applicationId);
-            application.PrivateEntity.Reference = "PVT-LTD: " + application.PrivateEntity.PrivateEntityId;
-            //
+            application.PrivateEntity.Reference = "P/L: " + application.PrivateEntity.PrivateEntityId;
             
+            
+            Guid payment;
+            try
+            {
+                payment = await _paymentsService.BillAsync(application.Service, application.User,
+                    application.PrivateEntity.Reference);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            application.Payment = payment;
             application.Status = EApplicationStatus.Submitted;
             return await _context.SaveChangesAsync();
         }
@@ -254,6 +273,7 @@ namespace TurnTable.ExternalServices.PrivateEntity {
                 .Include(a => a.PrivateEntity)
                 .AsNoTracking()
                 .SingleAsync(a => a.ApplicationId.Equals(applicationId));
+
             if (previousApplication.Status == EApplicationStatus.Examined &&
                 previousApplication.RaisedQueries.Count > 0)
             {
@@ -269,7 +289,7 @@ namespace TurnTable.ExternalServices.PrivateEntity {
 
             return null;
         }
-        
+
         // Helper methods
 
         public async Task<Application> GetPrivateEntityApplicationAsync(Guid user, int applicationId)
@@ -287,7 +307,7 @@ namespace TurnTable.ExternalServices.PrivateEntity {
                 .Reference(p => p.MemorandumOfAssociation).LoadAsync();
         }
 
-        private ShareHolder MapPerson(NewShareHolderRequestDto dto,ICollection<ShareClause> shareClauses)
+        private ShareHolder MapPerson(NewShareHolderRequestDto dto, ICollection<ShareClause> shareClauses)
         {
             var person = _mapper.Map<ShareHolder>(dto);
             foreach (var subscription in dto.Subs)
@@ -298,7 +318,7 @@ namespace TurnTable.ExternalServices.PrivateEntity {
             }
 
             return person;
-        }        
+        }
 
         private static void AddPrivateEntityMember(Application application, ShareHolder shareHolder)
         {

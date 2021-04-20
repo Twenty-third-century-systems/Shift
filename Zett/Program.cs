@@ -16,13 +16,13 @@ namespace Zett {
 
             var mapperConfiguration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Country, Fridge.Models.Country>();
-                cfg.CreateMap<City, Fridge.Models.City>();
+                cfg.CreateMap<Country, Fridge.Models.Main.Country>();
+                cfg.CreateMap<City, Fridge.Models.Main.City>();
             });
 
             var mapper = new Mapper(mapperConfiguration);
             var countries =
-                mapper.Map<List<Country>, List<Fridge.Models.Country>>(worldDatabase.Countries.Include(c => c.Cities)
+                mapper.Map<List<Country>, List<Fridge.Models.Main.Country>>(worldDatabase.Countries.Include(c => c.Cities)
                     .ToList());
             mainDatabase.Countries.AddRange(countries);
             mainDatabase.SaveChanges();

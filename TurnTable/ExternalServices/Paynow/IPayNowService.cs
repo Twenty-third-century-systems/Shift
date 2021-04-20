@@ -1,4 +1,5 @@
 ﻿using Fridge.Models;
+using Fridge.Models.Payments;
 
 namespace TurnTable.ExternalServices.Paynow {
     public interface IPayNowService {
@@ -6,5 +7,6 @@ namespace TurnTable.ExternalServices.Paynow {
         string GetPollUrl();
         bool WasPaid(string pollUrl);
         string GetPayNowReference();
+        public string GetInstructions();
     }
 }

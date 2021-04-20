@@ -2,12 +2,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using BarTender.Dtos;
 using Cabinet.Dtos.External.Request;
-using Dab.Dtos;
-using Dab.Globals;
-using Drinkers.ExternalClients.NameSearch;
-using Drinkers.ExternalClients.PrivateEntity;
+using Drinkers.ExternalApiClients.NameSearch;
+using Drinkers.ExternalApiClients.PrivateEntity;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -28,55 +25,24 @@ namespace Dab.Controllers {
             _mapper = mapper;
         }
 
-        [HttpGet("{nameId}/new/{name}")]
+        [HttpGet("new")]
         public async Task<IActionResult> NewPrivateEntity(int nameId, string name)
         {
             var nameClaim = User.Claims
                 .FirstOrDefault(c => c.Type.Equals("name") && c.Issuer.Equals("https://localhost:5001"));
-            ViewBag.User = nameClaim.Value;
+            if (nameClaim != null) ViewBag.User = nameClaim.Value;
 
-            var application = await _privateEntityApiClientService.NewPrivateEntityAsync(nameId);
-            if (application != null)
-            {
-                ViewBag.Application = application;
-                ViewBag.EntityName = $"{name} (pvt) ltd";
-            }
-
-            else return NotFound();
-
-            // using (var client = new HttpClient())
+            // var application = await _privateEntityApiClientService.NewPrivateEntityAsync(nameId);
+            // if (application != null)
             // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var responce = client
-            //         .GetAsync($"{ApiUrls.NameOnApplication}/{nameId}/name")
-            //         .Result;
-
-            // var imweResponse = client
-            //     .PostAsJsonAsync<NameApplicationAndDefaults>(
-            //         $"{ApiUrls.InitialisePvtApplication}", 
-            //         nameAndApplication
-            //         )
-            //     .Result;
-
-            //     if (responce.IsSuccessStatusCode)
-            //     {
-            //         var nameAndApplication =
-            //             JsonConvert.DeserializeObject<NameApplicationAndDefaults>(
-            //                 await responce.Content.ReadAsStringAsync());
-            //         nameAndApplication.Id = nameId;
-            //         ViewBag.NameRacho = nameAndApplication.Value;
-            //         ViewBag.ApplicationId = nameAndApplication.ApplicationId;
-            //         ViewBag.PvtEntityApplication = nameAndApplication.PvtEntityId;
-            //         ViewBag.Cities = nameAndApplication.Cities;
-            //         ViewBag.Countries = nameAndApplication.Countries;
-            //         ViewBag.Gender = nameAndApplication.Genders;
-            //     }
-            //     else
-            //     {
-            //         return BadRequest("Something went wrong in trying to use");
-            //     }
+            //     ViewBag.Application = application;
+            //     ViewBag.EntityName = $"{name} (pvt) ltd";
             // }
+            
+            ViewBag.Application = 1;
+            ViewBag.EntityName = $" (pvt) ltd";
+
+            // else return NotFound();
 
             return View();
         }
@@ -85,14 +51,6 @@ namespace Dab.Controllers {
         public async Task<IActionResult> RegisteredNames()
         {
             return Ok(await _nameSearchApiClientService.GetApplicableNamesAsync());
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = await client.GetAsync(ApiUrls.RegisteredNames).Result.Content
-            //         .ReadAsStringAsync();
-            //     return Ok(JsonConvert.DeserializeObject<List<RegisteredNameDto>>(response));
-            // }
         }
 
         [HttpPost("office")]
@@ -101,33 +59,17 @@ namespace Dab.Controllers {
             var officeDto = _mapper.Map<NewPrivateEntityOfficeRequestDto>(dto.AddressInformation);
             officeDto.Address = _mapper.Map<NewPrivateEntityAddressRequestDto>(dto.AddressInformation);
             officeDto.ApplicationId = dto.ApplicationId;
-            var application = await _privateEntityApiClientService.NewPrivateEntityOffice(officeDto);
+            var application = await _privateEntityApiClientService.NewPrivateEntityOfficeAsync(officeDto);
             if (application != null)
                 return Ok();
-            // dto.Office.PhysicalAddress = dto.Office.PhysicalAddress.ToUpper();
-            // dto.Office.PostalAddress = dto.Office.PostalAddress.ToUpper();
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var responce = client
-            //         .PostAsJsonAsync<OfficeInformationDto>(ApiUrls.SubmitPvtApplicationOffice, dto)
-            //         .Result;
-            //     if (responce.IsSuccessStatusCode)
-            //     {
-            //         return Ok();
-            //     }
-            // }
 
             return BadRequest();
         }
 
-        //===========================================================================================================
-
         [HttpPost("directors")]
         public async Task<IActionResult> Directors(NewDirectorsRequestDto dto)
         {
-            if (await _privateEntityApiClientService.NewDirectors(dto) != null)
+            if (await _privateEntityApiClientService.NewDirectorsAsync(dto) != null)
                 return Ok();
             return BadRequest("Something went wrong in saving Directors");
         }
@@ -135,40 +77,24 @@ namespace Dab.Controllers {
         [HttpPost("secretary")]
         public async Task<IActionResult> Secretary(NewSecretaryRequestDto dto)
         {
-            if (await _privateEntityApiClientService.NewSecretary(dto) != null)
+            if (await _privateEntityApiClientService.NewSecretaryAsync(dto) != null)
                 return Ok();
             return BadRequest("Something went wrong in saving Directors");
         }
 
-        //===========================================================================================================
-
         [HttpPost("liability/clause")]
         public async Task<IActionResult> ShareAndLiabilityClauses(LiabilityClauseDto dto)
         {
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = client
-            //         .PostAsJsonAsync<LiabilityShareClausesDto>(ApiUrls.SubmitPvtApplicationsClauses,
-            //             dto).Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         var resp = await response.Content.ReadAsStringAsync();
-            //         return Ok(JsonConvert.DeserializeObject<int>(resp));
-            //     }
-            // }
-            var liabilityClause = _mapper.Map<NewLiabilityClauseRequestDto>(dto);
-            if (await _privateEntityApiClientService.LiabilityClause(liabilityClause) != null)
+            if (await _privateEntityApiClientService.LiabilityClauseAsync(_mapper.Map<NewLiabilityClauseRequestDto>(dto)) !=
+                null)
                 return Ok();
-
             return BadRequest();
         }
 
         [HttpPost("share/clauses")]
         public async Task<IActionResult> ShareClause(NewShareClausesRequestDto dto)
         {
-            if (await _privateEntityApiClientService.ShareClauses(dto) != null)
+            if (await _privateEntityApiClientService.ShareClausesAsync(dto) != null)
                 return Ok();
             return BadRequest();
         }
@@ -176,35 +102,9 @@ namespace Dab.Controllers {
         [HttpPost("objects")]
         public async Task<IActionResult> Objects(MemorandumObjectsRequestDto dto)
         {
-            //
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = client
-            //         .PostAsJsonAsync<MemorandumObjectsRequestDto>(ApiUrls.SubmitPvtApplicationsObjects,
-            //             memorandumObjectsRequestDto).Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         return NoContent();
-            //     }
-            // }
-
-            var newMemo = new NewMemorandumOfAssociationObjectsRequestDto
-            {
-                ApplicationId = dto.ApplicationId
-            };
-            foreach (var dtoObject in dto.Objects)
-            {
-                newMemo.Objects.Add(new NewMemorandumOfAssociationObjectRequestDto
-                {
-                    Value = dtoObject.Objective
-                });
-            }
-
-            if (await _privateEntityApiClientService.Objectives(newMemo) != null)
+            if (await _privateEntityApiClientService.ObjectivesAsync(
+                _mapper.Map<NewMemorandumOfAssociationObjectsRequestDto>(dto)) != null)
                 return Ok();
-
             return BadRequest();
         }
 
@@ -220,7 +120,7 @@ namespace Dab.Controllers {
                 var subscription = _mapper.Map<ShareholderSubscriptionDto>(shareHolder);
                 var nominee = _mapper.Map<NewShareHolderRequestDto>(shareHolder);
                 nominee.Subs.Add(subscription);
-                
+
                 if (!string.IsNullOrEmpty(shareHolder.BeneficiaryCountryCode))
                 {
                     var beneficiary = new NewShareHolderRequestDto
@@ -248,7 +148,7 @@ namespace Dab.Controllers {
                 shareHoldersRequestDto.Entities.Add(beneficiaryEntity);
             }
 
-            if (await _privateEntityApiClientService.ShareHolders(shareHoldersRequestDto) != null)
+            if (await _privateEntityApiClientService.ShareHoldersAsync(shareHoldersRequestDto) != null)
                 return Ok();
             return BadRequest();
         }
@@ -256,19 +156,8 @@ namespace Dab.Controllers {
         [HttpPost("table")]
         public async Task<IActionResult> Table(TableOfArticlesDto dto)
         {
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = client
-            //         .PostAsJsonAsync<TableOfArticlesDto>(ApiUrls.SubmitPvtApplicationsArticleTable,
-            //             dto).Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         return NoContent();
-            //     }
-            // }
-            if (await _privateEntityApiClientService.TableOfArticles(_mapper.Map<NewArticleOfAssociationRequestDto>(dto))!=null)
+            if (await _privateEntityApiClientService.TableOfArticlesAsync(
+                _mapper.Map<NewArticleOfAssociationRequestDto>(dto)) != null)
                 return Ok();
 
             return BadRequest();
@@ -277,100 +166,37 @@ namespace Dab.Controllers {
         [HttpPost("amends")]
         public async Task<IActionResult> AmendedArticles(AmendedArticlesDto dto)
         {
-            // using (var client = new HttpClient())
-            // {
-            //     var accessToken = await HttpContext.GetTokenAsync("access_token");
-            //     client.SetBearerToken(accessToken);
-            //     var response = client
-            //         .PostAsJsonAsync<AmendedArticlesDto>(ApiUrls.SubmitPvtApplicationsAmendedArticle,
-            //             dto).Result;
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         return NoContent();
-            //     }
-            // }
-            if (await _privateEntityApiClientService.AmendedArticles(_mapper.Map<NewAmendedArticlesRequestDto>(dto)) !=
+            if (await _privateEntityApiClientService.AmendedArticlesAsync(_mapper.Map<NewAmendedArticlesRequestDto>(dto)) !=
                 null)
                 return Ok();
 
             return BadRequest();
         }
-        //
-        // [HttpPost("people")]
-        // public async Task<IActionResult> People(ShareHoldingPersonDto shareHoldingPersonDto)
-        // {
-        //     using (var client = new HttpClient())
-        //     {
-        //         var accessToken = await HttpContext.GetTokenAsync("access_token");
-        //         client.SetBearerToken(accessToken);
-        //         var response = client
-        //             .PostAsJsonAsync<ShareHoldingPersonDto>(ApiUrls.SubmitPvtApplicationShareHoldingPeople,
-        //                 shareHoldingPersonDto).Result;
-        //         if (response.IsSuccessStatusCode)
-        //         {
-        //             return NoContent();
-        //         }
-        //     }
-        //
-        //     return BadRequest();
-        // }
-
-        // [HttpPost("entity")]
-        // public async Task<IActionResult> Entity(ShareHoldingEntityDto shareHoldingEntityDto)
-        // {
-        //     using (var client = new HttpClient())
-        //     {
-        //         var accessToken = await HttpContext.GetTokenAsync("access_token");
-        //         client.SetBearerToken(accessToken);
-        //         var response = client
-        //             .PostAsJsonAsync<ShareHoldingEntityDto>(ApiUrls.SubmitPvtApplicationShareHoldingEntities,
-        //                 shareHoldingEntityDto).Result;
-        //         if (response.IsSuccessStatusCode)
-        //         {
-        //             return NoContent();
-        //         }
-        //     }
-        //
-        //     return BadRequest();
-        // }
 
         [HttpPost("{applicationId}/submit")]
         public async Task<IActionResult> FinishApplication(int applicationId)
+        {
+            if (await _privateEntityApiClientService.FinishAsync(applicationId))
+                return Ok();
+            return BadRequest();
+        }
+
+        [HttpGet("{applicationId}/reload")]
+        public IActionResult ReloadApplication(int applicationId)
         {
             // using (var client = new HttpClient())
             // {
             //     var accessToken = await HttpContext.GetTokenAsync("access_token");
             //     client.SetBearerToken(accessToken);
             //     var response = client
-            //         .PostAsJsonAsync<int>(ApiUrls.SubmitPvtApplication,
-            //             applicationId).Result;
+            //         .GetAsync($"{ApiUrls.ReloadPvtApplication}/{applicationId}/reload").Result;
             //     if (response.IsSuccessStatusCode)
             //     {
-            //         return NoContent();
+            //         var populatedApplication = JsonConvert
+            //             .DeserializeObject<PopulatedApplicationDetailDto>(await response.Content.ReadAsStringAsync());
+            //         return Ok(populatedApplication);
             //     }
             // }
-            if (await _privateEntityApiClientService.Finish(applicationId))
-                return Ok();
-
-            return BadRequest();
-        }
-
-        [HttpGet("{applicationId}/reload")]
-        public async Task<IActionResult> ReloadApplication(int applicationId)
-        {
-            using (var client = new HttpClient())
-            {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                client.SetBearerToken(accessToken);
-                var response = client
-                    .GetAsync($"{ApiUrls.ReloadPvtApplication}/{applicationId}/reload").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var populatedApplication = JsonConvert
-                        .DeserializeObject<PopulatedApplicationDetailDto>(await response.Content.ReadAsStringAsync());
-                    return Ok(populatedApplication);
-                }
-            }
 
             return BadRequest("Something went wrong in reloading the application");
         }

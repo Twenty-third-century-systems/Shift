@@ -4,6 +4,7 @@ using Cabinet.Dtos.Internal.Request;
 using Cabinet.Dtos.Internal.Response;
 using Fridge.Constants;
 using Fridge.Models;
+using Fridge.Models.Main;
 
 namespace DJ.Profiles {
     public class DomainToResource : Profile {

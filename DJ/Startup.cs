@@ -1,9 +1,6 @@
 using System;
 using AutoMapper;
-using Cooler.DataModels;
 using Fridge.Contexts;
-using LinqToDB.AspNet;
-using LinqToDB.AspNet.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using TurnTable.InternalServices;
 using TurnTable.InternalServices.Applications;
 using TurnTable.InternalServices.NameSearchExamination;
 using TurnTable.InternalServices.PrivateEntityExamination;
@@ -62,9 +58,9 @@ namespace DJ {
             services.AddSwaggerGen(x =>
                 x.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "Entity Reg API",
-                    Description = "Client API",
+                    Version = "v2.1",
+                    Title = "API",
+                    Description = "Client",
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
@@ -78,25 +74,6 @@ namespace DJ {
                         Url = new Uri("https://example.com/license"),
                     }
                 }));
-
-
-            services.AddLinqToDbContext<EachDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("EachDatabase"))
-                    .UseDefaultLogging(provider);
-            });
-
-            services.AddLinqToDbContext<PoleDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("PoleDatabase"))
-                    .UseDefaultLogging(provider);
-            });
-
-            services.AddLinqToDbContext<ShwaDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
-                    .UseDefaultLogging(provider);
-            });
 
             services.AddAutoMapper(typeof(Program));
             

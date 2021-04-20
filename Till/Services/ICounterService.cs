@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cabinet.Dtos.External.Request;
+using Cabinet.Dtos.External.Response;
 using Till.Dtos;
 using Till.Models;
 
@@ -12,6 +14,6 @@ namespace Till.Services {
         Task ReconcileAccountsAsync(Guid user);
         Task<AccountPaymentsDto> GetAccountHistAndBalanceAsync(Guid user);
         Task<Payment> AddPaymentAsync(PaymentDataDto paymentDataDto);
-        Task<IEnumerable<PriceListItemDto>> GetPricesAsync();
+        Task<IEnumerable<PriceListItemRequestDto>> GetPricesAsync();
     }
 }

@@ -72,9 +72,15 @@ namespace Dab.Profiles {
             CreateMap<AmendedArticleDto, NewAmendedArticleRequestDto>()
                 .ForMember(dest => dest.Value,
                     op => op.MapFrom(src => src.Article));
-            
+
             //
             CreateMap<AmendedArticlesDto, NewAmendedArticlesRequestDto>();
+
+            CreateMap<MemorandumObjectsRequestDto, NewMemorandumOfAssociationObjectsRequestDto>();
+
+            CreateMap<SingleObjectiveRequestDto, NewMemorandumOfAssociationObjectRequestDto>()
+                .ForMember(dest => dest.Value, op =>
+                    op.MapFrom(src => src.Objective));
         }
     }
 }

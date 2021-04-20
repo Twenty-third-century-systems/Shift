@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using TurnTable.ExternalServices;
 using TurnTable.ExternalServices.NameSearch;
 using TurnTable.ExternalServices.Values;
 
@@ -23,7 +22,6 @@ namespace BarTender.Controllers {
         private readonly IOptions<List<DesignationsForNameSearchSelection>> _designationValues;
         private readonly IValueService _valueService;
         private readonly INameSearchService _nameSearchService;
-        private readonly Guid _user = Guid.Parse("375cad3c-ed53-4757-a186-02d15cfcc110");
 
         public NameSearchController(IOptions<List<ServicesForNameSearchSelection>> serviceValues,
             IOptions<List<ReasonForSearchForNameSearchSelection>> reasonsValues,
@@ -55,20 +53,6 @@ namespace BarTender.Controllers {
         [HttpHead("{name}/availability")]
         public IActionResult GetNameAvailability(string name)
         {
-            // var namesInDataBase = (
-            //     from n in _eachDb.Names
-            //     where n.Value == name
-            //     select n
-            // ).ToList();
-            //
-            // foreach (var nameReturned in namesInDataBase)
-            // {
-            //     if (nameReturned.Status != 4)
-            //     {
-            //         return BadRequest();
-            //     }
-            // }
-
             if (_nameSearchService.NameIsAvailable(name))
                 return NoContent();
             return BadRequest("The suggested name is not available for reservation");
@@ -91,123 +75,11 @@ namespace BarTender.Controllers {
                 }
                 else
                 {
-                    // TODO: to substitute with NOT ALLOWED
-                    return BadRequest("Not allowed");
+                    return Unauthorized();
                 }
             }
-            //
-            //
-            // using (var client = new HttpClient())
-            // {
-            //     var paymentDataDto = new PaymentDataDto
-            //     {
-            //         Email = "brightonkofu@outlook.com",
-            //         Service = 1,
-            //         UserId = Guid.Parse(user.Sub)
-            //     };
-            //
-            //     //TODO: get email from authority
-            //
-            //
-            //     var responce = await client
-            //         .PostAsJsonAsync<PaymentDataDto>("https://localhost:44375/api/Payments/Service", paymentDataDto);
-            //
-            //
-            //     if (responce.IsSuccessStatusCode)
-            //     {
-            //         int status = 1;
-            //
-            //         var service = (
-            //             from value in _poleDb.Services
-            //             where value.Description == "name search"
-            //             select value
-            //         ).FirstOrDefault();
-            //
-            //         if (service != null)
-            //         {
-            //             var applicationId = _eachDb.Applications
-            //                 .Value(a => a.UserId, user.Sub)
-            //                 .Value(a => a.ServiceId, service.Id)
-            //                 .Value(a => a.DateSubmitted, DateTime.Now)
-            //                 .Value(a => a.Status, status)
-            //                 .Value(a => a.SortingOffice, details.Details.SortingOffice)
-            //                 .InsertWithInt32Identity();
-            //
-            //             if (applicationId != null)
-            //             {
-            //                 Guid nameSearchId = Guid.NewGuid();
-            //                 int nameSearchSubmissionResult = _eachDb.NameSearches
-            //                     .Value(b => b.Id, nameSearchId.ToString())
-            //                     .Value(b => b.Service, details.Details.TypeOfEntity)
-            //                     .Value(b => b.Justification, details.Details.Justification)
-            //                     .Value(b => b.DesignationId, details.Details.Designation)
-            //                     .Value(b => b.ApplicationId, applicationId)
-            //                     .Value(b => b.ReasonForSearch, details.Details.ReasonForSearch)
-            //                     .Value(b => b.Reference, Guid.NewGuid().ToString())
-            //                     .Insert();
-            //                 if (nameSearchSubmissionResult == 1)
-            //                 {
-            //                     int namesSubmited = 0;
-            //                     foreach (var name in details.Names)
-            //                     {
-            //                         int nameStatus = 7;
-            //                         namesSubmited += _eachDb.Names
-            //                             .Value(c => c.Value, name)
-            //                             .Value(c => c.Status, nameStatus)
-            //                             .Value(c => c.NameSearchId, nameSearchId.ToString())
-            //                             .Insert();
-            //                     }
-            //
-            //                     if (namesSubmited >= 2)
-            //                     {
-            //                         return Created("/submited", new NameSearchResponseDto
-            //                         {
-            //                             Id = nameSearchId,
-            //                             Details = details.Details,
-            //                             Names = details.Names
-            //                         });
-            //                     }
-            //                     else
-            //                     {
-            //                         return StatusCode(StatusCodes.Status500InternalServerError,
-            //                             "Failed to insert Names");
-            //                     }
-            //                 }
-            //                 else
-            //                 {
-            //                     return StatusCode(StatusCodes.Status500InternalServerError,
-            //                         "Failed to insert NewNameSearchApplicationDto search");
-            //                 }
-            //             }
-            //             else
-            //             {
-            //                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create application");
-            //             }
-            //         }
-            //         else
-            //         {
-            //             return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong");
-            //         }
-            //     }
-            //     else
-            //     {
-            //         return BadRequest("Insufficient funds");
-            //     }
-            // }
 
             return Created("", await _nameSearchService.CreateNewNameSearchAsync(user.Sub, details));
-        }
-
-        [AllowAnonymous]
-        [HttpHead("test-approve")]
-        public async Task<IActionResult> TestApprove(int applicationId)
-        {
-            // if (await _nameSearchService.TestApproveNameSearch(_user, applicationId)>0)
-            // {
-            //     return Ok();
-            // }
-
-            return BadRequest("Could not update");
         }
 
 

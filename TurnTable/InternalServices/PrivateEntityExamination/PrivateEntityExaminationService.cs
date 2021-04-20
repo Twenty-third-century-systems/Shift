@@ -5,6 +5,7 @@ using Cabinet.Dtos.Internal.Request;
 using Fridge.Constants;
 using Fridge.Contexts;
 using Fridge.Models;
+using Fridge.Models.Main;
 
 namespace TurnTable.InternalServices.PrivateEntityExamination {
     public class PrivateEntityExaminationService : IPrivateEntityExaminationService {

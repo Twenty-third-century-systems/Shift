@@ -13,11 +13,11 @@ namespace TurnTable.ExternalServices.Values {
     public class ValueService : IValueService {
         private readonly MainDatabaseContext _context;
         private readonly IMapper _mapper;
-        private IPaymentService _paymentService;
+        private IPaymentsService _paymentsService;
 
-        public ValueService(MainDatabaseContext context, IMapper mapper, IPaymentService paymentService)
+        public ValueService(MainDatabaseContext context, IMapper mapper, IPaymentsService paymentsService)
         {
-            _paymentService = paymentService;
+            _paymentsService = paymentsService;
             _mapper = mapper;
             _context = context;
         }
@@ -34,7 +34,7 @@ namespace TurnTable.ExternalServices.Values {
             ExternalUserDashboardRequestDto dto = new ExternalUserDashboardRequestDto();
 
             // User account balance
-            dto.AccountBalance = await _paymentService.GetBalanceAsync(user);
+            dto.AccountBalance = await _paymentsService.GetBalanceAsync(user);
             // All applications by user
             var applicationsByUser = await _mapper
                 .ProjectTo<SubmittedApplicationSummaryResponseDto>(

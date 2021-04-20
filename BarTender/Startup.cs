@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using BarTender.Background;
 using BarTender.Models;
-using BarTender.Repositories;
-using Cooler.DataModels;
 using Fridge.Contexts;
-using LinqToDB.AspNet;
-using LinqToDB.AspNet.Logging;
-using LinqToDB.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -18,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using TurnTable.ExternalServices;
 using TurnTable.ExternalServices.MutualExclusion;
 using TurnTable.ExternalServices.NameSearch;
 using TurnTable.ExternalServices.Outputs;
@@ -44,6 +38,12 @@ namespace BarTender {
             services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(Configuration.GetConnectionString("BigDb"));
+            });
+            
+            
+            services.AddDbContext<PaymentsDatabaseContext>(o =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("pytDb"));
             });
 
             services.AddControllers(o =>
@@ -78,9 +78,9 @@ namespace BarTender {
             services.AddSwaggerGen(x =>
                 x.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "Entity Reg API",
-                    Description = "Client API",
+                    Version = "v2.1",
+                    Title = "API",
+                    Description = "Internal",
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
@@ -94,24 +94,6 @@ namespace BarTender {
                         Url = new Uri("https://example.com/license"),
                     }
                 }));
-
-            services.AddLinqToDbContext<EachDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("EachDatabase"))
-                    .UseDefaultLogging(provider);
-            });
-
-            services.AddLinqToDbContext<PoleDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("PoleDatabase"))
-                    .UseDefaultLogging(provider);
-            });
-
-            services.AddLinqToDbContext<ShwaDB>((provider, options) =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("ShwaDatabase"))
-                    .UseDefaultLogging(provider);
-            });
 
             services.AddAutoMapper(typeof(Program));
 
@@ -130,7 +112,7 @@ namespace BarTender {
 
             services.AddTransient<INameSearchService, NameSearchService>();
 
-            services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IPaymentsService, PaymentsService>();
 
             services.AddSingleton<INameSearchMutualExclusionService, NameSearchMutualExclusionService>();
 

@@ -34,8 +34,8 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
-        private ApplicationDbContext _context;
-        private RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ShwaDB _shwaDb;
 
         public AccountController(
@@ -221,25 +221,25 @@ namespace IdentityServerHost.Quickstart.UI
         [HttpGet]
         public async Task<ViewResult> Register()
         {
-            var countries = (
-                from c in _shwaDb.Countries
-                select new Country
-                {
-                    Code = c.Code,
-                    Name = c.Name
-                }).ToList();
-
-            var cities = (
-                from ct in _shwaDb.Cities
-                where ct.CountryCode.Equals(countries.Where(c => c.Name.Equals("Zimbabwe")).FirstOrDefault().Code)
-                      && ct.CanSort != null
-                select new City
-                {
-                    Id = ct.ID,
-                    Name = ct.Name
-                }).ToList();
-
-            ViewBag.Cities = cities;
+            // var countries = (
+            //     from c in _shwaDb.Countries
+            //     select new Country
+            //     {
+            //         Code = c.Code,
+            //         Name = c.Name
+            //     }).ToList();
+            //
+            // var cities = (
+            //     from ct in _shwaDb.Cities
+            //     where ct.CountryCode.Equals(countries.FirstOrDefault(c => c.Name.Equals("Zimbabwe")).Code)
+            //           && ct.CanSort != null
+            //     select new City
+            //     {
+            //         Id = ct.ID,
+            //         Name = ct.Name
+            //     }).ToList();
+            //
+            // ViewBag.Cities = cities;
             return View();
         }
 
@@ -271,7 +271,7 @@ namespace IdentityServerHost.Quickstart.UI
                     if (!await _roleManager.RoleExistsAsync("Registrar"))
                         await CreateRoles();
                     // Registrar
-                    await _userManager.AddToRoleAsync(user, "Registrar");
+                    await _userManager.AddToRoleAsync(user, "Examiner");
 
                     // var policy = _context.Policies.Where(p => p.Value.Equals("cannot sign")).FirstOrDefault();
                     // var savedUser = _context.Users.Where(u => u.UserName.Equals(user.UserName)).FirstOrDefault();

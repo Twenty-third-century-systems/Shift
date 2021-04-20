@@ -46,17 +46,20 @@
                 <div class="form-group">
                     <label>Office</label>
                     <select class="form-control select2" id="office" name="office">
-                        @foreach (var value in ViewBag.Cities)
-                        {
-                            if (value.Name.Equals("Harare"))
-                            {
-                                <option selected value="@value.Id">@value.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@value.Id">@value.Name</option>
-                            }
-                        }
+                        <option selected></option>
+                        <option value="1364">Harare</option>
+                        <option value="1365">Bulawayo</option>
+                        @* @foreach (var value in ViewBag.Cities) *@
+                        @* { *@
+                        @*     if (value.Name.Equals("Harare")) *@
+                        @*     { *@
+                        @*         <option selected value="@value.Id">@value.Name</option> *@
+                        @*     } *@
+                        @*     else *@
+                        @*     { *@
+                        @*         <option value="@value.Id">@value.Name</option> *@
+                        @*     } *@
+                        @* } *@
                     </select>
                 </div>
             </div>
@@ -86,8 +89,8 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Mobile number</label>
-                    <input type="text" class="form-control" name="phoneNumber" id="phoneNumber">
+                    <label for="phoneNumber">Mobile number</label>
+                    <input type="text" class="form-control w-100" name="phoneNumber" id="phoneNumber">
                 </div>
             </div>
         </div>

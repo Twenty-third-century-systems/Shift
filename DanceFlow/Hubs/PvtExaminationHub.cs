@@ -1,7 +1,5 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Drinkers.ExternalClients.PrivateEntity;
-using Drinkers.InternalClients.PvtEntity;
+﻿using System.Threading.Tasks;
+using Drinkers.InternalApiClients.PvtEntity;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DanceFlow.Hubs {
